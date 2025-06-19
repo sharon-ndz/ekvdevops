@@ -9,3 +9,7 @@ api_key_quota_limit   = 10000
 api_key_quota_period  = "MONTH"
 waf_rate_limit   = 1000
 log_retention_days = 7
+api_gateway_name        = "stage-rest-api"
+api_log_group_name      = "/aws/api-gateway/stage-api"
+vpc_link_name           = "stage-vpc-link"
+api_gateway_description = "Stage environment REST API"

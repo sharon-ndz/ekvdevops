@@ -26,13 +26,13 @@ resource "aws_api_gateway_account" "account" {
 }
 
 resource "aws_api_gateway_vpc_link" "this" {
-  name        = "${var.environment}-vpc-link"
+  name        = var.vpc_link_name
   target_arns = [data.terraform_remote_state.nlb.outputs.nlb_arn]
 }
 
 resource "aws_api_gateway_rest_api" "this" {
-  name        = "${var.environment}-rest-api"
-  description = "REST API to NLB on port 4000 — ${timestamp()}"
+  name        = var.api_gateway_name
+  description = var.api_gateway_description
 
   endpoint_configuration {
     types = ["REGIONAL"]
@@ -42,7 +42,7 @@ resource "aws_api_gateway_rest_api" "this" {
 }
 
 resource "aws_cloudwatch_log_group" "api_logs" {
-  name              = "/aws/api-gateway/${var.environment}-api"
+  name              = var.api_log_group_name
   retention_in_days = var.log_retention_days
 }
 
@@ -70,7 +70,7 @@ resource "aws_api_gateway_integration" "proxy" {
   http_method             = aws_api_gateway_method.proxy.http_method
   integration_http_method = "ANY"
   type                    = "HTTP"
-  uri                     = "http://${data.terraform_remote_state.nlb.outputs.nlb_dns_name}:4000/{proxy}"
+  uri                     = "http://${data.terraform_remote_state.nlb.outputs.nlb_dns_name}:${var.backend_port}/{proxy}"
   connection_type         = "VPC_LINK"
   connection_id           = aws_api_gateway_vpc_link.this.id
   passthrough_behavior    = "WHEN_NO_TEMPLATES"
@@ -126,7 +126,7 @@ resource "aws_api_gateway_deployment" "this" {
 }
 
 resource "aws_api_gateway_stage" "default" {
-  stage_name    = "default"
+  stage_name    = var.api_stage_name
   rest_api_id   = aws_api_gateway_rest_api.this.id
   deployment_id = aws_api_gateway_deployment.this.id
 

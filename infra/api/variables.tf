@@ -52,3 +52,35 @@ variable "log_retention_days" {
   type        = number
   description = "Number of days to retain CloudWatch logs"
 }
+
+variable "api_log_group_name" {
+  description = "Name of CloudWatch log group for API Gateway"
+  type        = string
+}
+
+variable "api_gateway_name" {
+  description = "Name of the API Gateway"
+  type        = string
+}
+
+variable "vpc_link_name" {
+  description = "Name of the VPC Link for API Gateway"
+  type        = string
+}
+
+variable "api_stage_name" {
+  description = "API Gateway stage name"
+  type        = string
+  default     = "default"
+}
+
+variable "backend_port" {
+  description = "Port of the backend service"
+  type        = number
+  default     = 4000
+}
+
+variable "api_gateway_description" {
+  description = "Description for API Gateway"
+  type        = string
+}
