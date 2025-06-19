@@ -1,8 +1,8 @@
 tf_state_bucket  = "my-terraform-state-bckt43"
-vpc_state_key    = "stage/terraform.tfstate"
-nlb_state_key    = "stage/nlb/terraform.tfstate"
+vpc_state_key    = "dev/terraform.tfstate"
+nlb_state_key    = "dev/nlb/terraform.tfstate"
 region      = "us-east-1"
-environment = "stage"
+environment = "dev"
 api_key_rate_limit    = 5
 api_key_burst_limit   = 10
 api_key_quota_limit   = 10000

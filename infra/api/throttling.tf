@@ -13,13 +13,13 @@ resource "aws_api_gateway_usage_plan" "this" {
   }
 
   throttle_settings {
-    rate_limit  = 5
-    burst_limit = 10
+    rate_limit  = var.api_key_rate_limit
+    burst_limit = var.api_key_burst_limit
   }
 
   quota_settings {
-    limit  = 10000
-    period = "MONTH"
+    limit  = var.api_key_quota_limit
+    period = var.api_key_quota_period
   }
 }
 

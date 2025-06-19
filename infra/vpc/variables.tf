@@ -119,3 +119,50 @@ variable "key_name" {
 variable "public_key_path" {
   default = "~/.ssh/github-ci-key.pub"
 }
+
+variable "ec2_key_name" {
+  type        = string
+  description = "Key name for backend EC2"
+  default     = "githubaction"
+}
+
+variable "cloudwatch_ssm_config_path" {
+  type        = string
+  description = "SSM parameter path for CloudWatch agent config"
+  default     = "/cloudwatch/docker-config"
+}
+
+variable "ec2_tags" {
+  type        = map(string)
+  description = "Tags to apply to the EC2 instance"
+  default = {
+    Name = "Backend API IDLMS"
+  }
+}
+
+###iam.tf
+
+
+variable "ec2_ssm_role_name" {
+  type        = string
+  description = "Name for the EC2 IAM role for SSM"
+  default     = "ec2_ssm_role"
+}
+
+variable "ec2_ssm_profile_name" {
+  type        = string
+  description = "IAM instance profile name"
+  default     = "ec2_ssm_profile"
+}
+
+variable "ssm_policy_arn" {
+  type        = string
+  description = "ARN of the SSM managed instance core policy"
+  default     = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+variable "cloudwatch_agent_policy_arn" {
+  type        = string
+  description = "ARN of the CloudWatch Agent policy"
+  default     = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}

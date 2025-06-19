@@ -38,20 +38,68 @@ variable "lb_egress_roles" {
 }
 
 variable "tf_state_bucket" {
-  type = string
+  type        = string
+  description = "S3 bucket name for Terraform remote state"
+  default     = "my-terraform-state-bckt43"
 }
 
 variable "environment" {
-description = "Environment name (e.g., dev, stage, prod)"
-  type = string
+  type        = string
+  description = "Environment name (e.g., dev, stage, prod)"
+  default     = "stage"
 }
 
 variable "region" {
-  description = "The AWS region"
   type        = string
+  description = "The AWS region"
+  default     = "us-east-1"
 }
 
 variable "access_logs_prefix" {
-  description = "Prefix within the S3 bucket for NLB access logs"
   type        = string
+  description = "Prefix within the S3 bucket for NLB access logs"
+}
+
+variable "stack_name" {
+  type        = string
+  default     = "idlms-api"
+  description = "Base name for NLB and related resources"
+}
+
+variable "lb_ingress_port" {
+  type        = number
+  default     = 4000
+  description = "Ingress port for the NLB security group"
+}
+
+variable "lb_ingress_cidr_blocks" {
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+  description = "CIDR blocks allowed to access the load balancer"
+}
+
+# ✅ CloudWatch module variables
+variable "access_logs_bucket" {
+  type        = string
+  description = "S3 bucket to store NLB logs"
+}
+
+variable "ssm_param_name" {
+  type        = string
+  description = "SSM parameter name used by CloudWatch agent"
+}
+
+variable "ssm_tag_name" {
+  type        = string
+  description = "Tag value assigned to the SSM parameter"
+}
+
+variable "docker_log_group_name" {
+  type        = string
+  description = "CloudWatch log group name for Docker logs"
+}
+
+variable "log_group_tag_name" {
+  type        = string
+  description = "Tag for the Docker CloudWatch log group"
 }

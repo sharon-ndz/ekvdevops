@@ -5,17 +5,18 @@ provider "aws" {
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = "my-terraform-state-bckt43"
-    key    = "stage/terraform.tfstate"
-    region = "us-east-1"
+    bucket = var.tf_state_bucket
+    key    = var.vpc_state_key
+    region = var.region
   }
 }
 
 data "terraform_remote_state" "nlb" {
   backend = "s3"
   config = {
-    bucket = "my-terraform-state-bckt43"
-    key    = "stage/nlb/terraform.tfstate"
-    region = "us-east-1"
+    bucket = var.tf_state_bucket
+    key    = var.nlb_state_key
+    region = var.region
   }
 }
+

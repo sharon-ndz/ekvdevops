@@ -22,7 +22,7 @@ resource "aws_iam_role_policy_attachment" "api_gw_logs" {
 
 resource "aws_api_gateway_account" "account" {
   cloudwatch_role_arn = aws_iam_role.api_gw_cloudwatch.arn
-  depends_on = [aws_iam_role_policy_attachment.api_gw_logs]
+  depends_on          = [aws_iam_role_policy_attachment.api_gw_logs]
 }
 
 resource "aws_api_gateway_vpc_link" "this" {
@@ -43,7 +43,7 @@ resource "aws_api_gateway_rest_api" "this" {
 
 resource "aws_cloudwatch_log_group" "api_logs" {
   name              = "/aws/api-gateway/${var.environment}-api"
-  retention_in_days = 7
+  retention_in_days = var.log_retention_days
 }
 
 resource "aws_api_gateway_resource" "proxy" {
@@ -53,11 +53,11 @@ resource "aws_api_gateway_resource" "proxy" {
 }
 
 resource "aws_api_gateway_method" "proxy" {
-  rest_api_id   = aws_api_gateway_rest_api.this.id
-  resource_id   = aws_api_gateway_resource.proxy.id
-  http_method   = "ANY"
-  authorization = "NONE"
-  api_key_required  = true
+  rest_api_id      = aws_api_gateway_rest_api.this.id
+  resource_id      = aws_api_gateway_resource.proxy.id
+  http_method      = "ANY"
+  authorization    = "NONE"
+  api_key_required = true
 
   request_parameters = {
     "method.request.path.proxy" = true
@@ -88,10 +88,10 @@ resource "aws_api_gateway_method_response" "proxy_200" {
   status_code = "200"
 
   response_parameters = {
-    "method.response.header.Content-Type"                 = true
-    "method.response.header.Access-Control-Allow-Origin"  = true
-    "method.response.header.Access-Control-Allow-Methods" = true
-    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Content-Type"                  = true
+    "method.response.header.Access-Control-Allow-Origin"   = true
+    "method.response.header.Access-Control-Allow-Methods"  = true
+    "method.response.header.Access-Control-Allow-Headers"  = true
   }
 }
 
@@ -102,10 +102,10 @@ resource "aws_api_gateway_integration_response" "proxy_200" {
   status_code = aws_api_gateway_method_response.proxy_200.status_code
 
   response_parameters = {
-    "method.response.header.Content-Type"                 = "integration.response.header.Content-Type"
-    "method.response.header.Access-Control-Allow-Origin"  = "integration.response.header.Access-Control-Allow-Origin"
-    "method.response.header.Access-Control-Allow-Methods" = "integration.response.header.Access-Control-Allow-Methods"
-    "method.response.header.Access-Control-Allow-Headers" = "integration.response.header.Access-Control-Allow-Headers"
+    "method.response.header.Content-Type"                  = "integration.response.header.Content-Type"
+    "method.response.header.Access-Control-Allow-Origin"   = "integration.response.header.Access-Control-Allow-Origin"
+    "method.response.header.Access-Control-Allow-Methods"  = "integration.response.header.Access-Control-Allow-Methods"
+    "method.response.header.Access-Control-Allow-Headers"  = "integration.response.header.Access-Control-Allow-Headers"
   }
 
   depends_on = [

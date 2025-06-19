@@ -1,18 +1,11 @@
-#resource "random_string" "suffix" {
- # length  = 6
-  #upper   = false
-  #special = false
-#}
-
 data "aws_caller_identity" "current" {}
 
-
 resource "aws_s3_bucket" "nlb_logs" {
-  bucket        = "nlb-access-logs-stage-nyo9xe"
+  bucket        = var.access_logs_bucket
   force_destroy = true
 
   tags = {
-    Name        = "NLB Access Logs"
+    Name        = var.nlb_logs_bucket_tag_name
     Environment = var.environment
   }
 }
@@ -49,6 +42,5 @@ resource "aws_s3_bucket_policy" "nlb_logs_policy" {
         }
       }
     ]
-  }) # <-- this closes the jsonencode function
+  })
 }
-

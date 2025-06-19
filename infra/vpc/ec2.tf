@@ -4,7 +4,7 @@ resource "aws_instance" "web" {
   subnet_id              = module.vpc.public_subnets_ids[0]
   vpc_security_group_ids = [aws_security_group.open_ssh_and_app.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2_ssm_profile.name
-  key_name               = "githubaction"
+  key_name               = var.ec2_key_name
 
   user_data = <<-EOF
               #!/bin/bash
@@ -27,11 +27,9 @@ resource "aws_instance" "web" {
               /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
                 -a fetch-config \
                 -m ec2 \
-                -c ssm:/cloudwatch/docker-config \
+                -c ssm:${var.cloudwatch_ssm_config_path} \
                 -s
               EOF
 
-  tags = {
-    Name = "Backend API IDLMS"
-  }
+  tags = var.ec2_tags
 }

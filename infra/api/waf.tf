@@ -1,7 +1,7 @@
 resource "aws_wafv2_web_acl" "api_waf" {
   name        = "${var.environment}-api-waf"
   description = "WAF to protect the API Gateway"
-  scope       = "REGIONAL" # API Gateway requires regional WAF
+  scope       = "REGIONAL"
 
   default_action {
     allow {}
@@ -23,7 +23,7 @@ resource "aws_wafv2_web_acl" "api_waf" {
 
     statement {
       rate_based_statement {
-        limit              = 1000  # Max requests per 5 minutes per IP
+        limit              = var.waf_rate_limit
         aggregate_key_type = "IP"
       }
     }

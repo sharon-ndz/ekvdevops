@@ -7,7 +7,7 @@ load_balancer_type = "network"
 internal           = true
 target_port        = 4000
 lb_create_sg       = true
-access_logs_prefix = "dev/nlb"
+access_logs_prefix = "stage/nlb"
 
 lb_egress_roles = [
   {
@@ -23,6 +23,10 @@ lb_egress_roles = [
 ]
 
 common_tags = {
-  Environment = "dev"
+  Environment = "stage"
   Project     = "IDMS"
 }
+ssm_param_name         = "/cloudwatch/docker-config"
+ssm_tag_name           = "docker-cloudwatch-config"
+docker_log_group_name  = "/docker/api"
+log_group_tag_name     = "DockerAPI"

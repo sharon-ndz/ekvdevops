@@ -10,8 +10,9 @@ data "terraform_remote_state" "vpc" {
 data "terraform_remote_state" "cloudwatch" {
   backend = "s3"
   config = {
-    bucket = "my-terraform-state-bckt43"  # Your main state bucket
-    key    = "${var.environment}/cloudwatch.tfstate"   # Update this if different
-    region = "us-east-1"
+    bucket = var.tf_state_bucket
+    key    = "${var.environment}/cloudwatch.tfstate"
+    region = var.region
   }
 }
+
