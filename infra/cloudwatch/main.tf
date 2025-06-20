@@ -1,5 +1,5 @@
 module "cloudwatch" {
-  source = "../../../terraform-modules/cloudwatch"
+  source = "git::https://github.com/sharon-ndz/terraform-modules.git//cloudwatch"
 
   environment                 = var.environment
   region                      = var.region

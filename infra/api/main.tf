@@ -1,5 +1,5 @@
 module "api-gateway" {
-  source = "../../../terraform-modules/api-gateway"
+  source = "git::https://github.com/sharon-ndz/terraform-modules.git//api-gateway"
 
   environment             = var.environment
   region                  = var.region

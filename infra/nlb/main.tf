@@ -15,7 +15,7 @@ module "cloudwatch" {
 
 
 module "group_1_nlb" {
-  source               = "../../../terraform-modules/nlb"
+  source               = "git::https://github.com/sharon-ndz/terraform-modules.git//nlb"
 
   name                 = "group-1-nlb"
   internal             = var.internal
