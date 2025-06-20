@@ -11,3 +11,6 @@ output "api_log_group_name" {
   value = module.api-gateway.log_group_name
 }
 
+output "api_stage_arn" {
+  value = module.api-gateway.stage_arn
+}

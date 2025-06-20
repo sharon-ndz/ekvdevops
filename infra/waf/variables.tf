@@ -13,7 +13,17 @@ variable "waf_rate_limit" {
   type        = number
 }
 
-variable "api_gateway_stage_arn" {
-  description = "API Gateway Stage ARN to associate with WAF"
+variable "api_tf_state_bucket" {
   type        = string
+  description = "S3 bucket name for Terraform remote state of API"
+}
+
+variable "api_tf_state_key" {
+  type        = string
+  description = "S3 key path for API remote state"
+}
+
+variable "api_tf_state_region" {
+  type        = string
+  description = "Region for the API remote state backend"
 }
