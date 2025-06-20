@@ -1,19 +1,21 @@
-resource "aws_cloudwatch_log_group" "docker_api" {
-  name              = var.docker_log_group_name
-  retention_in_days = var.retention_in_days
-  skip_destroy      = true
+module "cloudwatch" {
+  source = "../../../terraform-modules/cloudwatch"
 
-  tags = {
-    Name = var.log_group_tag_name
-  }
-
-  lifecycle {
-    prevent_destroy = true
-    ignore_changes = [
-      name,
-      retention_in_days,
-      tags
-    ]
-  }
+  environment                 = var.environment
+  region                      = var.region
+  tf_state_bucket             = var.tf_state_bucket
+  access_logs_bucket          = var.access_logs_bucket
+  access_logs_prefix          = var.access_logs_prefix
+  log_group_tag_name          = var.log_group_tag_name
+  retention_in_days           = var.retention_in_days
+  ssm_param_name              = var.ssm_param_name
+  metrics_collection_interval = var.metrics_collection_interval
+  cloudwatch_agent_logfile    = var.cloudwatch_agent_logfile
+  docker_log_file_path        = var.docker_log_file_path
+  docker_log_group_name       = var.docker_log_group_name
+  log_stream_name             = var.log_stream_name
+  timezone                    = var.timezone
+  ssm_tag_name                = var.ssm_tag_name
+  nlb_logs_bucket_tag_name    = var.nlb_logs_bucket_tag_name
 }
 
