@@ -8,8 +8,9 @@ resource "aws_api_gateway_usage_plan" "this" {
   name = "${var.environment}-usage-plan"
 
   api_stages {
-    api_id = aws_api_gateway_rest_api.this.id
-    stage  = aws_api_gateway_stage.default.stage_name
+    api_id = module.api-gateway.api_gateway_id
+    stage  = module.api-gateway.api_stage_name
+
   }
 
   throttle_settings {
@@ -21,6 +22,8 @@ resource "aws_api_gateway_usage_plan" "this" {
     limit  = var.api_key_quota_limit
     period = var.api_key_quota_period
   }
+
+  depends_on = [module.api-gateway]
 }
 
 resource "aws_api_gateway_usage_plan_key" "this" {

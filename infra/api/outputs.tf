@@ -1,5 +1,5 @@
 output "api_gateway_url" {
-  value = "https://${aws_api_gateway_rest_api.this.id}.execute-api.${var.region}.amazonaws.com/default"
+  value = "https://${module.api-gateway.rest_api_id}.execute-api.${var.region}.amazonaws.com/${var.api_stage_name}"
 }
 
 output "api_key_value" {
@@ -8,5 +8,6 @@ output "api_key_value" {
 }
 
 output "api_log_group_name" {
-  value = aws_cloudwatch_log_group.api_logs.name
+  value = module.api-gateway.log_group_name
 }
+

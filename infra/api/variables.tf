@@ -43,19 +43,9 @@ variable "api_key_quota_period" {
   description = "Quota period (DAY, WEEK, MONTH)"
 }
 
-variable "waf_rate_limit" {
-  type        = number
-  description = "Maximum requests per 5 minutes per IP"
-}
-
 variable "log_retention_days" {
   type        = number
   description = "Number of days to retain CloudWatch logs"
-}
-
-variable "api_log_group_name" {
-  description = "Name of CloudWatch log group for API Gateway"
-  type        = string
 }
 
 variable "api_gateway_name" {
@@ -82,5 +72,10 @@ variable "backend_port" {
 
 variable "api_gateway_description" {
   description = "Description for API Gateway"
+  type        = string
+}
+
+variable "api_log_group_prefix" {
+  description = "Prefix for the CloudWatch API Gateway log group"
   type        = string
 }
