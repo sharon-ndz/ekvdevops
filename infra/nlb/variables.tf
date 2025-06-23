@@ -55,10 +55,10 @@ variable "region" {
   default     = "us-east-1"
 }
 
-variable "access_logs_prefix" {
-  type        = string
-  description = "Prefix within the S3 bucket for NLB access logs"
-}
+#variable "access_logs_prefix" {
+#  type        = string
+#  description = "Prefix within the S3 bucket for NLB access logs"
+#}
 
 variable "stack_name" {
   type        = string
@@ -79,10 +79,10 @@ variable "lb_ingress_cidr_blocks" {
 }
 
 # ✅ CloudWatch module variables
-variable "access_logs_bucket" {
-  type        = string
-  description = "S3 bucket to store NLB logs"
-}
+#variable "access_logs_bucket" {
+ # type        = string
+#  description = "S3 bucket to store NLB logs"
+#}
 
 variable "ssm_param_name" {
   type        = string

@@ -2,12 +2,12 @@ tf_state_bucket = "my-terraform-state-bckt43"
 environment     = "stage"
 region          = "us-east-1"
 
-access_logs_bucket = "nlb-access-logs-stage-nyo9xe"
+#access_logs_bucket = "nlb-access-logs-stage-nyo9xe"
 load_balancer_type = "network"
 internal           = true
 target_port        = 4000
 lb_create_sg       = true
-access_logs_prefix = "stage/nlb"
+#access_logs_prefix = "stage/nlb"
 
 lb_egress_roles = [
   {

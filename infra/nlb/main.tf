@@ -1,17 +1,17 @@
-module "cloudwatch" {
-  source                = "git::https://github.com/sharon-ndz/terraform-modules.git//cloudwatch"
-  environment           = var.environment
-  region                = var.region
+#module "cloudwatch" {
+ # source                = "git::https://github.com/sharon-ndz/terraform-modules.git//cloudwatch"
+  #environment           = var.environment
+ # region                = var.region
 
   # Required additional variables
-  tf_state_bucket       = var.tf_state_bucket
-  ssm_param_name        = var.ssm_param_name
-  ssm_tag_name          = var.ssm_tag_name
-  docker_log_group_name = var.docker_log_group_name
-  log_group_tag_name    = var.log_group_tag_name
-  access_logs_bucket    = var.access_logs_bucket
-  access_logs_prefix    = var.access_logs_prefix
-}
+  #tf_state_bucket       = var.tf_state_bucket
+  #ssm_param_name        = var.ssm_param_name
+  #ssm_tag_name          = var.ssm_tag_name
+  #docker_log_group_name = var.docker_log_group_name
+  #log_group_tag_name    = var.log_group_tag_name
+  #access_logs_bucket    = var.access_logs_bucket
+  #access_logs_prefix    = var.access_logs_prefix
+#}
 
 
 module "group_1_nlb" {
@@ -34,10 +34,9 @@ module "group_1_nlb" {
   sg_name       = "group-1-nlb-sg"
   ingress_roles = local.lb_sg_ingress_roles
   egress_roles  = var.lb_egress_roles
-
   tags = var.common_tags
 
   # ✅ Use S3 bucket created by local cloudwatch module
-  access_logs_bucket = module.cloudwatch.nlb_logs_bucket
-  access_logs_prefix = var.access_logs_prefix
+#  access_logs_bucket = var.access_logs_bucket
+#  access_logs_prefix = var.access_logs_prefix
 }
