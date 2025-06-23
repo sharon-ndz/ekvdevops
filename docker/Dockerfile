@@ -34,4 +34,5 @@ RUN npm run build
 EXPOSE 4000
 
 # Start the app
-CMD ["npm", "run", "start:prod"]
+CMD sh -c "npm run seeder && npm run start:prod"
+
