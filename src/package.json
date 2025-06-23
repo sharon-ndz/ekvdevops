@@ -22,7 +22,7 @@
     "migration:reset": "yarn migration:drop && yarn migration:sync",
     "migration:sync": "yarn typeorm -d ./src/config/typeorm.config.ts schema:sync",
     "check:cycles": "madge --circular --extensions ts ./src",
-    "seeder": "ts-node ./src/database/seed.ts",
+    "seeder": "ts-node ./database/seed.ts",
     "seeder:create": "ts-node generators/seeder-g.ts",
     "app:install": "npm run db:drop && npm run db:create && npm run migrate && npm run seeder",
     "app:install:light": "npm run migration:drop && npm run migration:run && npm run seeder",
