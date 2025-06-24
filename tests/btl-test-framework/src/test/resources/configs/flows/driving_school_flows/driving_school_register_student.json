@@ -1,0 +1,11 @@
+ [
+    {
+      "name": "Driving school Resgiter Student: Verfify NIN",
+      "method": "GET",
+      "path": "auth/verify-nin/22345678938",
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    }
+ ]

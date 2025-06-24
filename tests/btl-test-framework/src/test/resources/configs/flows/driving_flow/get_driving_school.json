@@ -1,0 +1,53 @@
+ [
+    {
+      "name": "get_driving_school: Get Driving School (Page1)",
+      "method": "GET",
+      "path": "driving-school",
+      "query": {
+        "page": "",
+        "resultsPerPage": ""
+      },
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "get_driving_school: Get single driving school",
+      "method": "GET",
+      "path": "driving-school/single/1",
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "get_driving_school: Get training durations",
+      "method": "GET",
+      "path": "driving-school/training-durations/1",
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "get_driving_school: Get CBT centers ",
+      "method": "GET",
+      "path": "cbt/centers",
+      "query": {
+        "page": "",
+        "resultsPerPage": ""
+      },
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "get_driving_school: Book slot",
+      "method": "POST",
+      "path": "cbt/book-slot",
+      "body": {
+        "cbtCenterId": "1"
+      },
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]

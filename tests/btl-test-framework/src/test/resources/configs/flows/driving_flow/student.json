@@ -1,0 +1,119 @@
+[
+    {
+      "name": "Student: Issue Certificate",
+      "method": "POST",
+      "path": "driving-school/students/issue-cert",
+      "body": {
+        "studentNo": "DRLFZFF6D8DR-280467",
+        "modules": [
+          "Introduction to Road Safety",
+          "Basic Driving Techniques",
+          "Parking & Manoeuvring Skills",
+          "Mock Theory Tests",
+          "Manoeuvring Skills",
+          "Final Assessment",
+          "Traffic Rules & Regulations",
+          "Defensive Driving",
+          "Emergency Handling & Safety",
+          "Practical Driving Sessions",
+          "Test 1",
+          "Understanding Road Signs & Markings",
+          "Night & Adverse weather Driving",
+          "Eco-Driving & Fuel Efficiency",
+          "Precautions",
+          "Test 2",
+          "Vehicle Controls & Operations",
+          "Highway & Motorway Driving",
+          "Vehicle Maintenance Basics",
+          "Test 3"
+        ]
+      }
+    ,
+      "extract": {
+        "identifier": "data.identifier",
+        "drivingSchoolId": "data.id"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "name": "Student: Get  Stats",
+      "method": "GET",
+      "path": "driving-school/students/stats",
+      "assertions": {
+        "status": 200
+        }
+    },
+    {
+      "name": "Student: Get  All Students",
+      "method": "GET",
+      "path": "driving-school/students",
+      "query": {
+        "page": 1,
+        "resultsPerPage": 10
+      },
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Student: Resgiter Student",
+      "method": "POST",
+      "path": "driving-school/students/register",
+      "body": {
+        "nin": "30000000089",
+        "reference": "DRAYSXUOO76DRA1740059845409",
+        "titleId": 1,
+        "drivingSchoolId": 1,
+        "trainingDurationId": 1,
+        "firstName": "OWOLABI",
+        "middleName": null,
+        "lastName": "JAMES",
+        "maidenName": "Umar",
+        "genderId": 1,
+        "nationalityId": 1,
+        "placeOfBirth": "Uguda",
+        "address": "Admiral Rufus Eyitayo Street, House 2 ,Sam Nujoma  Estate, Galadimawa, Abuja",
+        "dateOfBirth": "20-01-1981",
+        "maritalStatusId": 1,
+        "bloodGroupId": 7,
+        "occupationId": 4,
+        "email": "hassan@barnksfortetech.com",
+        "phone": "08164364711",
+        "stateOfOriginId": 25,
+        "lgaOfOriginId": 518,
+        "files": [
+          {
+            "fileId": 1,
+            "documentType": "face"
+          },
+          {
+            "fileId": 2,
+            "documentType": "signature"
+          }
+        ],
+        "nextOfKinName": "Umar Inuwa Hassan",
+        "nextOfKinPhone": "08164364335",
+        "nextOfKinRelationshipId": 1,
+        "nextOfKinNationalityId": 1,
+        "courseLevel": "beginner"
+      },
+      "assertions": {
+        "status": 200
+        }
+    },
+    {
+      "name": "Student: Get  Student Details",
+      "method": "GET",
+      "path": "driving-school/students/details/DR03NLEU58DR-135269",
+      "assertions": {
+        "status": 201
+        }
+    }
+  ]

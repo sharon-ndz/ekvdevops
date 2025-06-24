@@ -1,0 +1,48 @@
+ [
+    {
+      "name": "Permit: Get Permit stats ",
+      "method": "GET",
+      "path": "permit/stats",
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Permit:  Get Permit List",
+      "method": "GET",
+      "path": "permit/list",
+      "query": {
+        "page": "1",
+        "resultsPerPage": "10"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Permit: Get Permit Details",
+      "method": "GET",
+      "path": "permit/details/PM203181989165146712",
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+    "name": "Permit: Issue Permit ",
+    "method": "POST",
+    "path": "permit/new-issuance",
+    "body": {
+      "permitClassId": 1,
+      "years": 5,
+      "studentNo": "DR03NLEU58DR-135269",
+      "reference": "PIME6LUIR2PI1738109830031"
+    },
+    "requires": ["token"],
+    "assertions": {
+      "status": 201
+    }
+   }
+]

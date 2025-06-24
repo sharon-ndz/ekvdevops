@@ -1,0 +1,60 @@
+ [
+    {
+      "name": "Login Success",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "josiah.adgbola@mailinator.com",
+        "password": "password"
+      },
+      "extract": {
+        "token": "accessToken"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "accessToken": {
+            "exists": true
+          },
+          "": {
+            "success": true
+          }
+        }
+      }
+    },
+    {
+      "name": "Login Failure - Wrong Password",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "josiah.adgbola@mailinator.com",
+        "password": "password123"
+      },
+      "assertions": {
+        "status": 400,
+        "body": {
+          "message": {
+            "equals": "Invalid credentials"
+          }
+        }
+      }
+    },
+    {
+      "name": "Login Failure - Wrong e-mail format",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "josiah.adgbola",
+        "password": "password123"
+      },
+      "assertions": {
+        "status": 400,
+        "body": {
+          "message": {
+            "contains": "email must be an email"
+          }
+        }
+      }
+    }
+ ]
+

@@ -1,0 +1,109 @@
+[
+    {
+      "name": "driving_school_self_onboarding: create  a driving school",
+      "method": "POST",
+      "path": "driving-school/self-service/create",
+      "body": {
+        "name": "Self Test Driving School ${randomString:5}",
+        "email": "fcsd.${randomString:6}@mailinnator.com",
+        "logo": "${randomString:12}",
+        "phone": "${phoneNumber:090,11}",
+        "stateId": 25,
+        "lgaId": 518,
+        "address": "Mkanjuola, Eve, Ikeja, Lagos",
+        "rcNumber": "RC-997978",
+        "password": "1passwor#D"
+      },
+      "extract": {
+        "identifier": "data.identifier",
+        "drivingSchoolId": "data.id"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": {
+            "exists": true
+          },
+          "data.identifier": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "name": "driving_school_self_onboarding: complete application",
+      "method": "POST",
+      "path": "driving-school/complete-application",
+      "body": {
+        "drivingSchoolId": "${drivingSchoolId}",
+        "vehicleTypes": ["Mini Pick-ups", "Motorcycle", "SUVs"],
+        "rcNumber": "8373884",
+        "totalVehicles": 10,
+        "totalSimulators": 4,
+        "totalClassrooms": 5,
+        "classRoomCapacity": "300",
+        "totalInstructors": 7,
+        "trainingRange": "50 km",
+        "docType": "",
+        "docFile": ""
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "name": "driving_school_self_onboarding: assign officer",
+      "method": "POST",
+      "path": "driving-school/lasdri/assign-officer",
+      "body": {
+        "drivingSchoolId": "${drivingSchoolId}",
+        "officerId": 2,
+        "inspectionDate": "2025-5-30"
+      },
+      "assertions": {
+        "status": 200,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "name": "driving_school_self_onboarding: submit inspectionr",
+      "method": "POST",
+      "path": "driving-school/lasdri/assign-inspection",
+      "body": {
+        "drivingSchoolId": "${drivingSchoolId}",
+        "questionId": 1,
+        "status": 1,
+        "totalScore": "LASDRI Inspection for the month of May 2025",
+        "stateId": 25,
+        "inspectionResult": [
+          {"questionId": 1, "choice": "A. Yes", "comment": "good"},
+          {"questionId": 2, "choice": "A. Yes", "comment": "good"},
+          {"questionId": 3, "choice": "A. Yes", "comment": "good"},
+          {"questionId": 4, "choice": "A. Yes", "comment": "good"},
+          {"questionId": 5, "choice": "A. Yes", "comment": "good"},
+          {"questionId": 6, "choice": "A. Yes", "comment": "good"},
+          {"questionId": 7, "choice": "A. Yes", "comment": "good"}
+        ],
+        "month": 6,
+        "year": 2025
+      },
+      "assertions": {
+        "status": 200,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    }
+]
+

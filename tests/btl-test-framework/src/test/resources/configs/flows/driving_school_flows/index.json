@@ -1,0 +1,7 @@
+[
+  "../auth_flows/school_admin.json",
+  "driving_school_cms.json",
+  "driving_school_register_student.json",
+  "driving_school_self_onboarding.json",
+  "driving_school_self_service.json"
+]

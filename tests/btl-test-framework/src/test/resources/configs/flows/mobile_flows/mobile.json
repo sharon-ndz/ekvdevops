@@ -1,0 +1,173 @@
+[
+    {
+      "name": "Mobile: Get Test History",
+      "method": "GET",
+      "path": "driving-test/test-history",
+      "query": {
+        "page": 1,
+        "resultsPerPage": "10"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Mobile: Get CBT Ernrolls ",
+      "method": "GET",
+      "path": "cbt/enrolls",
+      "query": {
+        "page": "1",
+        "resultsPerPage": "10"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Mobile: Get Registrations By Agent",
+      "method": "GET",
+      "path": "license/registrations-by-agent",
+      "query": {
+        "page": "1",
+        "resultsPerPage": "10"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Mobile: Submit Driving Test ",
+      "method": "POST",
+      "path": "driving-test/submit-driving-test",
+      "body": {
+        "applicationNo": "DRLP/2025/189704",
+        "score": 91,
+        "answers": [
+          {
+            "category": "Vision",
+            "question": "Do you have any eyes Issues",
+            "result": "No"
+          },
+          {
+            "category": "Vision",
+            "question": "Vision Assessment",
+            "result": "Passed"
+          }
+        ],
+        "licenseClassId": 1,
+        "vehicleType": "Toyota Camry 2021",
+        "location": "Ahmadu Bello Expres Way",
+        "files": [
+          {
+            "fileId": 3,
+            "documentType": "testFile"
+          }
+        ]
+      }
+    ,
+      "requires": ["token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "name": "Mobile: Submit Driving Test with Payment ",
+      "method": "POST",
+      "path": "driving-test/submit-driving-test",
+      "body": {
+        "applicationNo": "DRLP/2025/189704",
+        "score": 91,
+        "answers": [
+          {
+            "category": "Vision",
+            "question": "Do you have any eyes Issues",
+            "result": "No"
+          },
+          {
+            "category": "Vision",
+            "question": "Vision Assessment",
+            "result": "Passed"
+          }
+        ],
+        "licenseClassId": 1,
+        "vehicleType": "Toyota Camry 2021",
+        "location": "Ahmadu Bello Expres Way",
+        "files": [
+          {
+            "fileId": 3,
+            "documentType": "testFile"
+          }
+        ],
+        "reference": "NL4ZUSRDHVNL1747327821784"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "name": "Mobile: Submit Renewal request ",
+      "method": "POST",
+      "path": "license/mobile/submit-renewal-request",
+      "body": {
+        "oldLicenseNo": "49815726",
+        "applicationNo": "DRLP/2025/387412",
+        "weight": 65,
+        "height": 6.5,
+        "eyes": "BROWN",
+        "licenseClassId": 4,
+        "years": 3,
+        "email": "kesty.developer@gmail.com",
+        "nationalityId": 1,
+        "stateId": 25,
+        "lgaId": 518,
+        "source": "assisted_mobile",
+        "isExternal": false,
+        "files": [
+          {
+            "fileId": 1,
+            "documentType": "finger"
+          }
+        ],
+        "reference": "LR3Z11QUO3LR1739957392526"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "name": "Mobile: Submit Replacement Request ",
+      "method": "POST",
+      "path": "license/mobile/submit-replacement-request",
+      "body": {
+        "oldLicenseNo": "20569384",
+        "replacementReason": "damaged",
+        "weight": 65,
+        "height": 6.5,
+        "eyes": "BROWN",
+        "licenseClassId": 4,
+        "years": 3,
+        "email": "kesty.developer@gmail.com",
+        "nationalityId": 1,
+        "stateId": 25,
+        "lgaId": 518,
+        "source": "assisted_mobile",
+        "isExternal": false,
+        "files": [
+          {
+            "fileId": 1,
+            "documentType": "face"
+          }
+        ],
+        "reference": "LRILRVLVO1ALRI1739958309029"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 201
+      }
+    }
+]

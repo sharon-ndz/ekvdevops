@@ -1,0 +1,25 @@
+ [
+    {
+      "name": "school_admin: Authenticate as school admin",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "josiah.adgbola@mailinator.com",
+        "password": "password"
+      },
+      "extract": {
+        "token": "accessToken"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "accessToken": {
+            "exists": true
+          },
+          "": {
+            "success": true
+          }
+        }
+      }
+    }
+  ]

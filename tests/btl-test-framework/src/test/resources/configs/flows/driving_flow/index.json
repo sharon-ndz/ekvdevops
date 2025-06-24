@@ -1,0 +1,11 @@
+[
+  "../auth_flows/school_admin.json",
+  "device_authentication.json",
+  "driving_test_flow.json",
+  "get_driving.json",
+  "get_driving_school.json",
+  "inspection.json",
+  "permit.json",
+  "student.json",
+  "test_history.json"
+]

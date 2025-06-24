@@ -1,0 +1,26 @@
+ [
+    {
+      "name": "lasdri_officer: Authenticate as lasdri  officer",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "lasdri.officer@mailinator.com",
+        "password": "password"
+      },
+      "extract": {
+        "token": "accessToken"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "accessToken": {
+            "exists": true
+          },
+          "": {
+            "success": true
+          }
+        }
+      }
+    }
+  ]
+

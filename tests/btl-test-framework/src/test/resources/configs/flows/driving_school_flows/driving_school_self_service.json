@@ -1,0 +1,81 @@
+[
+    {
+      "name": "Self-service  create  a driving School",
+      "method": "POST",
+      "path": "driving-school/self-service/create",
+      "body": {
+        "name": "Self Test Driving School ${randomString:5}",
+        "email": "fcsd.${randomString:6}@mailinnator.com",
+        "logo": "${randomString:12}",
+        "phone": "${phoneNumber:090,11}",
+        "stateId": 25,
+        "lgaId": 518,
+        "address": "Mkanjuola, Eve, Ikeja, Lagos",
+        "rcNumber": "RC-997978",
+        "password": "1passwor#D"
+      },
+      "extract": {
+        "identifier": "data.identifier",
+        "drivingSchoolId": "data.id"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": {
+            "exists": true
+          },
+          "data.identifier": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "name": "Get  a driving School",
+      "method": "GET",
+      "path": "driving-school/single/1",
+      "assertions": {
+        "status": 200,
+        "body": {
+          "data.id": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "name": "Get  all driving Schools",
+      "method": "GET",
+      "path": "driving-school?stateId=25&lgaId=518",
+      "assertions": {
+        "status": 200
+        }
+    },
+    {
+      "name": "Get  a driving school training durations",
+      "method": "GET",
+      "path": "driving-school/training-durations/1",
+      "assertions": {
+        "status": 200,
+        "body": {
+          "data.id": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "name": "Get  a single  training duration",
+      "method": "GET",
+      "path": "driving-school/training-duration/1",
+      "assertions": {
+        "status": 200,
+        "body": {
+          "data.id": {
+            "exists": true
+          }
+        }
+      }
+    }
+]
+

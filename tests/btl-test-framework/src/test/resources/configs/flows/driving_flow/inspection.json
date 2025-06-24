@@ -1,0 +1,35 @@
+ [
+    {
+      "name": "Inspection: Get Inspection List ",
+      "method": "GET",
+      "path": "inspections",
+      "query": {
+        "page": "1",
+        "resultsPerPage": "10",
+        "drivingSchoolId": 1
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Inspection: Create Inspection Log ",
+      "method": "POST",
+      "path": "inspections",
+      "body": {
+        "drivingSchoolId": 1,
+        "questionId": 0,
+        "totalScrore": 8,
+        "year": 2025,
+        "month": 2,
+        "name": "FRSC Inspection for the month of Feb 2025",
+        "comment": "Up to standard",
+        "status": "cleared"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]

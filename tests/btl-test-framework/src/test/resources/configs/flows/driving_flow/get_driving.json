@@ -1,0 +1,33 @@
+ [
+    {
+      "name": "get_driving: Get Single Driving School",
+      "method": "GET",
+      "path": "driving-school/single/1",
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "get_driving: Get Training Durations",
+      "method": "GET",
+      "path": "driving-school/training-durations/1",
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "get_driving: Get CBT Centers",
+      "method": "GET",
+      "path": "cbt/centers",
+      "query": {
+        "page": "",
+        "resultsPerPage": ""
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    }
+  ]

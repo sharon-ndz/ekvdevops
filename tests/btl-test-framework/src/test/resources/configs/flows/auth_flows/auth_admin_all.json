@@ -1,0 +1,59 @@
+[
+    {
+      "name": "Login as super admin",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "super.admin@mailinator.com",
+        "password": "password"
+      },
+      "extract": {
+        "token": "accessToken"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "accessToken": {
+            "exists": true
+          },
+          "": {
+            "success": true
+          }
+        }
+      }
+    },
+    {
+      "name": "Login Failure with any user",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "super.admin@mailinator.com",
+        "password": "password123"
+      },
+      "assertions": {
+        "status": 400,
+        "body": {
+          "message": {
+            "equals": "Invalid credentials"
+          }
+        }
+      }
+    },
+    {
+      "name": "Login Failure and user wrong e-mail",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "super.admin",
+        "password": "password123"
+      },
+      "assertions": {
+        "status": 400,
+        "body": {
+          "message": {
+            "contains": "email must be an email"
+          }
+        }
+      }
+    }
+]

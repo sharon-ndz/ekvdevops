@@ -1,0 +1,69 @@
+ [
+    {
+      "name": "driving_school_cms: Admin creates  a driving School",
+      "method": "POST",
+      "path": "driving-school",
+      "requires": ["token"],
+      "body": {
+        "name": "Test Driving School ${randomString:8}",
+        "email": "tdscool.${randomString:8}@mailinnator.com",
+        "logo": "${randomString:10}",
+        "phone": "${phoneNumber:090,11}",
+        "stateId": 25,
+        "lgaId": 518,
+        "address": "46 Agbado Ijaye, Ikeja, Lagos\"",
+        "isActive": 0,
+        "trainingDurations": [
+          3,6,9
+        ]
+      },
+      "extract": {
+        "drivingSchoolId": "data.id",
+        "name": "data.name",
+        "email": "data.email",
+        "phone": "data.phone"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "id": {
+            "success": true
+          }
+        }
+      }
+    },
+    {
+      "name": "driving_school_cms: Update a driving School ",
+      "method": "PATCH",
+      "path": "driving-school",
+      "requires": ["token","drivingSchoolId"],
+      "body": {
+        "id": 56,
+        "name": "${name}",
+        "email": "${email}",
+        "phone": "${phone}",
+        "stateId": 25,
+        "lgaId": 518,
+        "address": "Swift Ave, Lekki Phase 1, Leki, Lago",
+        "isActive": 1,
+        "trainingDurations": [3, 6, 9]
+      },
+      "requires": ["token","drivingSchoolId","name","email","phone"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "driving_school_cms: Driving School Toggle Status ",
+      "method": "PATCH",
+      "path": "driving-school/toggle-status/56",
+      "body": {
+        "status": "0"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    }
+  ]
+

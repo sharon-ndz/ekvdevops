@@ -1,0 +1,25 @@
+[
+    {
+      "name": "super_admin: Authenticate as super admin",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "super.admin@mailinator.com",
+        "password": "password"
+      },
+      "extract": {
+        "token": "accessToken"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "accessToken": {
+            "exists": true
+          },
+          "": {
+            "success": true
+          }
+        }
+      }
+    }
+  ]

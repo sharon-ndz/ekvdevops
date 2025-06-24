@@ -1,0 +1,51 @@
+[
+    {
+      "name": "Auth_API: Get Driving School Application List",
+      "method": "GET",
+      "path": "driving-school/applications/list",
+      "query": {
+        "page": "1",
+        "resultPerPage": "10"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+
+        }
+    },
+    {
+      "name": "Auth_API: Get Driving School Application Detail",
+      "method": "GET",
+      "path": "driving-school/applications/details/3",
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+
+      }
+    },
+    {
+      "name": "Auth_API: Get Driving School Application Stats",
+      "method": "GET",
+      "path": "driving-school/applications/stats",
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+
+      }
+    },
+    {
+      "name": "Auth_API: Change Application Status",
+      "method": "POST",
+      "path": "driving-school/change-application-status",
+      "requires": ["token"],
+      "body": {
+        "applicationId": "DRLF/2025/823970",
+        "status": 1
+      },
+      "assertions": {
+        "status": 201
+
+      }
+    }
+  ]
+

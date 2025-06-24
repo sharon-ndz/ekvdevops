@@ -1,0 +1,54 @@
+ [
+    {
+      "name": "Mobile LSDRI: Check Device ACtivation Status",
+      "method": "GET",
+      "path": "device/check-activation-status",
+      "query": {
+        "deviceId": "8490474847333837872827288UIRIOP8373937383784748"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Mobile LSDRI: Post ",
+      "method": "POST",
+      "path": "device/pre-activation",
+      "body": {
+        "deviceImei": "9848748474874847484",
+        "license": "LICENSE038383777262664",
+        "deviceId": "8490474847333837872827288UIRIOP8373937383784748",
+        "type": "android",
+        "organizationCode": "MVAA",
+        "requesterEmail": "mvaaagent@mailinator.com",
+        "requesterFirstName": "MVAA",
+        "requesterLastName": "Agent",
+        "requesterPhone": "08170000044"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "name": "Mobile LSDRI: Update Biometrics ",
+      "method": "POST",
+      "path": "users/update-biometrics",
+      "body": {
+        "email": "garrett@mailinator.com",
+        "files": [
+          {
+            "documentType": "finger",
+            "fingerType": "right_thumb",
+            "fileId": 1
+          }
+        ]
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 201
+      }
+    }
+
+  ]
