@@ -31,7 +31,7 @@ public class TestBase {
             JsonNode config = mapper.readTree(stream);
             baseUrl = config.get("baseUrl").asText();
             RestAssured.baseURI = baseUrl;
-            //System.out.println("Base URL: " + baseUrl);
+            System.out.println("Base URL: " + baseUrl);
         }
     }
 
