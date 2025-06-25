@@ -1,0 +1,16 @@
+[
+    {
+      "name": "cbt_enrolls: Get CBT Enrolls",
+      "method": "GET",
+      "path": "cbt/enrolls",
+      "query": {
+        "page": "1",
+        "resultsPerPage": "10"
+      },
+      "requires": ["token"],
+      "assertions": {
+        "status": 200
+        }
+    }
+]
+

@@ -1,0 +1,95 @@
+[
+
+  {
+    "name": "mobile_mvaa: Send OTP ",
+    "method": "POST",
+    "path": "auth/send-otp",
+    "body": {
+      "email": "vickkycodegenius@gmail.com"
+    },
+    "requires": ["token"],
+    "assertions": {
+      "status": 201
+    }
+  },
+  {
+    "name": "mobile_mvaa: Validate OTP ",
+    "method": "POST",
+    "path": "auth/validate-otp",
+    "body": {
+      "email": "vickkycodegenius@gmail.com",
+      "otp": "377101"
+    },
+    "requires": ["token"],
+    "assertions": {
+      "status": 201
+    }
+  },
+  {
+    "name": "mobile_mvaa: License Pre-Registration ",
+    "method": "POST",
+    "path": "license/single/pre-registration",
+    "body": {
+      "applicationNo": "DRLP/2025/849367"
+    },
+    "requires": ["token"],
+    "assertions": {
+      "status": 201
+    }
+  },
+  {
+    "name": "mobile_mvaa: Submit Pre-registration files ",
+    "method": "POST",
+    "path": "license/submit-pre-registration-files",
+    "body": {
+      "reference": "BIOARQTXT12BIO1741767893420",
+      "applicationNo": "DRLP/2025/760385",
+      "files": [
+        {
+          "fileId": 1,
+          "documentType": "finger",
+          "fingerType": "index_1"
+        }
+      ]
+    },
+    "requires": ["token"],
+    "assertions": {
+      "status": 201
+    }
+  },
+  {
+    "name": "mobile_mvaa: License submit new requset ",
+    "method": "POST",
+    "path": "license/submit-new-request",
+    "body": {
+      "certificateNo": "DR8C20L5I3DR-648932",
+      "source": "mobile",
+      "files": []
+    },
+    "requires": ["token"],
+    "assertions": {
+      "status": 201
+    }
+  },
+  {
+    "name": "mobile_mvaa: Generate License Card ",
+    "method": "GET",
+    "path": "license/generate-license/86427159",
+    "requires": ["token"],
+    "assertions": {
+      "status": 200
+    }
+  },
+  {
+    "name": "mvaa_mobile: License Details ",
+    "method": "POST",
+    "path": "license/details",
+    "body": {
+      "applicationNo": "DRLP/2025/087956"
+    },
+    "requires": ["token"],
+    "assertions": {
+      "status": 201
+    }
+  }
+]
