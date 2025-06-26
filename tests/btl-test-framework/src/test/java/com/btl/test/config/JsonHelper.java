@@ -11,14 +11,31 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Map;
-//import java.util.regex.Matcher;
-//import java.util.regex.Pattern;
-
+/**
+ * Utility class for common JSON operations such as reading JSON from files or resources,
+ * enumerating JSON object fields, and resolving placeholders inside JSON nodes.
+ *
+ * <p>This class leverages Jackson's {@link ObjectMapper} for JSON parsing and
+ * provides helper methods for test configuration processing.</p>
+ *
+ * <p>It supports recursive placeholder resolution in JSON nodes, replacing
+ * string placeholders like {@code ${randomString:8}} with actual runtime values.</p>
+ *
+ * @author rpillai
+ * @see com.btl.test.config.PlaceholderResolver
+ */
 public class JsonHelper {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    /**
+     * Reads and parses a JSON file from the given filesystem path.
+     *
+     * @param path the path to the JSON file to read
+     * @return the root {@link JsonNode} of the parsed JSON content
+     * @throws IOException if the file is not found or JSON parsing fails
+     */
     public static JsonNode readJsonFromFile(Path path) throws IOException {
         if (path == null || !Files.exists(path)) {
             String msg = "❌️ File not found: " + (path != null ? path.toAbsolutePath() : "null");
@@ -36,7 +53,12 @@ public class JsonHelper {
     }
 
     /**
-     * Returns all field names of a JSON object node.
+     * Returns an iterable over the field names of a JSON object node.
+     *
+     * <p>If the node is null or not an object, returns an empty iterable.</p>
+     *
+     * @param node the JSON node to inspect
+     * @return iterable of field names if node is a JSON object, empty otherwise
      */
     public static Iterable<String> fieldNames(JsonNode node) {
         if (node == null || !node.isObject()) return () -> new Iterator<String>() {
@@ -48,7 +70,11 @@ public class JsonHelper {
     }
 
     /**
-     * Loads a JSON file from classpath and returns as JsonNode.
+     * Loads a JSON file from the classpath resources and parses it into a {@link JsonNode}.
+     *
+     * @param path the classpath resource path of the JSON file
+     * @return the root JSON node of the parsed resource
+     * @throws RuntimeException if resource not found or reading/parsing fails
      */
     public static JsonNode loadJsonFromResource(String path) {
         try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path)) {
@@ -61,9 +87,14 @@ public class JsonHelper {
     }
 
     /**
-     * Resolves placeholders inside a JsonNode (recursively),
-     * replacing string values with placeholders (e.g. ${randomString:8}).
-     * Returns a new JsonNode with all placeholders replaced.
+     * Recursively resolves placeholders inside a given JSON node using the provided context map.
+     *
+     * <p>Placeholders are expected to be in string values, e.g. {@code ${randomString:8}}.
+     * This method returns a new JSON node with all placeholders replaced by their resolved values.</p>
+     *
+     * @param node the JSON node possibly containing placeholders
+     * @param context the context map for placeholder resolution
+     * @return a new {@link JsonNode} with placeholders resolved
      */
     public static JsonNode resolvePlaceholdersInNode(JsonNode node, Map<String,String> context) {
         if (node == null) return null;

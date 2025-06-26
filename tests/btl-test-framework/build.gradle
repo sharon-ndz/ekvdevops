@@ -61,3 +61,11 @@ test {
         forkEvery = 0
 
 }
+
+tasks.javadoc {
+    source = sourceSets.test.allJava
+    classpath += configurations.testRuntimeClasspath
+    destinationDir = file("$buildDir/docs/javadoc")
+    failOnError = false
+    options.memberLevel = JavadocMemberLevel.PROTECTED
+}

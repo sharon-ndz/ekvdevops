@@ -17,16 +17,56 @@ import java.util.stream.Stream;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.fail;
 
-
+/**
+ * Test suite that dynamically loads and executes flow-based API tests from JSON configuration files.
+ *
+ * <p>This test class scans the {@code resources/configs/flows/} directory at runtime.
+ * Each subdirectory is treated as a test flow and must contain an {@code index.json} file
+ * that lists the individual endpoint configuration files to execute.</p>
+ *
+ * <h2>Flow Discovery and Execution</h2>
+ * <ul>
+ *   <li>Each subdirectory under {@code configs/flows/} represents a distinct test flow.</li>
+ *   <li>The test suite auto-discovers newly added folders and their {@code index.json} files.</li>
+ *   <li>{@code index.json} contains a list of endpoint JSON filenames to load and execute in order.</li>
+ *   <li>Each endpoint file defines a single or multiple API steps (with method, path, body, assertions, etc).</li>
+ * </ul>
+ *
+ * <p>During execution, endpoint requests are dynamically built with placeholder resolution,
+ * query parameters, authorization headers, context propagation, and assertion checks.</p>
+ *
+ * <p>Dynamic tests are generated per flow and executed sequentially using JUnit 5's {@link org.junit.jupiter.api.DynamicTest}.</p>
+ *
+ * @author rpillai
+ * @see com.btl.test.base.TestBase
+ * @see com.btl.test.config.ConfigLoader
+ * @see com.btl.test.config.JsonHelper
+ * @see com.btl.test.config.PlaceholderResolver
+ */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ApiSuiteTest extends TestBase {
 
+    /**
+     * Initializes the test environment before all tests are executed.
+     * This typically sets base URI and other shared configurations.
+     *
+     * @throws Exception if setup fails.
+     */
     @BeforeAll
     public static void init() throws Exception {
         System.out.println("Calling setupBase");
         setupBase(); // Initialize base URI/context, etc.
     }
 
+    /**
+     * Dynamically generates tests for each configured flow and its endpoints.
+     *
+     * <p>Each flow is defined by an index JSON file, which lists endpoint files.
+     * Each endpoint file contains one or more API steps to be executed in order.</p>
+     *
+     * @return Stream of {@link DynamicTest} instances.
+     * @throws Exception if config loading or parsing fails.
+     */
     @TestFactory
     public Stream<DynamicTest> generateTests() throws Exception {
         try {
@@ -79,6 +119,15 @@ public class ApiSuiteTest extends TestBase {
         }
     }
 
+    /**
+     * Executes a single API endpoint request defined in the JSON configuration.
+     *
+     * <p>Supports GET, POST, PUT, PATCH, and DELETE HTTP methods.
+     * Automatically resolves placeholders, handles context injection,
+     * executes assertions, and stores extracted values back to context.</p>
+     *
+     * @param endpoint JsonNode representing a single endpoint config.
+     */
     private void runRequest(JsonNode endpoint) {
         String method = endpoint.get("method").asText();
         String rawPath = endpoint.get("path").asText();
@@ -152,6 +201,10 @@ public class ApiSuiteTest extends TestBase {
             }
         }
     }
+    /**
+     * Dummy test to verify base URL configuration.
+     * Used for sanity check and simple logging.
+     */
     @Test
     public void dummyTest() {
         System.out.println("✅ Config is using URL " + baseUrl );

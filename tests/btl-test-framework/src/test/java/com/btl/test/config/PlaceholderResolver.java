@@ -4,15 +4,34 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Random;
-
+/**
+ * Utility class for resolving placeholders in strings.
+ *
+ * <p>Supports placeholders of the form <code>${key}</code> or <code>${key:param}</code>.
+ * Values can be substituted from a provided context map or generated dynamically for keys like
+ * <code>randomString</code> or <code>phoneNumber</code>.</p>
+ *
+ * <p>Example placeholders:</p>
+ * <ul>
+ *   <li><code>${token}</code> — replaced by value in context map under key "token"</li>
+ *   <li><code>${randomString:8}</code> — replaced by a randomly generated 8-character string</li>
+ *   <li><code>${phoneNumber:0801,10}</code> — replaced by a phone number string starting with "0801" and total length 10</li>
+ * </ul>
+ * @author rpillai
+ * @see com.btl.test.config.JsonHelper#resolvePlaceholdersInNode(JsonNode, Map)
+ */
 public class PlaceholderResolver {
 
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
     private static final Random random = new Random();
 
     /**
-     * Resolves placeholders like ${key:param} or ${key} in the input string,
-     * replacing them with values from context or generated dynamically.
+     * Resolves placeholders like <code>${key:param}</code> or <code>${key}</code> in the input string,
+     * replacing them with corresponding values from the context map or generated dynamically.
+     *
+     * @param input the input string possibly containing placeholders
+     * @param context the map providing replacement values for keys
+     * @return the input string with all placeholders resolved or left unchanged if no match found
      */
     public static String resolve(String input, Map<String, String> context) {
         if (input == null) return null;
@@ -56,7 +75,18 @@ public class PlaceholderResolver {
     }
 
     /**
-     * Generate dynamic values based on key and param
+     * Generates a dynamic value for the given key and parameter.
+     *
+     * Supported keys:
+     * <ul>
+     *   <li><code>randomString</code>: generates a random alphanumeric string of given length (default 8)</li>
+     *   <li><code>phoneNumber</code>: generates a numeric phone number string with optional prefix and total length</li>
+     * </ul>
+     *
+     * @param key the placeholder key (e.g. "randomString", "phoneNumber")
+     * @param param optional parameter string, e.g. length or prefix,length
+     * @param context context map for additional lookup if needed
+     * @return generated string value or null if key is not supported
      */
     public static String generateValue(String key, String param, Map<String,String> context) {
         if ("randomString".equals(key)) {
@@ -72,13 +102,25 @@ public class PlaceholderResolver {
         if ("phoneNumber".equals(key)) {
             return generatePhoneNumber(param);
         }
+        if ("numericString".equals(key)) {
+            int length = 8; // default length
+            if (param != null) {
+                try {
+                    length = Integer.parseInt(param);
+                } catch (NumberFormatException ignored) {}
+            }
+            return generateNumericString(length);
+        }
 
         // Fallback: try to return from context
         return context.getOrDefault(key, null);
     }
 
     /**
-     * Generates a random alphanumeric string of given length
+     * Generates a random alphanumeric string of the specified length.
+     *
+     * @param length desired length of the string
+     * @return random alphanumeric string
      */
     public static String generateRandomString(int length) {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -88,7 +130,21 @@ public class PlaceholderResolver {
         }
         return sb.toString();
     }
-
+    /**
+     * Generates a phone number string.
+     *
+     * <p>The parameter can be:</p>
+     * <ul>
+     *   <li>null or empty: generate 12-digit random numeric string</li>
+     *   <li>a number (e.g. "12"): total length of phone number</li>
+     *   <li>a prefix (digits) shorter than default length: prefix + random digits to fill length</li>
+     *   <li>prefix and length separated by comma (e.g. "0801,10")</li>
+     * </ul>
+     *
+     * @param param optional parameter defining prefix and/or total length
+     * @return generated phone number string
+     * @throws IllegalArgumentException if prefix length exceeds total length
+     */
     public static String generatePhoneNumber(String param) {
         int defaultLength = 12;
         String prefix = "";
@@ -130,6 +186,16 @@ public class PlaceholderResolver {
         return sb.toString();
     }
 
+    /**
+     * Generates a random numeric string of the specified length.
+     * <p>
+     * Each character in the returned string is a digit between 0 and 9.
+     * This method is typically used for generating test values such as phone numbers
+     * or numeric IDs.
+     *
+     * @param length the desired length of the generated numeric string
+     * @return a random string composed only of numeric digits
+     */
     private static int safeParseInt(String str, int defaultVal) {
         try {
             return Integer.parseInt(str);
