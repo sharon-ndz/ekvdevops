@@ -110,7 +110,8 @@ public class ApiSuiteTest extends TestBase {
                 if (!context.containsKey(key)) {
                     System.out.println("⏭️ Skipping " + endpoint.get("name").asText() +
                             " — missing dependency: " + key);
-                    return;
+                    fail("Test aborted: Required field not found in context. key="+key);
+                    //return;
                 }
                 if (key.equals("token")) {
                     request.header("Authorization", "Bearer " + context.get("token"));
