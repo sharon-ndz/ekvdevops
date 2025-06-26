@@ -54,8 +54,9 @@ test {
     useJUnitPlatform()
     include '**/ApiSuiteTest.*'  // or '**/*Suite.*' if you want
         testLogging {
-            events "passed", "skipped", "failed"
-            showStandardStreams = false
+            events "failed"
+            exceptionFormat "short"
+            showStandardStreams = true
         }
         forkEvery = 0
 

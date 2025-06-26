@@ -1,0 +1,17 @@
+[
+  {
+  "name": "create_device: Create a device",
+  "method": "POST",
+  "path": "device",
+  "body": {
+    "deviceImei": "490154203237518",
+    "license": "LICENSE9585989438363846384364",
+    "type": "android",
+    "organizationCode": "MVAA"
+  },
+  "requires": ["token"],
+  "assertions": {
+    "status": 201
+  }
+}
+]

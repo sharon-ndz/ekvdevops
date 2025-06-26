@@ -4,13 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+//import java.util.regex.Matcher;
+//import java.util.regex.Pattern;
 
 public class JsonHelper {
 
@@ -18,7 +20,19 @@ public class JsonHelper {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     public static JsonNode readJsonFromFile(Path path) throws IOException {
-        return objectMapper.readTree(path.toFile());
+        if (path == null || !Files.exists(path)) {
+            String msg = "❌️ File not found: " + (path != null ? path.toAbsolutePath() : "null");
+            System.err.println(msg);
+            throw new FileNotFoundException(msg);
+        }
+
+        try {
+            return objectMapper.readTree(path.toFile());
+        } catch (IOException e) {
+            String msg = "❌ Failed to read JSON from file: " + path.toAbsolutePath();
+            System.err.println(msg);
+            throw new IOException(msg, e);
+        }
     }
 
     /**
