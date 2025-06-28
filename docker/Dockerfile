@@ -1,37 +1,32 @@
-# idms/docker/Dockerfile
+# Stage 1: Build the NestJS app
+FROM node:18-alpine AS builder
 
-FROM node:18-alpine
-
-# Install PostgreSQL client
-RUN apk add --no-cache postgresql-client
-
-# Set working directory inside the container
 WORKDIR /app
 
-# Copy package files first for caching layer
-COPY src/package*.json ./src/
-COPY src/tsconfig.json ./src/
+# Copy only package files first for caching
+COPY package*.json ./
 
-# Set working dir to source
-WORKDIR /app/src
-
-# Install dependencies
+# Install all dependencies including @nestjs/cli
 RUN npm install
 
-# Copy the rest of the application source code
-COPY src/ ./
+# Copy the full source code
+COPY . .
 
-COPY docker/.env ../.env
-
-# Copy build-related configs (optional, already included in COPY . . if in root)
-#COPY tsconfig*.json ./
-# COPY nest-cli.json ./
-
-# Build the app
+# Build the NestJS app (uses nest CLI)
 RUN npm run build
 
-# Expose app port
-EXPOSE 4000
+# Stage 2: Production image
+FROM node:18-alpine
 
-# Start the app
-CMD ["npm", "run", "start:prod"]
+WORKDIR /app
+
+# Copy only necessary files
+COPY package*.json ./
+RUN npm install --only=production
+
+# Copy the built output from previous stage
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 4000
+CMD ["node", "dist/src/main.js"]
+

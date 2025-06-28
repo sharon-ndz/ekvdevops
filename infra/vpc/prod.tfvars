@@ -51,4 +51,9 @@ public_subnets = {
     "map_public_ip_on_launch": true,
     "route_table_name": "prod-public"
 }
+ec2_tags = {
+  Name = "Backend API IDLMS-prod"
+}
+
+
 instance_type = "t3.medium"

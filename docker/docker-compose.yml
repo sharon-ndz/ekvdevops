@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:latest
     container_name: postgres
     env_file:
-      - .env
+      - ../src/.env
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -21,16 +19,20 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   app:
-    image: api:latest
-    container_name: api
+    build:
+      context: ../src
+      dockerfile: ../docker/Dockerfile
+    container_name: backend
     restart: always
-    ports:
-      - "4000:4000"
+    env_file:
+      - ../src/.env
+    working_dir: /app
     depends_on:
       postgres:
         condition: service_healthy
-    env_file:
-      - .env
+    command: node dist/src/main.js
+    ports:
+      - "4000:4000"
 
 volumes:
   pgdata:

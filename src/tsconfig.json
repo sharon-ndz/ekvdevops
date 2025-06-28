@@ -10,9 +10,6 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "paths": {
-      "src/*": ["./*"]   // 👈 This is the missing piece
-    },
     "strict": true,
     "allowJs": true,
     "esModuleInterop": true,
@@ -26,6 +23,5 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true
-  }
+  },
 }
-

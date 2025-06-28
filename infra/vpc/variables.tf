@@ -17,7 +17,6 @@ variable "common_tags" {
 variable "ami_id" {
   description = "AMI ID for EC2 instance"
   type        = string
-  default     = "ami-084568db4383264d4"
 }
 
 ###VPC###
@@ -54,14 +53,14 @@ variable "nat_gateway_name" {
   type = string
 }
 
-#variable "private_lb_subnets" {
-#  type = object({
-#    routes                   = list(any)
-#    cidrs_blocks             = list(string)
-#    subnets_name_prefix      = string
-#    route_table_name         = string
-#  })
-#}
+variable "private_lb_subnets" {
+  type = object({
+    routes                   = list(any)
+    cidrs_blocks             = list(string)
+    subnets_name_prefix      = string
+    route_table_name         = string
+  })
+}
 
 ###Private Subnets###
 variable "private_subnets" {
@@ -74,25 +73,25 @@ variable "private_subnets" {
 }
 
 ##Private Data Subnets
-#variable "private_data_subnets" {
-#  type = object({
-#    routes                   = list(any)
-#    cidrs_blocks             = list(string)
-#    subnets_name_prefix      = string
-#    route_table_name         = string
-#    is_public                = bool
-#  })
-#}
+variable "private_data_subnets" {
+  type = object({
+    routes                   = list(any)
+    cidrs_blocks             = list(string)
+    subnets_name_prefix      = string
+    route_table_name         = string
+    is_public                = bool
+  })
+}
 
 ##Private Services Subnets
-#variable "private_services_subnets" {
-#  type = object({
-#    routes                   = list(any)
-#    cidrs_blocks             = list(string)
-#    subnets_name_prefix      = string
-#    route_table_name         = string
-#  })
-#}
+variable "private_services_subnets" {
+  type = object({
+    routes                   = list(any)
+    cidrs_blocks             = list(string)
+    subnets_name_prefix      = string
+    route_table_name         = string
+  })
+}
 
 ###Public Subnets###
 variable "public_subnets" {
@@ -105,6 +104,16 @@ variable "public_subnets" {
   })
 }
 
+## Private App Subnets
+variable "private_app_subnets" {
+  type = object({
+    routes              = list(any)
+    cidrs_blocks        = list(string)
+    subnets_name_prefix = string
+    route_table_name    = string
+  })
+  description = "Configuration for private application subnets"
+}
 
 
 variable "instance_type" {

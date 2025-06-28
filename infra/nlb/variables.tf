@@ -94,12 +94,12 @@ variable "ssm_tag_name" {
   description = "Tag value assigned to the SSM parameter"
 }
 
-variable "docker_log_group_name" {
-  type        = string
-  description = "CloudWatch log group name for Docker logs"
-}
+#variable "docker_log_group_name" {
+#  type        = string
+#  description = "CloudWatch log group name for Docker logs"
+#}
 
-variable "log_group_tag_name" {
-  type        = string
-  description = "Tag for the Docker CloudWatch log group"
-}
+#variable "log_group_tag_name" {
+#  type        = string
+#  description = "Tag for the Docker CloudWatch log group"
+#}

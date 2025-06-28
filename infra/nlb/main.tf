@@ -15,9 +15,9 @@
 
 
 module "group_1_nlb" {
-  source               = "git::https://github.com/sharon-ndz/terraform-modules.git//nlb"
+  source               = "../terraform-modules/nlb"
 
-  name                 = "group-1-nlb"
+  name                 = "${var.environment}-idlms-nlb"
   internal             = var.internal
   load_balancer_type   = var.load_balancer_type
   vpc_id               = data.terraform_remote_state.vpc.outputs.vpc_id
@@ -31,12 +31,12 @@ module "group_1_nlb" {
   ]
 
   create_sg     = var.lb_create_sg
-  sg_name       = "group-1-nlb-sg"
+  sg_name       = "${var.environment}-group-1-nlb-sg"
   ingress_roles = local.lb_sg_ingress_roles
   egress_roles  = var.lb_egress_roles
   tags = var.common_tags
 
   # ✅ Use S3 bucket created by local cloudwatch module
 #  access_logs_bucket = var.access_logs_bucket
-#  access_logs_prefix = var.access_logs_prefix
+#  access_logs_prefix = var.access_logs_prefix 
 }
