@@ -18,3 +18,7 @@ module "cloudwatch" {
   ssm_tag_name                = var.ssm_tag_name
   # nlb_logs_bucket_tag_name    = var.nlb_logs_bucket_tag_name      # ❌ NLB-related — not needed
 }
+
+provider "aws" {
+  region = var.region
+}

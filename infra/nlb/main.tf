@@ -12,7 +12,9 @@
   #access_logs_bucket    = var.access_logs_bucket
   #access_logs_prefix    = var.access_logs_prefix
 #}
-
+provider "aws" {
+  region = var.region
+}
 
 module "group_1_nlb" {
   source               = "../terraform-modules/nlb"

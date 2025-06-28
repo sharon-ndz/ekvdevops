@@ -10,3 +10,6 @@ module "http_api" {
   tags               = var.common_tags
 }
 
+provider "aws" {
+  region = var.region
+}
