@@ -14,9 +14,6 @@ sourceSets {
     }
 }
 
-test {
-    useJUnitPlatform() // enables JUnit 5 discovery
-}
 
 repositories {
     mavenCentral()
@@ -35,31 +32,41 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
 }
 
+
 test {
+    useJUnitPlatform()
 
-    // get project property or fallback
+    // Get project property or fallback
     def envProp = project.hasProperty('env') ? project.getProperty('env') : 'dev'
-
-    // pass it as system property to test JVM
     systemProperty 'env', envProp
 
-    // Generate a timestamp string, e.g. 2025-06-25_102030
+    // Generate a timestamp string
     def timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())
 
-    // Customize the test report output directory to include the timestamp
-    reports.html.outputLocation = file("$buildDir/reports/tests/test_$timestamp")
+    // Enable and configure reports the RIGHT way
+    reports {
+        html.required.set(true)
+        junitXml.required.set(true)
 
-    // Optionally also customize XML report dir similarly
-    reports.junitXml.outputLocation = file("$buildDir/test-results/test_$timestamp")
-    useJUnitPlatform()
-    include '**/ApiSuiteTest.*'  // or '**/*Suite.*' if you want
-        testLogging {
-            events "failed"
-            exceptionFormat "short"
-            showStandardStreams = true
-        }
-        forkEvery = 0
+        html.outputLocation.set(file("$buildDir/reports/tests/test_$timestamp"))
+        junitXml.outputLocation.set(file("$buildDir/test-results/test_$timestamp"))
+    }
 
+    //include '**/ApiSuiteTest.*'
+
+    testLogging {
+        events "failed", "skipped", "passed"
+        exceptionFormat "short"
+        showStandardStreams = false
+    }
+
+    // Print clickable link after tests
+    doLast {
+        println "\n📄 Test HTML report generated at:"
+        println "file://$buildDir/reports/tests/test_$timestamp/index.html\n"
+    }
+
+    forkEvery = 0
 }
 
 tasks.javadoc {

@@ -13,7 +13,7 @@
       }
     },
     {
-      "name": "Mobile: Get CBT Ernrolls ",
+      "name": "Mobile: Get CBT Enrolls ",
       "method": "GET",
       "path": "cbt/enrolls",
       "query": {
@@ -25,19 +25,7 @@
         "status": 200
       }
     },
-    {
-      "name": "Mobile: Get Registrations By Agent",
-      "method": "GET",
-      "path": "license/registrations-by-agent",
-      "query": {
-        "page": "1",
-        "resultsPerPage": "10"
-      },
-      "requires": ["token"],
-      "assertions": {
-        "status": 200
-      }
-    },
+
     {
       "name": "Mobile: Submit Driving Test ",
       "method": "POST",
