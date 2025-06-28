@@ -35,3 +35,8 @@ variable "nlb_listener_arn" {
   description = "ARN of the NLB Listener"
   type        = string
 }
+
+variable "vpc_link_subnet_ids" {
+  description = "Subnet IDs for VPC link (only from supported AZs)"
+  type        = list(string)
+}

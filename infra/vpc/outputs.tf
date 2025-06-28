@@ -46,3 +46,7 @@ output "ec2_private_ip" {
   description = "Private IP of the EC2 instance"
   value       = aws_instance.web.private_ip
 }
+
+output "vpc_link_subnet_ids" {
+  value = module.vpc.vpc_link_subnet_ids
+}

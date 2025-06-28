@@ -35,7 +35,7 @@ resource "aws_apigatewayv2_stage" "this" {
 
 resource "aws_apigatewayv2_vpc_link" "this" {
   name               = "${var.environment}-http-api-vpc-link"
-  subnet_ids         = var.private_subnet_ids
+  subnet_ids         = var.vpc_link_subnet_ids
   security_group_ids = var.security_group_ids
   tags               = var.tags
 }

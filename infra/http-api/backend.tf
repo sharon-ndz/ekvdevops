@@ -1,5 +1,3 @@
-# --- backend.tf ---
-
 terraform {
   backend "s3" {
     bucket = "my-terraform-state-bckt43"
@@ -8,3 +6,4 @@ terraform {
     encrypt = true
   }
 }
+
