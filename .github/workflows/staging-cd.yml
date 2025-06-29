@@ -33,7 +33,7 @@ jobs:
             build:
               - 'docker/**'
               - 'docker-compose.yml'
-              - 'app/**'
+              - 'src/**'
 
   deploy:
     needs: detect-changes
@@ -56,40 +56,22 @@ jobs:
         with:
           terraform_version: 1.5.0
 
-      - name: Configure AWS
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Terraform Apply VPC
+      - name: Terraform Apply (VPC, NLB, API Gateway, CloudWatch)
         if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
         run: |
-          cd infra/vpc
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/vpc/terraform.tfstate"
-          terraform apply -auto-approve -var-file="${ENV}.tfvars"
-
-      - name: Terraform Apply NLB
-        if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
-        run: |
-          cd infra/nlb
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/nlb/terraform.tfstate"
-          terraform apply -auto-approve -var-file="${ENV}.tfvars"
-
-      - name: Terraform Apply HTTP API
-        if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
-        run: |
-          cd infra/http-api
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/http-api/terraform.tfstate"
-          terraform apply -auto-approve -var-file="${ENV}.tfvars"
-
-      - name: Terraform Apply CloudWatch
-        if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
-        run: |
-          cd infra/cloudwatch
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/cloudwatch/terraform.tfstate"
-          terraform apply -auto-approve -var-file="${ENV}.tfvars"
+          for module in vpc nlb http-api cloudwatch; do
+            cd infra/$module
+            terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/${module}/terraform.tfstate"
+            terraform apply -auto-approve -var-file="${ENV}.tfvars"
+            cd ../..
+          done
 
       - name: Generate Docker Build Tag
         run: echo "BUILD_TAG=license-api-$(date +'%d%m%Y%H%M%S')" >> $GITHUB_ENV
@@ -100,9 +82,12 @@ jobs:
           mkdir -p docker/output
           docker save $BUILD_TAG | gzip > docker/output/$BUILD_TAG.tar.gz
 
-      - name: Upload Image and Compose File to S3
+      - name: Upload Docker Image to S3
         run: |
           aws s3 cp docker/output/$BUILD_TAG.tar.gz s3://${BACKUP_BUCKET}/docker-images/$ENV/$BUILD_TAG.tar.gz
+
+      - name: Upload docker-compose.yml to S3
+        run: |
           aws s3 cp docker/docker-compose.yml s3://${BACKUP_BUCKET}/docker-compose/$ENV/docker-compose.yml
 
       - name: Deploy artifact using SSM
@@ -121,7 +106,7 @@ jobs:
             --parameters "{\"commands\": [
               \"set -e\",
               \"if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi\",
-              \"if ! command -v aws &> /dev/null; then apt update && apt install -y unzip curl && curl \\\"https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip\\\" -o \\\"awscliv2.zip\\\" && unzip awscliv2.zip && ./aws/install && export PATH=\\$PATH:/usr/local/bin; fi\",
+              \"if ! command -v aws &> /dev/null; then curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip' && unzip awscliv2.zip && ./aws/install; fi\",
               \"mkdir -p /home/ubuntu/backup\",
               \"aws s3 cp s3://${BACKUP_BUCKET}/docker-compose/${ENV}/docker-compose.yml /home/ubuntu/docker-compose.yml\",
               \"aws s3 cp s3://${BACKUP_BUCKET}/docker-images/${ENV}/${BUILD_TAG}.tar.gz /home/ubuntu/app.tar.gz\",
