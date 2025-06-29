@@ -106,7 +106,7 @@ jobs:
 
       - name: Upload docker-compose.yml to S3
         run: |
-          aws s3 cp docker-compose.yml s3://${{ env.BACKUP_BUCKET }}/docker-compose/$ENV/docker-compose.yml
+          aws s3 cp docker/docker-compose.yml s3://${{ env.BACKUP_BUCKET }}/docker-compose/$ENV/docker-compose.yml
 
       - name: Deploy artifact using SSM
         run: |
