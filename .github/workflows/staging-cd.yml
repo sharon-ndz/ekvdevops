@@ -176,18 +176,18 @@ EOF
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy Docker image and docker-compose via S3" \
-            --parameters commands="[\ 
-              \"set -e\",\
-              \"if ! command -v aws &> /dev/null; then curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip' && unzip awscliv2.zip && ./aws/install; fi\",\
-              \"if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi\",\
-              \"mkdir -p /home/ubuntu/backup /home/ubuntu/src\",\
-              \"aws s3 cp s3://${BACKUP_BUCKET}/docker-compose/${ENV}/docker-compose.yml /home/ubuntu/docker-compose.yml\",\
-              \"aws s3 cp s3://${BACKUP_BUCKET}/env/${ENV}/.env /home/ubuntu/src/.env\",\
-              \"aws s3 cp s3://${BACKUP_BUCKET}/docker-images/${ENV}/${BUILD_TAG}.tar.gz /home/ubuntu/app.tar.gz\",\
-              \"gunzip -f /home/ubuntu/app.tar.gz\",\
-              \"docker load < /home/ubuntu/app.tar && cp /home/ubuntu/app.tar /home/ubuntu/backup/last-known-good.tar\",\
-              \"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml down || true\",\
-              \"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d)\"\
+            --parameters commands="[\"
+              set -e\",
+              \"if ! command -v aws &> /dev/null; then curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip' && unzip awscliv2.zip && ./aws/install; fi\",
+              \"if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi\",
+              \"mkdir -p /home/ubuntu/backup /home/ubuntu/src\",
+              \"aws s3 cp s3://${BACKUP_BUCKET}/docker-compose/${ENV}/docker-compose.yml /home/ubuntu/docker-compose.yml\",
+              \"aws s3 cp s3://${BACKUP_BUCKET}/env/${ENV}/.env /home/ubuntu/src/.env\",
+              \"aws s3 cp s3://${BACKUP_BUCKET}/docker-images/${ENV}/${BUILD_TAG}.tar.gz /home/ubuntu/app.tar.gz\",
+              \"gunzip -f /home/ubuntu/app.tar.gz\",
+              \"docker load < /home/ubuntu/app.tar && cp /home/ubuntu/app.tar /home/ubuntu/backup/last-known-good.tar\",
+              \"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml down || true\",
+              \"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d)\"
             ]" \
             --timeout-seconds 600 \
             --output text
