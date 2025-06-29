@@ -1,6 +1,5 @@
 name: Build and Deploy License API
 
-
 on:
   workflow_dispatch:
     inputs:
@@ -95,6 +94,57 @@ jobs:
       - name: Generate Docker Build Tag
         run: echo "BUILD_TAG=license-api-$(date +'%d%m%Y%H%M%S')" >> $GITHUB_ENV
 
+      - name: Generate .env from GitHub Environment Variables
+        run: |
+          mkdir -p src
+          {
+            echo "PORT=${{ vars.PORT }}"
+            echo "APP_NAME=${{ vars.APP_NAME }}"
+            echo "NODE_ENV=${{ vars.NODE_ENV }}"
+            echo "SALT_ROUNDS=${{ vars.SALT_ROUNDS }}"
+            echo "JWT_SECRET=${{ vars.JWT_SECRET }}"
+            echo "API_CLIENT_JWT_EXPIRES_IN=${{ vars.API_CLIENT_JWT_EXPIRES_IN }}"
+            echo "EMAIL_SENDER=${{ vars.EMAIL_SENDER }}"
+            echo "AUTO_RUN_MIGRATIONS=${{ vars.AUTO_RUN_MIGRATIONS }}"
+            echo "DB_HOST=${{ vars.DB_HOST }}"
+            echo "DB_PORT=${{ vars.DB_PORT }}"
+            echo "DB_USERNAME=${{ vars.DB_USERNAME }}"
+            echo "DB_PASSWORD=${{ vars.DB_PASSWORD }}"
+            echo "DB_NAME=${{ vars.DB_NAME }}"
+            echo "EMAIL_PORT=${{ vars.EMAIL_PORT }}"
+            echo "EMAIL_HOST=${{ vars.EMAIL_HOST }}"
+            echo "EMAIL_USER=${{ vars.EMAIL_USER }}"
+            echo "EMAIL_PASS=${{ vars.EMAIL_PASS }}"
+            echo "EMAIL_SECURE=${{ vars.EMAIL_SECURE }}"
+            echo "ORIGINS=${{ vars.ORIGINS }}"
+            echo "LOCAL_URL=${{ vars.LOCAL_URL }}"
+            echo "STAGING_URL=${{ vars.STAGING_URL }}"
+            echo "PAYMENT_KEY=${{ vars.PAYMENT_KEY }}"
+            echo "API_BASE_URL=${{ vars.API_BASE_URL }}"
+            echo "API_OPERATION=${{ vars.API_OPERATION }}"
+            echo "USERNAME=${{ vars.USERNAME }}"
+            echo "SECRETE=${{ vars.SECRETE }}"
+            echo "MERCHANT=${{ vars.MERCHANT }}"
+            echo "INTERACTION_OPERETION=${{ vars.INTERACTION_OPERETION }}"
+            echo "MERCHANT_NAME=${{ vars.MERCHANT_NAME }}"
+            echo "NIN_ENDPOINT=${{ vars.NIN_ENDPOINT }}"
+            echo "NIN_API_KEY=${{ vars.NIN_API_KEY }}"
+            echo "NIN_API_SECRETE=${{ vars.NIN_API_SECRETE }}"
+            echo "NIN_VERIFICATION=${{ vars.NIN_VERIFICATION }}"
+            echo "NIN_AUTH_USERNAME=${{ vars.NIN_AUTH_USERNAME }}"
+            echo "NIN_AUTH_PASSWORD=${{ vars.NIN_AUTH_PASSWORD }}"
+            echo "ATTACHMENT_S3_BUCKET=${{ vars.ATTACHMENT_S3_BUCKET }}"
+            echo "APP_AWS_REGION=${{ vars.APP_AWS_REGION }}"
+            echo "APP_AWS_SECRET_ACCESS_KEY=${{ vars.APP_AWS_SECRET_ACCESS_KEY }}"
+            echo "APP_AWS_ACCESS_KEY_ID=${{ vars.APP_AWS_ACCESS_KEY_ID }}"
+            echo "APP_AWS_ACCOUNT_ID=${{ vars.APP_AWS_ACCOUNT_ID }}"
+            echo "APP_AWS_NOTIFICATIONS_QUEUE_NAME=${{ vars.APP_AWS_NOTIFICATIONS_QUEUE_NAME }}"
+            echo "OTP_LOGIN_KEY=${{ vars.OTP_LOGIN_KEY }}"
+            echo "OTP_LOGIN_EXPIRED_TIME=${{ vars.OTP_LOGIN_EXPIRED_TIME }}"
+            echo "JWT_OTP_KEY=${{ vars.JWT_OTP_KEY }}"
+            echo "JWT_OTP_LOGIN_EXPIRED_TIME=${{ vars.JWT_OTP_LOGIN_EXPIRED_TIME }}"
+          } > src/.env
+
       - name: Build Docker Image
         run: |
           docker build -t $BUILD_TAG -f docker/Dockerfile src
@@ -109,58 +159,7 @@ jobs:
         run: |
           aws s3 cp docker/docker-compose.yml s3://${BACKUP_BUCKET}/docker-compose/$ENV/docker-compose.yml
 
-      - name: Generate .env from GitHub Environment Variables
-        run: |
-          mkdir -p src
-          cat <<EOF > src/.env
-PORT=${{ vars.PORT }}
-APP_NAME=${{ vars.APP_NAME }}
-NODE_ENV=${{ vars.NODE_ENV }}
-SALT_ROUNDS=${{ vars.SALT_ROUNDS }}
-JWT_SECRET=${{ vars.JWT_SECRET }}
-API_CLIENT_JWT_EXPIRES_IN=${{ vars.API_CLIENT_JWT_EXPIRES_IN }}
-EMAIL_SENDER=${{ vars.EMAIL_SENDER }}
-AUTO_RUN_MIGRATIONS=${{ vars.AUTO_RUN_MIGRATIONS }}
-DB_HOST=${{ vars.DB_HOST }}
-DB_PORT=${{ vars.DB_PORT }}
-DB_USERNAME=${{ vars.DB_USERNAME }}
-DB_PASSWORD=${{ vars.DB_PASSWORD }}
-DB_NAME=${{ vars.DB_NAME }}
-EMAIL_PORT=${{ vars.EMAIL_PORT }}
-EMAIL_HOST=${{ vars.EMAIL_HOST }}
-EMAIL_USER=${{ vars.EMAIL_USER }}
-EMAIL_PASS=${{ vars.EMAIL_PASS }}
-EMAIL_SECURE=${{ vars.EMAIL_SECURE }}
-ORIGINS=${{ vars.ORIGINS }}
-LOCAL_URL=${{ vars.LOCAL_URL }}
-STAGING_URL=${{ vars.STAGING_URL }}
-PAYMENT_KEY=${{ vars.PAYMENT_KEY }}
-API_BASE_URL=${{ vars.API_BASE_URL }}
-API_OPERATION=${{ vars.API_OPERATION }}
-USERNAME=${{ vars.USERNAME }}
-SECRETE=${{ vars.SECRETE }}
-MERCHANT=${{ vars.MERCHANT }}
-INTERACTION_OPERETION=${{ vars.INTERACTION_OPERETION }}
-MERCHANT_NAME=${{ vars.MERCHANT_NAME }}
-NIN_ENDPOINT=${{ vars.NIN_ENDPOINT }}
-NIN_API_KEY=${{ vars.NIN_API_KEY }}
-NIN_API_SECRETE=${{ vars.NIN_API_SECRETE }}
-NIN_VERIFICATION=${{ vars.NIN_VERIFICATION }}
-NIN_AUTH_USERNAME=${{ vars.NIN_AUTH_USERNAME }}
-NIN_AUTH_PASSWORD=${{ vars.NIN_AUTH_PASSWORD }}
-ATTACHMENT_S3_BUCKET=${{ vars.ATTACHMENT_S3_BUCKET }}
-APP_AWS_REGION=${{ vars.APP_AWS_REGION }}
-APP_AWS_SECRET_ACCESS_KEY=${{ vars.APP_AWS_SECRET_ACCESS_KEY }}
-APP_AWS_ACCESS_KEY_ID=${{ vars.APP_AWS_ACCESS_KEY_ID }}
-APP_AWS_ACCOUNT_ID=${{ vars.APP_AWS_ACCOUNT_ID }}
-APP_AWS_NOTIFICATIONS_QUEUE_NAME=${{ vars.APP_AWS_NOTIFICATIONS_QUEUE_NAME }}
-OTP_LOGIN_KEY=${{ vars.OTP_LOGIN_KEY }}
-OTP_LOGIN_EXPIRED_TIME=${{ vars.OTP_LOGIN_EXPIRED_TIME }}
-JWT_OTP_KEY=${{ vars.JWT_OTP_KEY }}
-JWT_OTP_LOGIN_EXPIRED_TIME=${{ vars.JWT_OTP_LOGIN_EXPIRED_TIME }}
-EOF
-
-      - name: Upload .env to S3
+      - name: Upload .env file to S3
         run: |
           aws s3 cp src/.env s3://${BACKUP_BUCKET}/env/$ENV/.env
 
