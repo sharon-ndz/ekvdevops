@@ -68,7 +68,6 @@ jobs:
         run: |
           cd infra/vpc
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/vpc/terraform.tfstate"
-          terraform plan -var-file="${ENV}.tfvars"
           terraform apply -auto-approve -var-file="${ENV}.tfvars"
 
       - name: Terraform Apply NLB
@@ -76,7 +75,6 @@ jobs:
         run: |
           cd infra/nlb
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/nlb/terraform.tfstate"
-          terraform plan -var-file="${ENV}.tfvars"
           terraform apply -auto-approve -var-file="${ENV}.tfvars"
 
       - name: Terraform Apply HTTP API
@@ -84,7 +82,6 @@ jobs:
         run: |
           cd infra/http-api
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/http-api/terraform.tfstate"
-          terraform plan -var-file="${ENV}.tfvars"
           terraform apply -auto-approve -var-file="${ENV}.tfvars"
 
       - name: Terraform Apply CloudWatch
@@ -92,7 +89,6 @@ jobs:
         run: |
           cd infra/cloudwatch
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/cloudwatch/terraform.tfstate"
-          terraform plan -var-file="${ENV}.tfvars"
           terraform apply -auto-approve -var-file="${ENV}.tfvars"
 
       - name: Generate Docker Build Tag
@@ -104,9 +100,13 @@ jobs:
           mkdir -p docker/output
           docker save $BUILD_TAG | gzip > docker/output/$BUILD_TAG.tar.gz
 
-      - name: Upload Image to S3
+      - name: Upload Docker Image to S3
         run: |
           aws s3 cp docker/output/$BUILD_TAG.tar.gz s3://${{ env.BACKUP_BUCKET }}/docker-images/$ENV/$BUILD_TAG.tar.gz
+
+      - name: Upload docker-compose.yml to S3
+        run: |
+          aws s3 cp docker-compose.yml s3://${{ env.BACKUP_BUCKET }}/docker-compose/$ENV/docker-compose.yml
 
       - name: Deploy artifact using SSM
         run: |
@@ -120,16 +120,17 @@ jobs:
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --comment "Deploy Docker image from S3 and restart container" \
+            --comment "Deploy Docker image and start container using docker-compose" \
             --parameters "{\"commands\": [
               \"set -e\",
               \"if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi\",
               \"mkdir -p /home/ubuntu/backup\",
+              \"aws s3 cp s3://${{ env.BACKUP_BUCKET }}/docker-compose/${{ env.ENV }}/docker-compose.yml /home/ubuntu/docker-compose.yml\",
               \"aws s3 cp s3://${{ env.BACKUP_BUCKET }}/docker-images/${{ env.ENV }}/${{ env.BUILD_TAG }}.tar.gz /home/ubuntu/app.tar.gz\",
               \"gunzip -f /home/ubuntu/app.tar.gz\",
               \"docker load < /home/ubuntu/app.tar && cp /home/ubuntu/app.tar /home/ubuntu/backup/last-known-good.tar\",
-              \"docker-compose down || true\",
-              \"docker-compose up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose up -d)\"
+              \"docker-compose -f /home/ubuntu/docker-compose.yml down || true\",
+              \"docker-compose -f /home/ubuntu/docker-compose.yml up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose -f /home/ubuntu/docker-compose.yml up -d)\"
             ]}" \
             --timeout-seconds 600 \
             --output text
