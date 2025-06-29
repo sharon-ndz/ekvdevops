@@ -108,58 +108,60 @@ jobs:
         run: |
           aws s3 cp docker/docker-compose.yml s3://${BACKUP_BUCKET}/docker-compose/$ENV/docker-compose.yml
 
-      - name: Generate .env from GitHub Secrets
+      - name: Generate .env from GitHub Environment Variables
         run: |
-          mkdir -p docker/output
-          touch docker/output/.env
-          echo "PORT=${{ secrets.PORT }}" >> docker/output/.env
-          echo "APP_NAME=${{ secrets.APP_NAME }}" >> docker/output/.env
-          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> docker/output/.env
-          echo "SALT_ROUNDS=${{ secrets.SALT_ROUNDS }}" >> docker/output/.env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> docker/output/.env
-          echo "API_CLIENT_JWT_EXPIRES_IN=${{ secrets.API_CLIENT_JWT_EXPIRES_IN }}" >> docker/output/.env
-          echo "EMAIL_SENDER=${{ secrets.EMAIL_SENDER }}" >> docker/output/.env
-          echo "AUTO_RUN_MIGRATIONS=${{ secrets.AUTO_RUN_MIGRATIONS }}" >> docker/output/.env
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> docker/output/.env
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> docker/output/.env
-          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> docker/output/.env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> docker/output/.env
-          echo "DB_NAME=${{ secrets.DB_NAME }}" >> docker/output/.env
-          echo "EMAIL_PORT=${{ secrets.EMAIL_PORT }}" >> docker/output/.env
-          echo "EMAIL_HOST=${{ secrets.EMAIL_HOST }}" >> docker/output/.env
-          echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> docker/output/.env
-          echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> docker/output/.env
-          echo "EMAIL_SECURE=${{ secrets.EMAIL_SECURE }}" >> docker/output/.env
-          echo "ORIGINS=${{ secrets.ORIGINS }}" >> docker/output/.env
-          echo "LOCAL_URL=${{ secrets.LOCAL_URL }}" >> docker/output/.env
-          echo "STAGING_URL=${{ secrets.STAGING_URL }}" >> docker/output/.env
-          echo "PAYMENT_KEY=${{ secrets.PAYMENT_KEY }}" >> docker/output/.env
-          echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" >> docker/output/.env
-          echo "API_OPERATION=${{ secrets.API_OPERATION }}" >> docker/output/.env
-          echo "USERNAME=${{ secrets.USERNAME }}" >> docker/output/.env
-          echo "SECRETE=${{ secrets.SECRETE }}" >> docker/output/.env
-          echo "MERCHANT=${{ secrets.MERCHANT }}" >> docker/output/.env
-          echo "INTERACTION_OPERETION=${{ secrets.INTERACTION_OPERETION }}" >> docker/output/.env
-          echo "MERCHANT_NAME=${{ secrets.MERCHANT_NAME }}" >> docker/output/.env
-          echo "NIN_ENDPOINT=${{ secrets.NIN_ENDPOINT }}" >> docker/output/.env
-          echo "NIN_API_KEY=${{ secrets.NIN_API_KEY }}" >> docker/output/.env
-          echo "NIN_API_SECRETE=${{ secrets.NIN_API_SECRETE }}" >> docker/output/.env
-          echo "NIN_VERIFICATION=${{ secrets.NIN_VERIFICATION }}" >> docker/output/.env
-          echo "NIN_AUTH_USERNAME=${{ secrets.NIN_AUTH_USERNAME }}" >> docker/output/.env
-          echo "NIN_AUTH_PASSWORD=${{ secrets.NIN_AUTH_PASSWORD }}" >> docker/output/.env
-          echo "ATTACHMENT_S3_BUCKET=${{ secrets.ATTACHMENT_S3_BUCKET }}" >> docker/output/.env
-          echo "APP_AWS_REGION=${{ secrets.APP_AWS_REGION }}" >> docker/output/.env
-          echo "APP_AWS_SECRET_ACCESS_KEY=${{ secrets.APP_AWS_SECRET_ACCESS_KEY }}" >> docker/output/.env
-          echo "APP_AWS_ACCESS_KEY_ID=${{ secrets.APP_AWS_ACCESS_KEY_ID }}" >> docker/output/.env
-          echo "APP_AWS_ACCOUNT_ID=${{ secrets.APP_AWS_ACCOUNT_ID }}" >> docker/output/.env
-          echo "APP_AWS_NOTIFICATIONS_QUEUE_NAME=${{ secrets.APP_AWS_NOTIFICATIONS_QUEUE_NAME }}" >> docker/output/.env
-          echo "OTP_LOGIN_KEY=${{ secrets.OTP_LOGIN_KEY }}" >> docker/output/.env
-          echo "OTP_LOGIN_EXPIRED_TIME=${{ secrets.OTP_LOGIN_EXPIRED_TIME }}" >> docker/output/.env
-          echo "JWT_OTP_KEY=${{ secrets.JWT_OTP_KEY }}" >> docker/output/.env
-          echo "JWT_OTP_LOGIN_EXPIRED_TIME=${{ secrets.JWT_OTP_LOGIN_EXPIRED_TIME }}" >> docker/output/.env
+          mkdir -p src
+          cat <<EOF > src/.env
+PORT=${{ vars.PORT }}
+APP_NAME=${{ vars.APP_NAME }}
+NODE_ENV=${{ vars.NODE_ENV }}
+SALT_ROUNDS=${{ vars.SALT_ROUNDS }}
+JWT_SECRET=${{ vars.JWT_SECRET }}
+API_CLIENT_JWT_EXPIRES_IN=${{ vars.API_CLIENT_JWT_EXPIRES_IN }}
+EMAIL_SENDER=${{ vars.EMAIL_SENDER }}
+AUTO_RUN_MIGRATIONS=${{ vars.AUTO_RUN_MIGRATIONS }}
+DB_HOST=${{ vars.DB_HOST }}
+DB_PORT=${{ vars.DB_PORT }}
+DB_USERNAME=${{ vars.DB_USERNAME }}
+DB_PASSWORD=${{ vars.DB_PASSWORD }}
+DB_NAME=${{ vars.DB_NAME }}
+EMAIL_PORT=${{ vars.EMAIL_PORT }}
+EMAIL_HOST=${{ vars.EMAIL_HOST }}
+EMAIL_USER=${{ vars.EMAIL_USER }}
+EMAIL_PASS=${{ vars.EMAIL_PASS }}
+EMAIL_SECURE=${{ vars.EMAIL_SECURE }}
+ORIGINS=${{ vars.ORIGINS }}
+LOCAL_URL=${{ vars.LOCAL_URL }}
+STAGING_URL=${{ vars.STAGING_URL }}
+PAYMENT_KEY=${{ vars.PAYMENT_KEY }}
+API_BASE_URL=${{ vars.API_BASE_URL }}
+API_OPERATION=${{ vars.API_OPERATION }}
+USERNAME=${{ vars.USERNAME }}
+SECRETE=${{ vars.SECRETE }}
+MERCHANT=${{ vars.MERCHANT }}
+INTERACTION_OPERETION=${{ vars.INTERACTION_OPERETION }}
+MERCHANT_NAME=${{ vars.MERCHANT_NAME }}
+NIN_ENDPOINT=${{ vars.NIN_ENDPOINT }}
+NIN_API_KEY=${{ vars.NIN_API_KEY }}
+NIN_API_SECRETE=${{ vars.NIN_API_SECRETE }}
+NIN_VERIFICATION=${{ vars.NIN_VERIFICATION }}
+NIN_AUTH_USERNAME=${{ vars.NIN_AUTH_USERNAME }}
+NIN_AUTH_PASSWORD=${{ vars.NIN_AUTH_PASSWORD }}
+ATTACHMENT_S3_BUCKET=${{ vars.ATTACHMENT_S3_BUCKET }}
+APP_AWS_REGION=${{ vars.APP_AWS_REGION }}
+APP_AWS_SECRET_ACCESS_KEY=${{ vars.APP_AWS_SECRET_ACCESS_KEY }}
+APP_AWS_ACCESS_KEY_ID=${{ vars.APP_AWS_ACCESS_KEY_ID }}
+APP_AWS_ACCOUNT_ID=${{ vars.APP_AWS_ACCOUNT_ID }}
+APP_AWS_NOTIFICATIONS_QUEUE_NAME=${{ vars.APP_AWS_NOTIFICATIONS_QUEUE_NAME }}
+OTP_LOGIN_KEY=${{ vars.OTP_LOGIN_KEY }}
+OTP_LOGIN_EXPIRED_TIME=${{ vars.OTP_LOGIN_EXPIRED_TIME }}
+JWT_OTP_KEY=${{ vars.JWT_OTP_KEY }}
+JWT_OTP_LOGIN_EXPIRED_TIME=${{ vars.JWT_OTP_LOGIN_EXPIRED_TIME }}
+EOF
 
       - name: Upload .env to S3
-        run: aws s3 cp docker/output/.env s3://${BACKUP_BUCKET}/env/${ENV}/.env
+        run: |
+          aws s3 cp src/.env s3://${BACKUP_BUCKET}/env/$ENV/.env
 
       - name: Deploy using SSM
         run: |
