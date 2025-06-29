@@ -6,6 +6,7 @@ ec2_ssm_role_name    = "dev-ec2_ssm_role"
 tf_state_bucket      = "my-terraform-state-bckt43"
 ami_id               = "ami-020cba7c55df1f615"
 
+docker_artifact_bucket = "idlms-website-built-artifact"
 enable_dns_support   = true
 enable_dns_hostnames = true
 vpc_name             = "dev-idlms-vpc"
