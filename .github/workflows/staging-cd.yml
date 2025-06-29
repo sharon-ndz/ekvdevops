@@ -6,7 +6,7 @@ on:
       environment:
         description: "Deployment environment"
         required: true
-        default: "stage"
+        default: "dev"
         type: choice
         options:
           - dev
@@ -97,53 +97,51 @@ jobs:
       - name: Generate .env file from GitHub Environment Variables
         run: |
           mkdir -p src
-          cat <<EOF > src/.env
-PORT=${{ vars.ENV_PORT }}
-APP_NAME=${{ vars.ENV_APP_NAME }}
-NODE_ENV=${{ vars.ENV_NODE_ENV }}
-SALT_ROUNDS=${{ vars.ENV_SALT_ROUNDS }}
-JWT_SECRET=${{ vars.ENV_JWT_SECRET }}
-API_CLIENT_JWT_EXPIRES_IN=${{ vars.ENV_API_CLIENT_JWT_EXPIRES_IN }}
-EMAIL_SENDER=${{ vars.ENV_EMAIL_SENDER }}
-AUTO_RUN_MIGRATIONS=${{ vars.ENV_AUTO_RUN_MIGRATIONS }}
-DB_HOST=${{ vars.ENV_DB_HOST }}
-DB_PORT=${{ vars.ENV_DB_PORT }}
-DB_USERNAME=${{ vars.ENV_DB_USERNAME }}
-DB_PASSWORD=${{ vars.ENV_DB_PASSWORD }}
-DB_NAME=${{ vars.ENV_DB_NAME }}
-EMAIL_PORT=${{ vars.ENV_EMAIL_PORT }}
-EMAIL_HOST=${{ vars.ENV_EMAIL_HOST }}
-EMAIL_USER=${{ vars.ENV_EMAIL_USER }}
-EMAIL_PASS=${{ vars.ENV_EMAIL_PASS }}
-EMAIL_SECURE=${{ vars.ENV_EMAIL_SECURE }}
-ORIGINS=${{ vars.ENV_ORIGINS }}
-LOCAL_URL=${{ vars.ENV_LOCAL_URL }}
-STAGING_URL=${{ vars.ENV_STAGING_URL }}
-PAYMENT_KEY=${{ vars.ENV_PAYMENT_KEY }}
-API_BASE_URL=${{ vars.ENV_API_BASE_URL }}
-API_OPERATION=${{ vars.ENV_API_OPERATION }}
-USERNAME=${{ vars.ENV_USERNAME }}
-SECRETE=${{ vars.ENV_SECRETE }}
-MERCHANT=${{ vars.ENV_MERCHANT }}
-INTERACTION_OPERETION=${{ vars.ENV_INTERACTION_OPERETION }}
-MERCHANT_NAME=${{ vars.ENV_MERCHANT_NAME }}
-NIN_ENDPOINT=${{ vars.ENV_NIN_ENDPOINT }}
-NIN_API_KEY=${{ vars.ENV_NIN_API_KEY }}
-NIN_API_SECRETE=${{ vars.ENV_NIN_API_SECRETE }}
-NIN_VERIFICATION=${{ vars.ENV_NIN_VERIFICATION }}
-NIN_AUTH_USERNAME=${{ vars.ENV_NIN_AUTH_USERNAME }}
-NIN_AUTH_PASSWORD=${{ vars.ENV_NIN_AUTH_PASSWORD }}
-ATTACHMENT_S3_BUCKET=${{ vars.ENV_ATTACHMENT_S3_BUCKET }}
-APP_AWS_REGION=${{ vars.ENV_APP_AWS_REGION }}
-APP_AWS_SECRET_ACCESS_KEY=${{ vars.ENV_APP_AWS_SECRET_ACCESS_KEY }}
-APP_AWS_ACCESS_KEY_ID=${{ vars.ENV_APP_AWS_ACCESS_KEY_ID }}
-APP_AWS_ACCOUNT_ID=${{ vars.ENV_APP_AWS_ACCOUNT_ID }}
-APP_AWS_NOTIFICATIONS_QUEUE_NAME=${{ vars.ENV_APP_AWS_NOTIFICATIONS_QUEUE_NAME }}
-OTP_LOGIN_KEY=${{ vars.ENV_OTP_LOGIN_KEY }}
-OTP_LOGIN_EXPIRED_TIME=${{ vars.ENV_OTP_LOGIN_EXPIRED_TIME }}
-JWT_OTP_KEY=${{ vars.ENV_JWT_OTP_KEY }}
-JWT_OTP_LOGIN_EXPIRED_TIME=${{ vars.ENV_JWT_OTP_LOGIN_EXPIRED_TIME }}
-EOF
+          echo "PORT=${{ vars.ENV_PORT }}" >> src/.env
+          echo "APP_NAME=${{ vars.ENV_APP_NAME }}" >> src/.env
+          echo "NODE_ENV=${{ vars.ENV_NODE_ENV }}" >> src/.env
+          echo "SALT_ROUNDS=${{ vars.ENV_SALT_ROUNDS }}" >> src/.env
+          echo "JWT_SECRET=${{ vars.ENV_JWT_SECRET }}" >> src/.env
+          echo "API_CLIENT_JWT_EXPIRES_IN=${{ vars.ENV_API_CLIENT_JWT_EXPIRES_IN }}" >> src/.env
+          echo "EMAIL_SENDER=${{ vars.ENV_EMAIL_SENDER }}" >> src/.env
+          echo "AUTO_RUN_MIGRATIONS=${{ vars.ENV_AUTO_RUN_MIGRATIONS }}" >> src/.env
+          echo "DB_HOST=${{ vars.ENV_DB_HOST }}" >> src/.env
+          echo "DB_PORT=${{ vars.ENV_DB_PORT }}" >> src/.env
+          echo "DB_USERNAME=${{ vars.ENV_DB_USERNAME }}" >> src/.env
+          echo "DB_PASSWORD=${{ vars.ENV_DB_PASSWORD }}" >> src/.env
+          echo "DB_NAME=${{ vars.ENV_DB_NAME }}" >> src/.env
+          echo "EMAIL_PORT=${{ vars.ENV_EMAIL_PORT }}" >> src/.env
+          echo "EMAIL_HOST=${{ vars.ENV_EMAIL_HOST }}" >> src/.env
+          echo "EMAIL_USER=${{ vars.ENV_EMAIL_USER }}" >> src/.env
+          echo "EMAIL_PASS=${{ vars.ENV_EMAIL_PASS }}" >> src/.env
+          echo "EMAIL_SECURE=${{ vars.ENV_EMAIL_SECURE }}" >> src/.env
+          echo "ORIGINS=${{ vars.ENV_ORIGINS }}" >> src/.env
+          echo "LOCAL_URL=${{ vars.ENV_LOCAL_URL }}" >> src/.env
+          echo "STAGING_URL=${{ vars.ENV_STAGING_URL }}" >> src/.env
+          echo "PAYMENT_KEY=${{ vars.ENV_PAYMENT_KEY }}" >> src/.env
+          echo "API_BASE_URL=${{ vars.ENV_API_BASE_URL }}" >> src/.env
+          echo "API_OPERATION=${{ vars.ENV_API_OPERATION }}" >> src/.env
+          echo "USERNAME=${{ vars.ENV_USERNAME }}" >> src/.env
+          echo "SECRETE=${{ vars.ENV_SECRETE }}" >> src/.env
+          echo "MERCHANT=${{ vars.ENV_MERCHANT }}" >> src/.env
+          echo "INTERACTION_OPERETION=${{ vars.ENV_INTERACTION_OPERETION }}" >> src/.env
+          echo "MERCHANT_NAME=${{ vars.ENV_MERCHANT_NAME }}" >> src/.env
+          echo "NIN_ENDPOINT=${{ vars.ENV_NIN_ENDPOINT }}" >> src/.env
+          echo "NIN_API_KEY=${{ vars.ENV_NIN_API_KEY }}" >> src/.env
+          echo "NIN_API_SECRETE=${{ vars.ENV_NIN_API_SECRETE }}" >> src/.env
+          echo "NIN_VERIFICATION=${{ vars.ENV_NIN_VERIFICATION }}" >> src/.env
+          echo "NIN_AUTH_USERNAME=${{ vars.ENV_NIN_AUTH_USERNAME }}" >> src/.env
+          echo "NIN_AUTH_PASSWORD=${{ vars.ENV_NIN_AUTH_PASSWORD }}" >> src/.env
+          echo "ATTACHMENT_S3_BUCKET=${{ vars.ENV_ATTACHMENT_S3_BUCKET }}" >> src/.env
+          echo "APP_AWS_REGION=${{ vars.ENV_APP_AWS_REGION }}" >> src/.env
+          echo "APP_AWS_SECRET_ACCESS_KEY=${{ vars.ENV_APP_AWS_SECRET_ACCESS_KEY }}" >> src/.env
+          echo "APP_AWS_ACCESS_KEY_ID=${{ vars.ENV_APP_AWS_ACCESS_KEY_ID }}" >> src/.env
+          echo "APP_AWS_ACCOUNT_ID=${{ vars.ENV_APP_AWS_ACCOUNT_ID }}" >> src/.env
+          echo "APP_AWS_NOTIFICATIONS_QUEUE_NAME=${{ vars.ENV_APP_AWS_NOTIFICATIONS_QUEUE_NAME }}" >> src/.env
+          echo "OTP_LOGIN_KEY=${{ vars.ENV_OTP_LOGIN_KEY }}" >> src/.env
+          echo "OTP_LOGIN_EXPIRED_TIME=${{ vars.ENV_OTP_LOGIN_EXPIRED_TIME }}" >> src/.env
+          echo "JWT_OTP_KEY=${{ vars.ENV_JWT_OTP_KEY }}" >> src/.env
+          echo "JWT_OTP_LOGIN_EXPIRED_TIME=${{ vars.ENV_JWT_OTP_LOGIN_EXPIRED_TIME }}" >> src/.env
 
       - name: Build Docker Image
         run: |
@@ -176,18 +174,18 @@ EOF
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy Docker image and docker-compose via S3" \
-            --parameters commands="[\"
-              set -e\",
-              \\"if ! command -v aws &> /dev/null; then curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip' && unzip awscliv2.zip && ./aws/install; fi\\",
-              \\"if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi\\",
-              \\"mkdir -p /home/ubuntu/src /home/ubuntu/backup\\",
-              \\"aws s3 cp s3://${BACKUP_BUCKET}/docker-compose/${ENV}/docker-compose.yml /home/ubuntu/docker-compose.yml\\",
-              \\"aws s3 cp s3://${BACKUP_BUCKET}/env/${ENV}/.env /home/ubuntu/src/.env\\",
-              \\"aws s3 cp s3://${BACKUP_BUCKET}/docker-images/${ENV}/${BUILD_TAG}.tar.gz /home/ubuntu/app.tar.gz\\",
-              \\"gunzip -f /home/ubuntu/app.tar.gz\\",
-              \\"docker load < /home/ubuntu/app.tar && cp /home/ubuntu/app.tar /home/ubuntu/backup/last-known-good.tar\\",
-              \\"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml down || true\\",
-              \\"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d)\"
+            --parameters commands="[\ 
+              \"set -e\",\
+              \"if ! command -v aws &> /dev/null; then curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip' && unzip awscliv2.zip && ./aws/install; fi\",\
+              \"if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi\",\
+              \"mkdir -p /home/ubuntu/backup /home/ubuntu/src\",\
+              \"aws s3 cp s3://${BACKUP_BUCKET}/docker-compose/${ENV}/docker-compose.yml /home/ubuntu/docker-compose.yml\",\
+              \"aws s3 cp s3://${BACKUP_BUCKET}/env/${ENV}/.env /home/ubuntu/src/.env\",\
+              \"aws s3 cp s3://${BACKUP_BUCKET}/docker-images/${ENV}/${BUILD_TAG}.tar.gz /home/ubuntu/app.tar.gz\",\
+              \"gunzip -f /home/ubuntu/app.tar.gz\",\
+              \"docker load < /home/ubuntu/app.tar && cp /home/ubuntu/app.tar /home/ubuntu/backup/last-known-good.tar\",\
+              \"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml down || true\",\
+              \"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d)\"\
             ]" \
             --timeout-seconds 600 \
             --output text
