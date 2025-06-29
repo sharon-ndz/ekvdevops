@@ -63,7 +63,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # ================== Terraform: VPC ==================
       - name: Terraform Apply VPC
         if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
         run: |
@@ -72,7 +71,6 @@ jobs:
           terraform plan -var-file="${ENV}.tfvars"
           terraform apply -auto-approve -var-file="${ENV}.tfvars"
 
-      # ================== Terraform: NLB ==================
       - name: Terraform Apply NLB
         if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
         run: |
@@ -81,7 +79,6 @@ jobs:
           terraform plan -var-file="${ENV}.tfvars"
           terraform apply -auto-approve -var-file="${ENV}.tfvars"
 
-      # ================== Terraform: HTTP API ==================
       - name: Terraform Apply HTTP API
         if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
         run: |
@@ -90,7 +87,6 @@ jobs:
           terraform plan -var-file="${ENV}.tfvars"
           terraform apply -auto-approve -var-file="${ENV}.tfvars"
 
-      # ================== Terraform: CloudWatch ==================
       - name: Terraform Apply CloudWatch
         if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
         run: |
@@ -99,7 +95,6 @@ jobs:
           terraform plan -var-file="${ENV}.tfvars"
           terraform apply -auto-approve -var-file="${ENV}.tfvars"
 
-      # ================== Docker Build ==================
       - name: Generate Docker Build Tag
         run: echo "BUILD_TAG=license-api-$(date +'%d%m%Y%H%M%S')" >> $GITHUB_ENV
 
@@ -113,7 +108,6 @@ jobs:
         run: |
           aws s3 cp docker/output/$BUILD_TAG.tar.gz s3://${{ env.BACKUP_BUCKET }}/docker-images/$ENV/$BUILD_TAG.tar.gz
 
-      # ================== EC2 Deployment via SSM ==================
       - name: Deploy artifact using SSM
         run: |
           INSTANCE_ID=$(aws ec2 describe-instances \
@@ -127,16 +121,17 @@ jobs:
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy Docker image from S3 and restart container" \
-            --parameters 'commands=[
-              "set -e",
-              "if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi",
-              "mkdir -p /home/ubuntu/backup",
-              "[ -f /home/ubuntu/app.tar ] && cp /home/ubuntu/app.tar /home/ubuntu/backup/last-known-good.tar || true",
-              "aws s3 cp s3://${BACKUP_BUCKET}/docker-images/${ENV}/${BUILD_TAG}.tar.gz /home/ubuntu/app.tar.gz",
-              "gunzip -f /home/ubuntu/app.tar.gz",
-              "docker load < /home/ubuntu/app.tar",
-              "docker-compose down || true",
-              "docker-compose up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose up -d)"
-            ]' \
+            --parameters "{\"commands\": [
+              \"set -e\",
+              \"if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi\",
+              \"mkdir -p /home/ubuntu/backup\",
+              \"[ -f /home/ubuntu/app.tar ] && cp /home/ubuntu/app.tar /home/ubuntu/backup/last-known-good.tar || true\",
+              \"aws s3 cp s3://${{ env.BACKUP_BUCKET }}/docker-images/${{ env.ENV }}/${{ env.BUILD_TAG }}.tar.gz /home/ubuntu/app.tar.gz\",
+              \"gunzip -f /home/ubuntu/app.tar.gz\",
+              \"docker load < /home/ubuntu/app.tar\",
+              \"docker-compose down || true\",
+              \"docker-compose up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose up -d)\"
+            ]}" \
             --timeout-seconds 600 \
             --output text
+
