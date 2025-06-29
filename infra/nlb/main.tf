@@ -27,10 +27,23 @@ module "group_1_nlb" {
   target_port          = var.target_port
   environment          = var.environment
 
-  subnet_mapping = [
-    for subnet_id in data.terraform_remote_state.vpc.outputs.private_subnets_ids :
-    { subnet_id = subnet_id }
+  locals {
+  az_to_subnet = zipmap(
+    data.terraform_remote_state.vpc.outputs.private_subnets_azs,
+    data.terraform_remote_state.vpc.outputs.private_subnets_ids
+  )
+
+  unique_subnets_per_az = [
+    for az, subnet_id in local.az_to_subnet :
+    { az = az, subnet_id = subnet_id }
   ]
+}
+
+subnet_mapping = [
+  for entry in local.unique_subnets_per_az :
+  { subnet_id = entry.subnet_id }
+]
+
 
   create_sg     = var.lb_create_sg
   sg_name       = "${var.environment}-group-1-nlb-sg"

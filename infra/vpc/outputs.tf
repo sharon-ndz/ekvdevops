@@ -50,3 +50,7 @@ output "ec2_private_ip" {
 output "vpc_link_subnet_ids" {
   value = module.vpc.vpc_link_subnet_ids
 }
+
+output "private_subnets_azs" {
+  value = module.vpc.private_subnets_azs
+}

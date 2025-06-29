@@ -48,3 +48,8 @@ output "vpc_link_subnet_ids" {
     s.id if contains(["us-east-1a", "us-east-1b", "us-east-1c"], s.availability_zone)
   ]
 }
+
+output "private_subnets_azs" {
+  description = "AZs of the private subnets"
+  value       = aws_subnet.private_subnets[*].availability_zone
+}
