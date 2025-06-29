@@ -68,7 +68,7 @@ jobs:
         if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
         run: |
           cd infra/vpc
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/terraform.tfstate"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/vpc/terraform.tfstate"
           terraform plan -var-file="${ENV}.tfvars"
           terraform apply -auto-approve -var-file="${ENV}.tfvars"
 
@@ -77,7 +77,7 @@ jobs:
         if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
         run: |
           cd infra/nlb
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/terraform.tfstate"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/nlb/terraform.tfstate"
           terraform plan -var-file="${ENV}.tfvars"
           terraform apply -auto-approve -var-file="${ENV}.tfvars"
 
@@ -86,7 +86,7 @@ jobs:
         if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
         run: |
           cd infra/http-api
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/terraform.tfstate"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/http-api/terraform.tfstate"
           terraform plan -var-file="${ENV}.tfvars"
           terraform apply -auto-approve -var-file="${ENV}.tfvars"
 
@@ -95,7 +95,7 @@ jobs:
         if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
         run: |
           cd infra/cloudwatch
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/terraform.tfstate"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/cloudwatch/terraform.tfstate"
           terraform plan -var-file="${ENV}.tfvars"
           terraform apply -auto-approve -var-file="${ENV}.tfvars"
 
