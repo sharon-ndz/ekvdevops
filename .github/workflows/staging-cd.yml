@@ -115,29 +115,28 @@ jobs:
 
       # ================== EC2 Deployment via SSM ==================
       - name: Deploy artifact using SSM
-  run: |
-    INSTANCE_ID=$(aws ec2 describe-instances \
-      --filters "Name=tag:Name,Values=Backend API IDLMS-${ENV}" "Name=instance-state-name,Values=running" \
-      --query "Reservations[].Instances[].InstanceId" \
-      --output text)
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=Backend API IDLMS-${ENV}" "Name=instance-state-name,Values=running" \
+            --query "Reservations[].Instances[].InstanceId" \
+            --output text)
 
-    echo "Deploying to instance: $INSTANCE_ID"
+          echo "Deploying to instance: $INSTANCE_ID"
 
-    aws ssm send-command \
-      --instance-ids "$INSTANCE_ID" \
-      --document-name "AWS-RunShellScript" \
-      --comment "Deploy Docker image from S3 and restart container" \
-      --parameters 'commands=[
-        "set -e",
-        "if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi",
-        "mkdir -p /home/ubuntu/backup",
-        "[ -f /home/ubuntu/app.tar ] && cp /home/ubuntu/app.tar /home/ubuntu/backup/last-known-good.tar || true",
-        "aws s3 cp s3://${BACKUP_BUCKET}/docker-images/${ENV}/${BUILD_TAG}.tar.gz /home/ubuntu/app.tar.gz",
-        "gunzip -f /home/ubuntu/app.tar.gz",
-        "docker load < /home/ubuntu/app.tar",
-        "docker-compose down || true",
-        "docker-compose up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose up -d)"
-      ]' \
-      --timeout-seconds 600 \
-      --output text
-
+          aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy Docker image from S3 and restart container" \
+            --parameters 'commands=[
+              "set -e",
+              "if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi",
+              "mkdir -p /home/ubuntu/backup",
+              "[ -f /home/ubuntu/app.tar ] && cp /home/ubuntu/app.tar /home/ubuntu/backup/last-known-good.tar || true",
+              "aws s3 cp s3://${BACKUP_BUCKET}/docker-images/${ENV}/${BUILD_TAG}.tar.gz /home/ubuntu/app.tar.gz",
+              "gunzip -f /home/ubuntu/app.tar.gz",
+              "docker load < /home/ubuntu/app.tar",
+              "docker-compose down || true",
+              "docker-compose up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose up -d)"
+            ]' \
+            --timeout-seconds 600 \
+            --output text
