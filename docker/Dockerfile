@@ -9,10 +9,10 @@ COPY package*.json ./
 # Install all dependencies including @nestjs/cli
 RUN npm install
 
-# Copy the full source code
+# Copy the rest of the source code
 COPY . .
 
-# Build the NestJS app (uses nest CLI)
+# Build the NestJS app (assumes main.ts and tsconfig etc. are here)
 RUN npm run build
 
 # Stage 2: Production image
@@ -20,11 +20,11 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy only necessary files
+# Copy package files and install production deps
 COPY package*.json ./
 RUN npm install --only=production
 
-# Copy the built output from previous stage
+# Copy built app from builder
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 4000
