@@ -1,8 +1,8 @@
 ###VPC###
 environment = "dev"
 region      = "us-east-1"
-ec2_ssm_profile_name = "dev-ec2_ssm_profile"
-ec2_ssm_role_name    = "ec2_ssm_role-dev"
+ec2_ssm_profile_name = "ec2_ssm_profile-dev"
+ec2_ssm_role_name    = "dev-ec2_ssm_role"
 tf_state_bucket      = "my-terraform-state-bckt43"
 ami_id               = "ami-020cba7c55df1f615"
 
