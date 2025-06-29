@@ -108,9 +108,60 @@ jobs:
         run: |
           aws s3 cp docker/docker-compose.yml s3://${BACKUP_BUCKET}/docker-compose/$ENV/docker-compose.yml
 
-      - name: Upload .env file to S3
+      - name: Generate .env from GitHub Secrets
         run: |
-          aws s3 cp src/.env s3://${BACKUP_BUCKET}/env/$ENV/.env
+          mkdir -p docker/output
+          cat <<EOF > docker/output/.env
+PORT=${{ secrets.PORT }}
+APP_NAME=${{ secrets.APP_NAME }}
+NODE_ENV=${{ secrets.NODE_ENV }}
+SALT_ROUNDS=${{ secrets.SALT_ROUNDS }}
+JWT_SECRET=${{ secrets.JWT_SECRET }}
+API_CLIENT_JWT_EXPIRES_IN=${{ secrets.API_CLIENT_JWT_EXPIRES_IN }}
+EMAIL_SENDER=${{ secrets.EMAIL_SENDER }}
+AUTO_RUN_MIGRATIONS=${{ secrets.AUTO_RUN_MIGRATIONS }}
+DB_HOST=${{ secrets.DB_HOST }}
+DB_PORT=${{ secrets.DB_PORT }}
+DB_USERNAME=${{ secrets.DB_USERNAME }}
+DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+DB_NAME=${{ secrets.DB_NAME }}
+EMAIL_PORT=${{ secrets.EMAIL_PORT }}
+EMAIL_HOST=${{ secrets.EMAIL_HOST }}
+EMAIL_USER=${{ secrets.EMAIL_USER }}
+EMAIL_PASS=${{ secrets.EMAIL_PASS }}
+EMAIL_SECURE=${{ secrets.EMAIL_SECURE }}
+ORIGINS=${{ secrets.ORIGINS }}
+LOCAL_URL=${{ secrets.LOCAL_URL }}
+STAGING_URL=${{ secrets.STAGING_URL }}
+PAYMENT_KEY=${{ secrets.PAYMENT_KEY }}
+API_BASE_URL=${{ secrets.API_BASE_URL }}
+API_OPERATION=${{ secrets.API_OPERATION }}
+USERNAME=${{ secrets.USERNAME }}
+SECRETE=${{ secrets.SECRETE }}
+MERCHANT=${{ secrets.MERCHANT }}
+INTERACTION_OPERETION=${{ secrets.INTERACTION_OPERETION }}
+MERCHANT_NAME=${{ secrets.MERCHANT_NAME }}
+NIN_ENDPOINT=${{ secrets.NIN_ENDPOINT }}
+NIN_API_KEY=${{ secrets.NIN_API_KEY }}
+NIN_API_SECRETE=${{ secrets.NIN_API_SECRETE }}
+NIN_VERIFICATION=${{ secrets.NIN_VERIFICATION }}
+NIN_AUTH_USERNAME=${{ secrets.NIN_AUTH_USERNAME }}
+NIN_AUTH_PASSWORD=${{ secrets.NIN_AUTH_PASSWORD }}
+ATTACHMENT_S3_BUCKET=${{ secrets.ATTACHMENT_S3_BUCKET }}
+APP_AWS_REGION=${{ secrets.APP_AWS_REGION }}
+APP_AWS_SECRET_ACCESS_KEY=${{ secrets.APP_AWS_SECRET_ACCESS_KEY }}
+APP_AWS_ACCESS_KEY_ID=${{ secrets.APP_AWS_ACCESS_KEY_ID }}
+APP_AWS_ACCOUNT_ID=${{ secrets.APP_AWS_ACCOUNT_ID }}
+APP_AWS_NOTIFICATIONS_QUEUE_NAME=${{ secrets.APP_AWS_NOTIFICATIONS_QUEUE_NAME }}
+OTP_LOGIN_KEY=${{ secrets.OTP_LOGIN_KEY }}
+OTP_LOGIN_EXPIRED_TIME=${{ secrets.OTP_LOGIN_EXPIRED_TIME }}
+JWT_OTP_KEY=${{ secrets.JWT_OTP_KEY }}
+JWT_OTP_LOGIN_EXPIRED_TIME=${{ secrets.JWT_OTP_LOGIN_EXPIRED_TIME }}
+EOF
+
+      - name: Upload generated .env file to S3
+        run: |
+          aws s3 cp docker/output/.env s3://${BACKUP_BUCKET}/env/$ENV/.env
 
       - name: Deploy using SSM
         run: |
@@ -136,7 +187,7 @@ jobs:
               \"gunzip -f /home/ubuntu/app.tar.gz\",
               \"docker load < /home/ubuntu/app.tar && cp /home/ubuntu/app.tar /home/ubuntu/backup/last-known-good.tar\",
               \"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml down || true\",
-              \"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d)\"
+              \"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d)\" 
             ]" \
             --timeout-seconds 600 \
             --output text
