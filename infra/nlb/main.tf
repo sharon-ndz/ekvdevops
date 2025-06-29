@@ -12,8 +12,21 @@
   #access_logs_bucket    = var.access_logs_bucket
   #access_logs_prefix    = var.access_logs_prefix
 #}
+
 provider "aws" {
   region = var.region
+}
+
+locals {
+  az_to_subnet = zipmap(
+    data.terraform_remote_state.vpc.outputs.private_subnets_azs,
+    data.terraform_remote_state.vpc.outputs.private_subnets_ids
+  )
+
+  unique_subnets_per_az = [
+    for az, subnet_id in local.az_to_subnet :
+    { az = az, subnet_id = subnet_id }
+  ]
 }
 
 module "group_1_nlb" {
@@ -27,31 +40,21 @@ module "group_1_nlb" {
   target_port          = var.target_port
   environment          = var.environment
 
-  locals {
-  az_to_subnet = zipmap(
-    data.terraform_remote_state.vpc.outputs.private_subnets_azs,
-    data.terraform_remote_state.vpc.outputs.private_subnets_ids
-  )
-
-  unique_subnets_per_az = [
-    for az, subnet_id in local.az_to_subnet :
-    { az = az, subnet_id = subnet_id }
+  subnet_mapping = [
+    for entry in local.unique_subnets_per_az :
+    { subnet_id = entry.subnet_id }
   ]
-}
-
-subnet_mapping = [
-  for entry in local.unique_subnets_per_az :
-  { subnet_id = entry.subnet_id }
-]
-
 
   create_sg     = var.lb_create_sg
   sg_name       = "${var.environment}-group-1-nlb-sg"
   ingress_roles = local.lb_sg_ingress_roles
   egress_roles  = var.lb_egress_roles
-  tags = var.common_tags
+  tags          = var.common_tags
+}
+
+
 
   # ✅ Use S3 bucket created by local cloudwatch module
 #  access_logs_bucket = var.access_logs_bucket
 #  access_logs_prefix = var.access_logs_prefix 
-}
+
