@@ -5,8 +5,6 @@ ec2_ssm_profile_name = "ec2_ssm_profile-dev"
 ec2_ssm_role_name    = "dev-ec2_ssm_role"
 tf_state_bucket      = "my-terraform-state-bckt43"
 ami_id               = "ami-020cba7c55df1f615"
-github_repo   = "jbn434/idms-dev-test"
-github_branch = "main"
 
 
 docker_artifact_bucket = "idlms-website-built-artifact"

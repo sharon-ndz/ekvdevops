@@ -14,7 +14,6 @@ on:
 env:
   AWS_REGION: us-east-1
   TF_BUCKET: my-terraform-state-bckt43
-  ECR_REPO: license-api
 
 jobs:
   deploy:
@@ -64,8 +63,24 @@ jobs:
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
-      # ===== ECR Build + Push + Deploy =====
+      # ✅ ECR & SSM Terraform Apply and Outputs
+      - name: Terraform Apply ECR
+        id: ecr
+        run: |
+          cd infra/ecr
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+          echo "ECR_REPO_URL=$(terraform output -raw ecr_repository_url)" >> $GITHUB_ENV
 
+      - name: Terraform Apply SSM
+        id: ssm
+        run: |
+          cd infra/ssm
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+          echo "SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name)" >> $GITHUB_ENV
+
+      # ✅ Docker Build and Push to ECR
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -76,8 +91,8 @@ jobs:
           DATE_TAG=$(date +'%Y.%m.%d')
           BUILD_NUM=$(printf "%03d" $GITHUB_RUN_NUMBER)
           BUILD_TAG="${DATE_TAG}.${BUILD_NUM}"
-          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO }}:${BUILD_TAG}"
-          LATEST_URI="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO }}:latest"
+          IMAGE_URI="${ECR_REPO_URL}:${BUILD_TAG}"
+          LATEST_URI="${ECR_REPO_URL}:latest"
 
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
           echo "LATEST_URI=$LATEST_URI" >> $GITHUB_ENV
@@ -100,6 +115,7 @@ jobs:
             --type String \
             --overwrite
 
+      # ✅ Deploy to EC2 with Correct .env Path from Terraform SSM Output
       - name: Deploy to EC2 via SSM
         run: |
           INSTANCE_ID=$(aws ec2 describe-instances \
@@ -115,12 +131,12 @@ jobs:
           echo "Deploying to instance: $INSTANCE_ID"
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
-          # Generate .env file from SSM before docker-compose
+          # ✅ Fetch .env using the dynamic path from SSM
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --parameters 'commands=[
-              "ENV=$(aws ssm get-parameter --name \"/idlms/env/shared\" --with-decryption --query \"Parameter.Value\" --output text)",
+              "ENV=$(aws ssm get-parameter --name \"'"$SSM_ENV_PARAM"'\" --with-decryption --query \"Parameter.Value\" --output text)",
               "echo \"$ENV\" > /home/ubuntu/.env",
               "echo \"BUILD_TAG=${BUILD_TAG}\" >> /home/ubuntu/.env"
             ]' \
@@ -128,14 +144,14 @@ jobs:
             --region $AWS_REGION \
             --output text
 
-          # Run docker-compose to deploy API
+          # ✅ Pull and restart containers
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Pull and restart License API with latest image" \
             --parameters 'commands=[
               "set -e",
-              "aws ecr get-login-password --region '${AWS_REGION}' | docker login --username AWS --password-stdin '${{ steps.login-ecr.outputs.registry }}'",
+              "aws ecr get-login-password --region '${AWS_REGION}' | docker login --username AWS --password-stdin '${ECR_REPO_URL%/*}'",
               "cd /home/ubuntu/",
               "docker-compose pull",
               "docker-compose up -d"
