@@ -70,7 +70,8 @@ jobs:
           cd infra/ecr
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
-          echo "ECR_REPO_URL=$(terraform output -raw ecr_repository_url)" >> $GITHUB_ENV
+          ECR_REPO_URL=$(terraform output -raw ecr_repository_url)
+          echo "ECR_REPO_URL=${ECR_REPO_URL}" | sed 's/::/%3A%3A/g' >> $GITHUB_ENV
 
       - name: Terraform Apply SSM
         id: ssm
