@@ -7,3 +7,7 @@ variable "region" {
   type        = string
 }
 
+variable "app_env_content" {
+  type        = string
+  description = "The contents of the .env file"
+}
