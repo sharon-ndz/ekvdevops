@@ -54,3 +54,8 @@ output "vpc_link_subnet_ids" {
 output "private_subnets_azs" {
   value = module.vpc.private_subnets_azs
 }
+
+output "github_actions_role_arn" {
+  value = aws_iam_role.github_oidc_role.arn
+  description = "IAM Role ARN to use as GITHUB_ROLE secret in GitHub Actions"
+}

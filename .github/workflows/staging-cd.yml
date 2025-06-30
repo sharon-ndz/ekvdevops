@@ -1,192 +1,115 @@
-name: Build and Deploy License API
+name: Deploy License API
 
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: "Deployment environment"
+      ENV:
+        description: 'Environment to deploy (dev/staging/prod)'
         required: true
-        default: "dev"
-        type: choice
-        options:
-          - dev
-          - stage
-          - prod
+        default: 'staging'
+      ROLLBACK_TAG:
+        description: 'Optional: Previous build tag (e.g., 2025.06.30.02). If left blank, deploys latest.'
+        required: false
+
+env:
+  AWS_REGION: us-east-1
+  TF_BUCKET: my-terraform-state-bckt43
+  ECR_REPO: license-api
 
 jobs:
-  detect-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      run_infra: ${{ steps.filter.outputs.infra }}
-      run_build: ${{ steps.filter.outputs.build }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Filter Changes
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            infra:
-              - 'infra/**'
-            build:
-              - 'docker/**'
-              - 'docker-compose.yml'
-              - 'src/**'
-
   deploy:
-    needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.run_infra == 'true' || needs.detect-changes.outputs.run_build == 'true' }}
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
-
-    env:
-      AWS_REGION: us-east-1
-      TF_BUCKET: my-terraform-state-bckt43
-      BACKUP_BUCKET: idlms-website-built-artifact
-      ENV: ${{ github.event.inputs.environment }}
+    environment: ${{ github.event.inputs.ENV }}
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.0
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.GITHUB_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Apply VPC
-        if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
         run: |
           cd infra/vpc
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/vpc/terraform.tfstate"
-          terraform apply -auto-approve -var-file="${ENV}.tfvars"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/vpc/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply NLB
-        if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
         run: |
           cd infra/nlb
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/nlb/terraform.tfstate"
-          terraform apply -auto-approve -var-file="${ENV}.tfvars"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/nlb/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
-      - name: Terraform Apply HTTP API
-        if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
+      - name: Terraform Apply API Gateway
         run: |
           cd infra/http-api
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/http-api/terraform.tfstate"
-          terraform apply -auto-approve -var-file="${ENV}.tfvars"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply CloudWatch
-        if: ${{ needs.detect-changes.outputs.run_infra == 'true' }}
         run: |
           cd infra/cloudwatch
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${ENV}/cloudwatch/terraform.tfstate"
-          terraform apply -auto-approve -var-file="${ENV}.tfvars"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
-      - name: Generate Docker Build Tag
-        run: echo "BUILD_TAG=license-api-$(date +'%d%m%Y%H%M%S')" >> $GITHUB_ENV
+      # ========== ECR Build + Push + Deploy ==========
 
-      - name: Generate .env file from GitHub Environment Variables
+      - name: Get AWS Account ID
+        run: echo "AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_ENV
+
+      - name: Decide Image URI
+        id: decide-image
         run: |
-          mkdir -p src
-          echo "PORT=${{ vars.ENV_PORT }}" >> src/.env
-          echo "APP_NAME=${{ vars.ENV_APP_NAME }}" >> src/.env
-          echo "NODE_ENV=${{ vars.ENV_NODE_ENV }}" >> src/.env
-          echo "SALT_ROUNDS=${{ vars.ENV_SALT_ROUNDS }}" >> src/.env
-          echo "JWT_SECRET=${{ vars.ENV_JWT_SECRET }}" >> src/.env
-          echo "API_CLIENT_JWT_EXPIRES_IN=${{ vars.ENV_API_CLIENT_JWT_EXPIRES_IN }}" >> src/.env
-          echo "EMAIL_SENDER=${{ vars.ENV_EMAIL_SENDER }}" >> src/.env
-          echo "AUTO_RUN_MIGRATIONS=${{ vars.ENV_AUTO_RUN_MIGRATIONS }}" >> src/.env
-          echo "DB_HOST=${{ vars.ENV_DB_HOST }}" >> src/.env
-          echo "DB_PORT=${{ vars.ENV_DB_PORT }}" >> src/.env
-          echo "DB_USERNAME=${{ vars.ENV_DB_USERNAME }}" >> src/.env
-          echo "DB_PASSWORD=${{ vars.ENV_DB_PASSWORD }}" >> src/.env
-          echo "DB_NAME=${{ vars.ENV_DB_NAME }}" >> src/.env
-          echo "EMAIL_PORT=${{ vars.ENV_EMAIL_PORT }}" >> src/.env
-          echo "EMAIL_HOST=${{ vars.ENV_EMAIL_HOST }}" >> src/.env
-          echo "EMAIL_USER=${{ vars.ENV_EMAIL_USER }}" >> src/.env
-          echo "EMAIL_PASS=${{ vars.ENV_EMAIL_PASS }}" >> src/.env
-          echo "EMAIL_SECURE=${{ vars.ENV_EMAIL_SECURE }}" >> src/.env
-          echo "ORIGINS=${{ vars.ENV_ORIGINS }}" >> src/.env
-          echo "LOCAL_URL=${{ vars.ENV_LOCAL_URL }}" >> src/.env
-          echo "STAGING_URL=${{ vars.ENV_STAGING_URL }}" >> src/.env
-          echo "PAYMENT_KEY=${{ vars.ENV_PAYMENT_KEY }}" >> src/.env
-          echo "API_BASE_URL=${{ vars.ENV_API_BASE_URL }}" >> src/.env
-          echo "API_OPERATION=${{ vars.ENV_API_OPERATION }}" >> src/.env
-          echo "USERNAME=${{ vars.ENV_USERNAME }}" >> src/.env
-          echo "SECRETE=${{ vars.ENV_SECRETE }}" >> src/.env
-          echo "MERCHANT=${{ vars.ENV_MERCHANT }}" >> src/.env
-          echo "INTERACTION_OPERETION=${{ vars.ENV_INTERACTION_OPERETION }}" >> src/.env
-          echo "MERCHANT_NAME=${{ vars.ENV_MERCHANT_NAME }}" >> src/.env
-          echo "NIN_ENDPOINT=${{ vars.ENV_NIN_ENDPOINT }}" >> src/.env
-          echo "NIN_API_KEY=${{ vars.ENV_NIN_API_KEY }}" >> src/.env
-          echo "NIN_API_SECRETE=${{ vars.ENV_NIN_API_SECRETE }}" >> src/.env
-          echo "NIN_VERIFICATION=${{ vars.ENV_NIN_VERIFICATION }}" >> src/.env
-          echo "NIN_AUTH_USERNAME=${{ vars.ENV_NIN_AUTH_USERNAME }}" >> src/.env
-          echo "NIN_AUTH_PASSWORD=${{ vars.ENV_NIN_AUTH_PASSWORD }}" >> src/.env
-          echo "ATTACHMENT_S3_BUCKET=${{ vars.ENV_ATTACHMENT_S3_BUCKET }}" >> src/.env
-          echo "APP_AWS_REGION=${{ vars.ENV_APP_AWS_REGION }}" >> src/.env
-          echo "APP_AWS_SECRET_ACCESS_KEY=${{ vars.ENV_APP_AWS_SECRET_ACCESS_KEY }}" >> src/.env
-          echo "APP_AWS_ACCESS_KEY_ID=${{ vars.ENV_APP_AWS_ACCESS_KEY_ID }}" >> src/.env
-          echo "APP_AWS_ACCOUNT_ID=${{ vars.ENV_APP_AWS_ACCOUNT_ID }}" >> src/.env
-          echo "APP_AWS_NOTIFICATIONS_QUEUE_NAME=${{ vars.ENV_APP_AWS_NOTIFICATIONS_QUEUE_NAME }}" >> src/.env
-          echo "OTP_LOGIN_KEY=${{ vars.ENV_OTP_LOGIN_KEY }}" >> src/.env
-          echo "OTP_LOGIN_EXPIRED_TIME=${{ vars.ENV_OTP_LOGIN_EXPIRED_TIME }}" >> src/.env
-          echo "JWT_OTP_KEY=${{ vars.ENV_JWT_OTP_KEY }}" >> src/.env
-          echo "JWT_OTP_LOGIN_EXPIRED_TIME=${{ vars.ENV_JWT_OTP_LOGIN_EXPIRED_TIME }}" >> src/.env
+          if [ -z "${{ github.event.inputs.ROLLBACK_TAG }}" ]; then
+            DATE_TAG=$(date +'%Y.%m.%d.%H%M')
+            GIT_TAG=$(git rev-parse --short HEAD)
+            BUILD_TAG="${DATE_TAG}-${GIT_TAG}"
+            IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${BUILD_TAG}"
 
-      - name: Build Docker Image
+            echo "BUILD_TAG=$BUILD_TAG" >> $GITHUB_ENV
+            echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+            echo "should_build_image=true" >> $GITHUB_ENV
+          else
+            IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${{ github.event.inputs.ROLLBACK_TAG }}"
+            echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+            echo "should_build_image=false" >> $GITHUB_ENV
+          fi
+
+      - name: Log in to Amazon ECR
+        if: env.should_build_image == 'true'
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push Docker Image to ECR
+        if: env.should_build_image == 'true'
         run: |
           docker build -t $BUILD_TAG -f docker/Dockerfile src
-          mkdir -p docker/output
-          docker save $BUILD_TAG | gzip > docker/output/$BUILD_TAG.tar.gz
+          docker tag $BUILD_TAG $IMAGE_URI
+          docker push $IMAGE_URI
 
-      - name: Upload Docker Image to S3
-        run: |
-          aws s3 cp docker/output/$BUILD_TAG.tar.gz s3://${BACKUP_BUCKET}/docker-images/$ENV/$BUILD_TAG.tar.gz
-
-      - name: Upload docker-compose.yml to S3
-        run: |
-          aws s3 cp docker/docker-compose.yml s3://${BACKUP_BUCKET}/docker-compose/$ENV/docker-compose.yml
-
-      - name: Upload .env file to S3
-        run: |
-          aws s3 cp src/.env s3://${BACKUP_BUCKET}/env/$ENV/.env
-
-      - name: Deploy using SSM
+      - name: Deploy to EC2 via SSM
         run: |
           INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=Backend API IDLMS-${ENV}" "Name=instance-state-name,Values=running" \
-            --query "Reservations[].Instances[].InstanceId" \
-            --output text)
+            --filters "Name=tag:Name,Values=Backend API IDLMS-${{ github.event.inputs.ENV }}" "Name=instance-state-name,Values=running" \
+            --query "Reservations[].Instances[].InstanceId" --output text)
 
           echo "Deploying to instance: $INSTANCE_ID"
 
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --comment "Deploy Docker image and docker-compose via S3" \
-            --parameters commands="[
-              \"set -e\",
-              \"if ! command -v aws &> /dev/null; then curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip && unzip awscliv2.zip && ./aws/install -i /usr/local/aws-cli -b /usr/local/bin -u; fi\",
-              \"if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi\",
-              \"mkdir -p /home/ubuntu/backup /home/ubuntu/src\",
-              \"aws s3 cp s3://${BACKUP_BUCKET}/docker-compose/${ENV}/docker-compose.yml /home/ubuntu/docker-compose.yml\",
-              \"aws s3 cp s3://${BACKUP_BUCKET}/env/${ENV}/.env /home/ubuntu/src/.env\",
-              \"aws s3 cp s3://${BACKUP_BUCKET}/docker-images/${ENV}/${BUILD_TAG}.tar.gz /home/ubuntu/app.tar.gz\",
-              \"gunzip -f /home/ubuntu/app.tar.gz\",
-              \"docker load < /home/ubuntu/app.tar && cp /home/ubuntu/app.tar /home/ubuntu/backup/last-known-good.tar\",
-              \"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml down || true\",
-              \"docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d || (echo 'Deployment failed. Rolling back...' && docker load < /home/ubuntu/backup/last-known-good.tar && docker-compose --env-file /home/ubuntu/src/.env -f /home/ubuntu/docker-compose.yml up -d)\"
-            ]" \
+            --comment "Deploy Docker image from ECR using docker-compose" \
+            --parameters '{"commands":["#!/bin/bash","set -e","if ! command -v aws &> /dev/null; then curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip && unzip awscliv2.zip && ./aws/install -i /usr/local/aws-cli -b /usr/local/bin -u; fi","if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi","aws ssm get-parameter --name \"/idlms/env/shared\" --with-decryption --query \"Parameter.Value\" --output text > /home/ubuntu/.env","aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com","docker-compose --env-file /home/ubuntu/.env -f /home/ubuntu/docker-compose.yml down || true","docker-compose --env-file /home/ubuntu/.env -f /home/ubuntu/docker-compose.yml up -d"]}' \
             --timeout-seconds 600 \
             --region $AWS_REGION \
             --output text

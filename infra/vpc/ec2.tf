@@ -11,7 +11,7 @@ resource "aws_instance" "web" {
               set -e
 
               apt-get update -y
-              apt-get install -y curl unzip wget snapd gnupg software-properties-common
+              apt-get install -y curl unzip wget snapd gnupg software-properties-common docker.io
 
               # Install SSM Agent
               snap install amazon-ssm-agent --classic
@@ -29,6 +29,13 @@ resource "aws_instance" "web" {
                 -m ec2 \
                 -c ssm:${var.cloudwatch_ssm_config_path} \
                 -s
+
+              # Create docker-compose.yml file from Terraform
+              cat <<'EOC' > /home/ubuntu/docker-compose.yml
+${indent(14, file("${path.module}/../../docker/docker-compose.yml"))}
+              EOC
+
+              chown ubuntu:ubuntu /home/ubuntu/docker-compose.yml
               EOF
 
   tags = var.ec2_tags

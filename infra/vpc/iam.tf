@@ -55,3 +55,82 @@ resource "aws_iam_role_policy_attachment" "s3_docker_backup_access" {
   role       = aws_iam_role.ec2_ssm_role.name
   policy_arn = aws_iam_policy.s3_docker_backup_access.arn
 }
+
+# ✅ ECR PULL POLICY
+resource "aws_iam_policy" "ecr_pull" {
+  name = "${var.environment}-ec2-ecr-pull-access"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecr_pull" {
+  role       = aws_iam_role.ec2_ssm_role.name
+  policy_arn = aws_iam_policy.ecr_pull.arn
+}
+
+# GitHub OIDC IAM Role
+data "aws_caller_identity" "current" {}
+
+resource "aws_iam_role" "github_oidc_role" {
+  name = "${var.environment}-github-actions-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
+        },
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Condition = {
+          StringEquals = {
+            "token.actions.githubusercontent.com:sub" = "repo:${var.github_repo}:ref:refs/heads/${var.github_branch}"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "github_ecr_push_policy" {
+  name = "${var.environment}-github-ecr-push-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:CompleteLayerUpload",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:InitiateLayerUpload",
+          "ecr:PutImage",
+          "ecr:UploadLayerPart"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "github_ecr_push" {
+  role       = aws_iam_role.github_oidc_role.name
+  policy_arn = aws_iam_policy.github_ecr_push_policy.arn
+}

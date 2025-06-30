@@ -180,3 +180,13 @@ variable "docker_artifact_bucket" {
   description = "S3 bucket name used to store Docker backup images"
   type        = string
 }
+
+variable "github_repo" {
+  description = "GitHub repository in format org/repo"
+  type        = string
+}
+
+variable "github_branch" {
+  description = "Branch allowed to assume role"
+  type        = string
+}
