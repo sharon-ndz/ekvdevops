@@ -115,6 +115,18 @@ jobs:
           echo "Deploying to instance: $INSTANCE_ID"
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
+          # Generate .env file from SSM *before* docker-compose
+          aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --parameters 'commands=[
+              "aws ssm get-parameter --name \"/idlms/env/shared\" --with-decryption --query \"Parameter.Value\" --output text > /home/ubuntu/.env"
+            ]' \
+            --timeout-seconds 300 \
+            --region $AWS_REGION \
+            --output text
+
+          # Run docker-compose to deploy API
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
@@ -127,17 +139,5 @@ jobs:
               "docker-compose up -d"
             ]' \
             --timeout-seconds 900 \
-            --output text
-
-      - name: Generate .env file from SSM
-        run: |
-          ENV=$(aws ssm get-parameter --name "/idlms/env/shared" --with-decryption --query "Parameter.Value" --output text)
-          echo "ENVIRONMENT=${ENV}" > .env
-          aws ssm send-command \
-            --instance-ids "$INSTANCE_ID" \
-            --document-name "AWS-RunShellScript" \
-            --parameters 'commands=[
-              "echo \"ENVIRONMENT='${ENV}'\" > /home/ubuntu/.env"
-            ]' \
-            --timeout-seconds 300 \
+            --region $AWS_REGION \
             --output text
