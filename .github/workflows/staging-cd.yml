@@ -63,7 +63,7 @@ jobs:
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
-      # ✅ ECR & SSM Terraform Apply and Outputs
+      # ✅ ECR block (fixed env export)
       - name: Terraform Apply ECR
         id: ecr
         run: |
@@ -71,26 +71,36 @@ jobs:
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
+          ECR_REPO_URL=$(terraform output -raw ecr_repository_url | head -n1 | tr -d '\r')
           {
             echo "ECR_REPO_URL<<EOF"
-            terraform output -raw ecr_repository_url
+            echo "$ECR_REPO_URL"
             echo "EOF"
           } >> $GITHUB_ENV
 
+      # ✅ SSM block (pull .env from SSM, encode, pass to Terraform)
       - name: Terraform Apply SSM
         id: ssm
         run: |
           cd infra/ssm
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
-          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+          ENV_CONTENT=$(aws ssm get-parameter \
+            --name "/idlms/shared/${{ github.event.inputs.ENV }}/.env" \
+            --with-decryption \
+            --query "Parameter.Value" \
+            --output text)
 
+          BASE64_ENV=$(echo "$ENV_CONTENT" | base64 -w 0)
+
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars" -var="app_env_content=${BASE64_ENV}"
+
+          SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name)
           {
             echo "SSM_ENV_PARAM<<EOF"
-            terraform output -raw ssm_env_param_name
+            echo "$SSM_ENV_PARAM"
             echo "EOF"
           } >> $GITHUB_ENV
 
-      # ✅ Docker Build and Push to ECR
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -125,7 +135,6 @@ jobs:
             --type String \
             --overwrite
 
-      # ✅ Deploy to EC2 with Correct .env Path from Terraform SSM Output
       - name: Deploy to EC2 via SSM
         run: |
           INSTANCE_ID=$(aws ec2 describe-instances \
@@ -141,7 +150,6 @@ jobs:
           echo "Deploying to instance: $INSTANCE_ID"
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
-          # ✅ Fetch .env using the dynamic path from SSM
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
@@ -154,7 +162,6 @@ jobs:
             --region $AWS_REGION \
             --output text
 
-          # ✅ Pull and restart containers
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
