@@ -63,14 +63,20 @@ jobs:
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
-      # ✅ Terraform Apply ECR (Modified)
+      # ✅ ECR & SSM Terraform Apply and Outputs
       - name: Terraform Apply ECR
         id: ecr
         run: |
           cd infra/ecr
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
-          echo "ECR_REPO_URL=$(terraform output -raw ecr_repository_url | tr -d '\r')" >> $GITHUB_ENV
+
+          ECR_REPO_URL=$(terraform output -raw ecr_repository_url)
+          {
+            echo "ECR_REPO_URL<<EOF"
+            echo "$ECR_REPO_URL"
+            echo "EOF"
+          } >> $GITHUB_ENV
 
       - name: Terraform Apply SSM
         id: ssm
@@ -80,6 +86,7 @@ jobs:
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
           echo "SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name)" >> $GITHUB_ENV
 
+      # ✅ Docker Build and Push to ECR
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -114,6 +121,7 @@ jobs:
             --type String \
             --overwrite
 
+      # ✅ Deploy to EC2 with Correct .env Path from Terraform SSM Output
       - name: Deploy to EC2 via SSM
         run: |
           INSTANCE_ID=$(aws ec2 describe-instances \
@@ -129,6 +137,7 @@ jobs:
           echo "Deploying to instance: $INSTANCE_ID"
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
+          # ✅ Fetch .env using the dynamic path from SSM
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
@@ -141,6 +150,7 @@ jobs:
             --region $AWS_REGION \
             --output text
 
+          # ✅ Pull and restart containers
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
