@@ -78,8 +78,17 @@ jobs:
         id: ssm
         run: |
           cd infra/ssm
+          ENV_CONTENT=$(aws ssm get-parameter \
+            --name "/idlms/shared/${{ github.event.inputs.ENV }}/.env" \
+            --with-decryption \
+            --query "Parameter.Value" \
+            --output text)
+
+          BASE64_ENV=$(echo "$ENV_CONTENT" | base64 -w 0)
+
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
-          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars" -var="app_env_content=${BASE64_ENV}"
+
           echo "SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name)" >> $GITHUB_ENV
 
       # ✅ Docker Build and Push to ECR
