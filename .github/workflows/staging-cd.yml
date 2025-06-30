@@ -115,12 +115,14 @@ jobs:
           echo "Deploying to instance: $INSTANCE_ID"
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
-          # Generate .env file from SSM *before* docker-compose
+          # Generate .env file from SSM before docker-compose
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --parameters 'commands=[
-              "aws ssm get-parameter --name \"/idlms/env/shared\" --with-decryption --query \"Parameter.Value\" --output text > /home/ubuntu/.env"
+              "ENV=$(aws ssm get-parameter --name \"/idlms/env/shared\" --with-decryption --query \"Parameter.Value\" --output text)",
+              "echo \"$ENV\" > /home/ubuntu/.env",
+              "echo \"BUILD_TAG=${BUILD_TAG}\" >> /home/ubuntu/.env"
             ]' \
             --timeout-seconds 300 \
             --region $AWS_REGION \
