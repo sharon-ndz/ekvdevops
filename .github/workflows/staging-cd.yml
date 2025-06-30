@@ -134,7 +134,7 @@ jobs:
             --parameters 'commands=[
               "set -e",
               "aws ecr get-login-password --region '${AWS_REGION}' | docker login --username AWS --password-stdin '${{ steps.login-ecr.outputs.registry }}'",
-              "cd /home/ubuntu/license-api",
+              "cd /home/ubuntu/",
               "docker-compose pull",
               "docker-compose up -d"
             ]' \
