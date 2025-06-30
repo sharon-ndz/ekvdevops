@@ -103,11 +103,17 @@ jobs:
       - name: Deploy to EC2 via SSM
         run: |
           INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=IDLMS-License-API" "Name=instance-state-name,Values=running" \
+            --filters "Name=tag:Name,Values=Backend API IDLMS-${{ github.event.inputs.ENV }}" "Name=instance-state-name,Values=running" \
             --query "Reservations[].Instances[].InstanceId" \
             --output text)
 
+          if [ -z "$INSTANCE_ID" ]; then
+            echo "❌ ERROR: No running EC2 instance found with tag Backend API IDLMS-${{ github.event.inputs.ENV }}"
+            exit 1
+          fi
+
           echo "Deploying to instance: $INSTANCE_ID"
+          echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
