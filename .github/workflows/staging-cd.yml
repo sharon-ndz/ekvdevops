@@ -71,12 +71,13 @@ jobs:
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
-          ECR_REPO_URL=$(terraform output -raw ecr_repository_url)
-           aws ssm put-parameter \
-            --name "/idlms/${{ github.event.inputs.ENV }}/ecr_repository_url" \
-            --value "$ECR_REPO_URL" \
-            --type String \
-            --overwrite
+          ECR_REPO_URL=$(terraform output -raw ecr_repository_url | tr -d '\r\n')
+          {
+           echo "ECR_REPO_URL<<EOF"
+           echo "$ECR_REPO_URL"
+           echo "EOF"
+          } >> $GITHUB_ENV
+
 
       # ✅ SSM block (pull .env from SSM, encode, pass to Terraform)
       - name: Terraform Apply SSM
@@ -104,12 +105,6 @@ jobs:
       - name: Generate build tags
         id: tags
         run: |
-          ECR_REPO_URL=$(aws ssm get-parameter \
-            --name "/idlms/${{ github.event.inputs.ENV }}/ecr_repository_url" \
-            --query "Parameter.Value" \
-            --output text)
-
-          echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
 
           DATE_TAG=$(date +'%Y.%m.%d')
           BUILD_NUM=$(printf "%03d" $GITHUB_RUN_NUMBER)
