@@ -28,5 +28,5 @@ RUN npm install --only=production
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 4000
-CMD ["node", "dist/src/main.js"]
+CMD ["node", "dist/main.js"]
 
