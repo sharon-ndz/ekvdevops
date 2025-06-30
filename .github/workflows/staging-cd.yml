@@ -36,8 +36,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Apply VPC
@@ -64,53 +63,74 @@ jobs:
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
-      # ========== ECR Build + Push + Deploy ==========
-
-      - name: Get AWS Account ID
-        run: echo "AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_ENV
-
-      - name: Decide Image URI
-        id: decide-image
-        run: |
-          if [ -z "${{ github.event.inputs.ROLLBACK_TAG }}" ]; then
-            DATE_TAG=$(date +'%Y.%m.%d.%H%M')
-            GIT_TAG=$(git rev-parse --short HEAD)
-            BUILD_TAG="${DATE_TAG}-${GIT_TAG}"
-            IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${BUILD_TAG}"
-
-            echo "BUILD_TAG=$BUILD_TAG" >> $GITHUB_ENV
-            echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
-            echo "should_build_image=true" >> $GITHUB_ENV
-          else
-            IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${{ github.event.inputs.ROLLBACK_TAG }}"
-            echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
-            echo "should_build_image=false" >> $GITHUB_ENV
-          fi
+      # ===== ECR Build + Push + Deploy =====
 
       - name: Log in to Amazon ECR
-        if: env.should_build_image == 'true'
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and Push Docker Image to ECR
-        if: env.should_build_image == 'true'
+      - name: Generate build tags
+        id: tags
         run: |
-          docker build -t $BUILD_TAG -f docker/Dockerfile src
-          docker tag $BUILD_TAG $IMAGE_URI
+          DATE_TAG=$(date +'%Y.%m.%d')
+          BUILD_NUM=$(printf "%03d" $GITHUB_RUN_NUMBER)
+          BUILD_TAG="${DATE_TAG}.${BUILD_NUM}"
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO }}:${BUILD_TAG}"
+          LATEST_URI="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO }}:latest"
+
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          echo "LATEST_URI=$LATEST_URI" >> $GITHUB_ENV
+          echo "BUILD_TAG=$BUILD_TAG" >> $GITHUB_ENV
+
+      - name: Build and tag Docker image
+        run: |
+          docker build -t $IMAGE_URI -t $LATEST_URI -f docker/Dockerfile src
+
+      - name: Push Docker images to ECR
+        run: |
           docker push $IMAGE_URI
+          docker push $LATEST_URI
+
+      - name: Update last successful build in SSM
+        run: |
+          aws ssm put-parameter \
+            --name "/idlms/license-api/last-successful-build" \
+            --value "$BUILD_TAG" \
+            --type String \
+            --overwrite
 
       - name: Deploy to EC2 via SSM
         run: |
           INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=Backend API IDLMS-${{ github.event.inputs.ENV }}" "Name=instance-state-name,Values=running" \
-            --query "Reservations[].Instances[].InstanceId" --output text)
+            --filters "Name=tag:Name,Values=IDLMS-License-API" "Name=instance-state-name,Values=running" \
+            --query "Reservations[].Instances[].InstanceId" \
+            --output text)
 
           echo "Deploying to instance: $INSTANCE_ID"
 
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --comment "Deploy Docker image from ECR using docker-compose" \
-            --parameters '{"commands":["#!/bin/bash","set -e","if ! command -v aws &> /dev/null; then curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip && unzip awscliv2.zip && ./aws/install -i /usr/local/aws-cli -b /usr/local/bin -u; fi","if ! command -v docker &> /dev/null; then apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker; fi","aws ssm get-parameter --name \"/idlms/env/shared\" --with-decryption --query \"Parameter.Value\" --output text > /home/ubuntu/.env","aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com","docker-compose --env-file /home/ubuntu/.env -f /home/ubuntu/docker-compose.yml down || true","docker-compose --env-file /home/ubuntu/.env -f /home/ubuntu/docker-compose.yml up -d"]}' \
-            --timeout-seconds 600 \
-            --region $AWS_REGION \
+            --comment "Pull and restart License API with latest image" \
+            --parameters 'commands=[
+              "set -e",
+              "aws ecr get-login-password --region '${AWS_REGION}' | docker login --username AWS --password-stdin '${{ steps.login-ecr.outputs.registry }}'",
+              "cd /home/ubuntu/license-api",
+              "docker-compose pull",
+              "docker-compose up -d"
+            ]' \
+            --timeout-seconds 900 \
+            --output text
+
+      - name: Generate .env file from SSM
+        run: |
+          ENV=$(aws ssm get-parameter --name "/idlms/env/shared" --with-decryption --query "Parameter.Value" --output text)
+          echo "ENVIRONMENT=${ENV}" > .env
+          aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --parameters 'commands=[
+              "echo \"ENVIRONMENT='${ENV}'\" > /home/ubuntu/.env"
+            ]' \
+            --timeout-seconds 300 \
             --output text
