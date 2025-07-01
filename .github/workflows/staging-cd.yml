@@ -70,6 +70,8 @@ jobs:
           cd infra/ecr
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+          RAW_OUTPUT=$(terraform output -raw ecr_repository_url 2>&1)
+          echo "Raw Terraform Output: [$RAW_OUTPUT]"
 
           ECR_REPO_URL=$(terraform output -raw ecr_repository_url | tr -d '\r\n')
           ECR_REPO_URL1=$(terraform output -raw ecr_repository_url | xargs)
