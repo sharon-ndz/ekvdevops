@@ -163,13 +163,14 @@ jobs:
 
           echo "Deploying to instance: $INSTANCE_ID"
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
-
-               aws ssm send-command \
+          
+              ENV_NAME="${ENV}"
+              aws ssm send-command \
                --instance-ids "$INSTANCE_ID" \
                --document-name "AWS-RunShellScript" \
                --comment "Retrieve .env from SSM inside EC2" \
                --parameters 'commands=[
-                "ENV=$(aws ssm get-parameter --name \"/idlms/shared/'"${ENV}"'/.env\" --with-decryption --query '\''Parameter.Value'\'' --output text)",
+                "ENV=$(aws ssm get-parameter --name \"/idlms/shared/'"${ENV_NAME}"'/.env\" --with-decryption --query '\''Parameter.Value'\'' --output text)",
                 "echo \"$ENV\" > /home/ubuntu/.env",
                 "echo \"BUILD_TAG='"${BUILD_TAG}"'\" >> /home/ubuntu/.env"
                  ]' \
