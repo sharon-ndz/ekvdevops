@@ -20,37 +20,26 @@ locals {
   ]
 }
 
+# Pair AZs with their corresponding subnet IDs
 locals {
-  # Create AZ -> subnet_id pairs
   az_subnet_pairs = [
-    for idx in range(length(data.terraform_remote_state.vpc.outputs.private_subnets_azs)) : {
+    for idx in range(length(data.terraform_remote_state.vpc.outputs.private_subnets_ids)) : {
       az        = data.terraform_remote_state.vpc.outputs.private_subnets_azs[idx]
       subnet_id = data.terraform_remote_state.vpc.outputs.private_subnets_ids[idx]
     }
   ]
 
-  # Group subnets by AZ
-  az_to_subnet_ids = {
-    for az in distinct(data.terraform_remote_state.vpc.outputs.private_subnets_azs) :
-    az => [
-      for pair in local.az_subnet_pairs : pair.subnet_id if pair.az == az
-    ]
-  }
+  # One unique subnet per AZ
+  unique_subnet_ids = distinct([
+    for az in distinct([for p in local.az_subnet_pairs : p.az]) : (
+      lookup({ for p in local.az_subnet_pairs : p.az => p.subnet_id }, az, null)
+    )
+  ])
 
-  # Get EC2 AZ from remote outputs
-  target_az = data.terraform_remote_state.vpc.outputs.ec2_az
-
-  # Pick first two private subnets (must be in different AZs)
-selected_subnets = slice(data.terraform_remote_state.vpc.outputs.private_subnets_ids, 0, 2)
-
-
-
-  # Final subnet_mapping
+  # Build subnet_mapping for NLB
   subnet_mapping = [
-  for subnet_id in local.selected_subnets : {
-    subnet_id = subnet_id
-  } if subnet_id != null && subnet_id != ""
-]
-
+    for subnet_id in local.unique_subnet_ids : {
+      subnet_id = subnet_id
+    }
+  ]
 }
-
