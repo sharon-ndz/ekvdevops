@@ -1,5 +1,5 @@
-
 ################################ NLB Related Local Variables ################################
+
 locals {
   stack_name = var.stack_name
 
@@ -20,3 +20,26 @@ locals {
   ]
 }
 
+locals {
+  # Pair each availability zone with its corresponding private subnet ID
+  az_subnet_pairs = [
+    for idx in range(length(data.terraform_remote_state.vpc.outputs.private_subnets_azs)) : {
+      az        = data.terraform_remote_state.vpc.outputs.private_subnets_azs[idx]
+      subnet_id = data.terraform_remote_state.vpc.outputs.private_subnets_ids[idx]
+    }
+  ]
+
+  # Deduplicate subnets per AZ (only one per AZ)
+  unique_subnets_by_az = {
+    for pair in local.az_subnet_pairs :
+    pair.az => pair.subnet_id...
+  }
+
+  # Format into list of { subnet_id = ... } for NLB input
+  unique_subnets_per_az = [
+    for az, subnet_ids in local.unique_subnets_by_az :
+    {
+      subnet_id = subnet_ids[0]
+    }
+  ]
+}
