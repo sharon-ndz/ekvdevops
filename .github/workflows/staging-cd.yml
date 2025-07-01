@@ -94,10 +94,13 @@ jobs:
 
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars" -var="app_env_content=${BASE64_ENV}"
-
-          SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm://')
+          SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm:\/\///')
 
           echo "SSM_ENV_PARAM=${SSM_ENV_PARAM}" >> $GITHUB_ENV
+
+          #SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm://')
+
+          #echo "SSM_ENV_PARAM=${SSM_ENV_PARAM}" >> $GITHUB_ENV
 
       - name: Print ECR URL
         run: echo "Using ECR:$ECR_REPO_URL"
