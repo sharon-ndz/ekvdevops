@@ -21,20 +21,27 @@ locals {
 }
 
 locals {
-  # Map AZ => Subnet ID (latest value for duplicate AZs will be used)
-  az_to_subnet_id = {
+  # Map AZ => list of subnet IDs (handles duplicates)
+  az_to_subnet_ids = {
     for idx, az in data.terraform_remote_state.vpc.outputs.private_subnets_azs :
-    az => data.terraform_remote_state.vpc.outputs.private_subnets_ids[idx]
+    az => concat(
+      lookup(az_to_subnet_ids, az, []),
+      [data.terraform_remote_state.vpc.outputs.private_subnets_ids[idx]]
+    )
   }
 
-  # Dynamically get AZs of EC2 instances (must be available in remote state)
-  target_azs = toset(data.terraform_remote_state.vpc.outputs.ec2_azs)
+  # EC2 instance AZ (singular) from remote state output
+  target_az = data.terraform_remote_state.vpc.outputs.ec2_az
 
-  # Select subnet per AZ matching EC2 AZs
-  selected_subnets = [
-    for az in local.target_azs :
-    { az = az, subnet_id = local.az_to_subnet_id[az] }
-    if contains(keys(local.az_to_subnet_id), az)
+  # Subnets in the EC2 AZ (list of subnet IDs)
+  selected_subnets = lookup(local.az_to_subnet_ids, local.target_az, [])
+
+  # Build subnet_mapping list for NLB module input
+  subnet_mapping = [
+    for subnet_id in local.selected_subnets : {
+      subnet_id = subnet_id
+      # optionally include allocation_id, private_ipv4_address, ipv6_address if needed
+    }
   ]
 }
 

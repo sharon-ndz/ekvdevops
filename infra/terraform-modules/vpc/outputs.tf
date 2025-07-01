@@ -53,3 +53,4 @@ output "private_subnets_azs" {
   description = "AZs of the private subnets"
   value       = aws_subnet.private_subnets[*].availability_zone
 }
+
