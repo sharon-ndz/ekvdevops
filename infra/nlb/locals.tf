@@ -40,8 +40,12 @@ locals {
   # Use EC2 AZ from remote state
   target_az = data.terraform_remote_state.vpc.outputs.ec2_az
 
-  # Subnets in the EC2 AZ
-  selected_subnets = lookup(local.az_to_subnet_ids, local.target_az, [])
+  # Subnets in the EC2 AZ, fail explicitly if not found
+selected_subnets = try(
+  lookup(local.az_to_subnet_ids, local.target_az),
+  []
+)
+
 
   # Format for NLB subnet_mapping
   subnet_mapping = [
