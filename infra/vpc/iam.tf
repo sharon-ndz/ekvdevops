@@ -20,19 +20,19 @@ resource "aws_iam_instance_profile" "ec2_ssm_profile" {
   role = aws_iam_role.ec2_ssm_role.name
 }
 
-# ✅ Attach AmazonSSMManagedInstanceCore
+# ✅ AmazonSSMManagedInstanceCore
 resource "aws_iam_role_policy_attachment" "ssm_core" {
   role       = aws_iam_role.ec2_ssm_role.name
-  policy_arn = var.ssm_policy_arn # Example: "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  policy_arn = var.ssm_policy_arn # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-# ✅ Attach CloudWatch Logs Agent Policy
+# ✅ CloudWatch Logs Agent
 resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
   role       = aws_iam_role.ec2_ssm_role.name
-  policy_arn = var.cloudwatch_agent_policy_arn # Example: "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  policy_arn = var.cloudwatch_agent_policy_arn # "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
-# ✅ S3 Read Access to Docker Artifact Bucket
+# ✅ Docker Artifact S3 Read Access
 resource "aws_iam_policy" "s3_docker_backup_access" {
   name = "${var.environment}-ec2-s3-docker-backup-access"
 
@@ -59,7 +59,7 @@ resource "aws_iam_role_policy_attachment" "s3_docker_backup_access" {
   policy_arn = aws_iam_policy.s3_docker_backup_access.arn
 }
 
-# ✅ ECR Pull Access Policy
+# ✅ ECR Pull Access
 resource "aws_iam_policy" "ecr_pull" {
   name = "${var.environment}-ec2-ecr-pull-access"
 
@@ -85,7 +85,7 @@ resource "aws_iam_role_policy_attachment" "ecr_pull" {
   policy_arn = aws_iam_policy.ecr_pull.arn
 }
 
-# ✅ ELBv2 Describe Permissions (for describe-target-health, etc.)
+# ✅ ELBv2 Describe Permissions
 resource "aws_iam_policy" "elb_describe" {
   name = "${var.environment}-ec2-elb-describe-access"
 
@@ -109,4 +109,27 @@ resource "aws_iam_policy" "elb_describe" {
 resource "aws_iam_role_policy_attachment" "elb_describe" {
   role       = aws_iam_role.ec2_ssm_role.name
   policy_arn = aws_iam_policy.elb_describe.arn
+}
+
+# ✅ SSM:DescribeInstanceInformation (optional for debugging)
+resource "aws_iam_policy" "ssm_debug" {
+  name = "${var.environment}-ec2-ssm-describe-instance"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ssm:DescribeInstanceInformation"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_debug" {
+  role       = aws_iam_role.ec2_ssm_role.name
+  policy_arn = aws_iam_policy.ssm_debug.arn
 }
