@@ -18,16 +18,19 @@ provider "aws" {
 }
 
 locals {
-  az_to_subnet = zipmap(
-    data.terraform_remote_state.vpc.outputs.private_subnets_azs,
-    data.terraform_remote_state.vpc.outputs.private_subnets_ids
-  )
+  # Build a map of AZ => subnet ID
+  subnets_by_az = {
+    for idx, az in data.terraform_remote_state.vpc.outputs.private_subnets_azs :
+    az => data.terraform_remote_state.vpc.outputs.private_subnets_ids[idx]
+  }
 
+  # Unique subnet per AZ for NLB
   unique_subnets_per_az = [
-    for az, subnet_id in local.az_to_subnet :
+    for az, subnet_id in local.subnets_by_az :
     { az = az, subnet_id = subnet_id }
   ]
 }
+
 
 module "group_1_nlb" {
   source               = "../terraform-modules/nlb"
