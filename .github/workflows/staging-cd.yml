@@ -14,6 +14,7 @@ on:
 env:
   AWS_REGION: us-east-1
   TF_BUCKET: my-terraform-state-bckt43
+  BACKUP_BUCKET: idlms-website-built-artifact
 
 jobs:
   deploy:
@@ -63,7 +64,6 @@ jobs:
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
-      # ✅ ECR block (fixed env export)
       - name: Terraform Apply ECR
         id: ecr
         run: |
@@ -76,10 +76,7 @@ jobs:
           echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
           echo $ECR_REPO_URL1
           echo $GITHUB_ENV
-          
 
-
-      # ✅ SSM block (pull .env from SSM, encode, pass to Terraform)
       - name: Terraform Apply SSM
         id: ssm
         run: |
@@ -105,7 +102,6 @@ jobs:
       - name: Generate build tags
         id: tags
         run: |
-
           DATE_TAG=$(date +'%Y.%m.%d')
           BUILD_NUM=$(printf "%03d" $GITHUB_RUN_NUMBER)
           BUILD_TAG="${DATE_TAG}.${BUILD_NUM}"
@@ -148,6 +144,19 @@ jobs:
           echo "Deploying to instance: $INSTANCE_ID"
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
+          # Upload docker-compose.yml to S3
+          aws s3 cp docker/docker-compose.yml s3://${BACKUP_BUCKET}/${{ github.event.inputs.ENV }}/docker-compose.yml
+
+          # Trigger EC2 to pull docker-compose.yml from S3
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --instance-ids "$INSTANCE_ID" \
+            --comment "Download docker-compose.yml from S3" \
+            --parameters 'commands=["aws s3 cp s3://'"$BACKUP_BUCKET"'/'"${{ github.event.inputs.ENV }}"'/docker-compose.yml /home/ubuntu/docker-compose.yml"]' \
+            --region $AWS_REGION \
+            --output text
+
+          # Create .env file on EC2
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
@@ -160,6 +169,7 @@ jobs:
             --region $AWS_REGION \
             --output text
 
+          # Restart Docker containers using new docker-compose.yml
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
