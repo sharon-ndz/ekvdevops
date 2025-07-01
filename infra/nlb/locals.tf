@@ -21,25 +21,20 @@ locals {
 }
 
 locals {
-  # Pair each availability zone with its corresponding private subnet ID
-  az_subnet_pairs = [
-    for idx in range(length(data.terraform_remote_state.vpc.outputs.private_subnets_azs)) : {
-      az        = data.terraform_remote_state.vpc.outputs.private_subnets_azs[idx]
-      subnet_id = data.terraform_remote_state.vpc.outputs.private_subnets_ids[idx]
-    }
-  ]
-
-  # Deduplicate subnets per AZ (only one per AZ)
-  unique_subnets_by_az = {
-    for pair in local.az_subnet_pairs :
-    pair.az => pair.subnet_id...
+  # Map AZ => Subnet ID (latest value for duplicate AZs will be used)
+  az_to_subnet_id = {
+    for idx, az in data.terraform_remote_state.vpc.outputs.private_subnets_azs :
+    az => data.terraform_remote_state.vpc.outputs.private_subnets_ids[idx]
   }
 
-  # Format into list of { subnet_id = ... } for NLB input
-  unique_subnets_per_az = [
-    for az, subnet_ids in local.unique_subnets_by_az :
-    {
-      subnet_id = subnet_ids[0]
-    }
+  # Dynamically get AZs of EC2 instances (must be available in remote state)
+  target_azs = toset(data.terraform_remote_state.vpc.outputs.ec2_azs)
+
+  # Select subnet per AZ matching EC2 AZs
+  selected_subnets = [
+    for az in local.target_azs :
+    { az = az, subnet_id = local.az_to_subnet_id[az] }
+    if contains(keys(local.az_to_subnet_id), az)
   ]
 }
+

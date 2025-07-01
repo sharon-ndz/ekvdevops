@@ -27,3 +27,11 @@ output "lb_listener_arn" {
   description = "The ARN of the load balancer listener"
   value       = concat(aws_lb_listener.this.*.arn, [""])[0]
 }
+
+output "private_subnets_with_az" {
+  description = "Map of AZ => Subnet ID for private subnets"
+  value = {
+    for idx, az in aws_subnet.private_subnets[*].availability_zone :
+    az => aws_subnet.private_subnets[idx].id
+  }
+}

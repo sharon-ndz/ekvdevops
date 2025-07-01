@@ -30,10 +30,11 @@ module "group_1_nlb" {
   target_port          = var.target_port
   environment          = var.environment
 
-  subnet_mapping = [
-    for entry in local.unique_subnets_per_az :
+    subnet_mapping = [
+    for entry in local.selected_subnets :
     { subnet_id = entry.subnet_id }
   ]
+
 
   create_sg     = var.lb_create_sg
   sg_name       = "${var.environment}-group-1-nlb-sg"

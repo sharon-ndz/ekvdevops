@@ -55,3 +55,7 @@ output "private_subnets_azs" {
   value = module.vpc.private_subnets_azs
 }
 
+output "ec2_az" {
+  description = "Availability Zone of the EC2 instance"
+  value       = aws_instance.web.availability_zone
+}
