@@ -168,18 +168,28 @@ jobs:
             --region $AWS_REGION \
             --output text
 
-          # Create .env file on EC2
-          aws ssm send-command \
-            --instance-ids "$INSTANCE_ID" \
-            --document-name "AWS-RunShellScript" \
-            --parameters 'commands=[
-              "ENV=$(aws ssm get-parameter --name \"'"$SSM_ENV_PARAM"'\" --with-decryption --query \"Parameter.Value\" --output text)",
-              "echo \"$ENV\" > /home/ubuntu/.env",
-              "echo \"BUILD_TAG=${BUILD_TAG}\" >> /home/ubuntu/.env"
-            ]' \
-            --timeout-seconds 300 \
-            --region $AWS_REGION \
-            --output text
+          # 1. Get the parameter (plaintext)
+          ENV_CONTENT=$(aws ssm get-parameter \
+            --name "$SSM_ENV_PARAM" \
+            --query "Parameter.Value" \
+            --output text)
+
+          # 2. Base64 encode to preserve line breaks
+          ENCODED_ENV=$(echo "$ENV_CONTENT" | base64 -w 0)
+
+          # 3. Send it to EC2 to create the `.env` file
+         aws ssm send-command \
+           --instance-ids "$INSTANCE_ID" \
+           --document-name "AWS-RunShellScript" \
+           --comment "Write .env to EC2" \
+           --parameters "{\"commands\":[
+                \"echo '$ENCODED_ENV' | base64 -d > /home/ubuntu/.env\",
+                 \"echo 'BUILD_TAG=$BUILD_TAG' >> /home/ubuntu/.env\"
+              ]}" \
+             --timeout-seconds 300 \
+             --region "$AWS_REGION" \
+             --output text
+
 
           # Restart Docker containers using new docker-compose.yml
           aws ssm send-command \
