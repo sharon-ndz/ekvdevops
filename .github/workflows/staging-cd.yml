@@ -73,11 +73,9 @@ jobs:
 
           ECR_REPO_URL=$(terraform output -raw ecr_repository_url | tr -d '\r\n')
           echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
-          {
-           echo "ECR_REPO_URL<<EOF"
-           echo "$ECR_REPO_URL"
-           echo "EOF"
-          } >> $GITHUB_ENV
+          echo $ECR_REPO_URL
+          echo $GITHUB_ENV
+          
 
 
       # ✅ SSM block (pull .env from SSM, encode, pass to Terraform)
