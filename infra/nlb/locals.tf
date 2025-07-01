@@ -1,5 +1,3 @@
-################################ NLB Related Local Variables ################################
-
 locals {
   stack_name = var.stack_name
 
@@ -20,25 +18,28 @@ locals {
   ]
 }
 
-# Pair AZs with their corresponding subnet IDs
+# Subnet Mapping Logic
 locals {
   az_subnet_pairs = [
-    for idx in range(length(data.terraform_remote_state.vpc.outputs.private_subnets_ids)) : {
+    for idx in range(length(data.terraform_remote_state.vpc.outputs.private_subnets_azs)) : {
       az        = data.terraform_remote_state.vpc.outputs.private_subnets_azs[idx]
       subnet_id = data.terraform_remote_state.vpc.outputs.private_subnets_ids[idx]
     }
   ]
 
-  # One unique subnet per AZ
-  unique_subnet_ids = distinct([
-    for az in distinct([for p in local.az_subnet_pairs : p.az]) : (
-      lookup({ for p in local.az_subnet_pairs : p.az => p.subnet_id }, az, null)
-    )
-  ])
+  az_to_subnet_ids = {
+    for az in distinct(data.terraform_remote_state.vpc.outputs.private_subnets_azs) :
+    az => [
+      for pair in local.az_subnet_pairs : pair.subnet_id if pair.az == az
+    ]
+  }
 
-  # Build subnet_mapping for NLB
+  target_az = data.terraform_remote_state.vpc.outputs.ec2_az
+
+  selected_subnets = lookup(local.az_to_subnet_ids, local.target_az, [])
+
   subnet_mapping = [
-    for subnet_id in local.unique_subnet_ids : {
+    for subnet_id in local.selected_subnets : {
       subnet_id = subnet_id
     }
   ]
