@@ -98,7 +98,7 @@ jobs:
           echo "SSM_ENV_PARAM=${SSM_ENV_PARAM}" >> $GITHUB_ENV
 
       - name: Print ECR URL
-        run: echo "Using ECR: $ECR_REPO_URL"
+        run: echo "Using ECR:$ECR_REPO_URL"
         env:
           ECR_REPO_URL: ${{ env.ECR_REPO_URL }}
 
