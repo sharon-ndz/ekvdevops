@@ -40,8 +40,9 @@ locals {
   # Get EC2 AZ from remote outputs
   target_az = data.terraform_remote_state.vpc.outputs.ec2_az
 
-  # Subnets in that AZ
-  selected_subnets = lookup(local.az_to_subnet_ids, local.target_az, [])
+  # Pick first two private subnets (must be in different AZs)
+selected_subnets = slice(data.terraform_remote_state.vpc.outputs.private_subnets_ids, 0, 2)
+
 
 
   # Final subnet_mapping
