@@ -100,7 +100,8 @@ jobs:
       - name: Print ECR URL
         run: echo "Using ECR: $ECR_REPO_URL"
         env:
-         ECR_REPO_URL: ${{ env.ECR_REPO_URL }}
+          ECR_REPO_URL: ${{ env.ECR_REPO_URL }}
+
 
 
       - name: Log in to Amazon ECR
