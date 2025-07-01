@@ -20,16 +20,19 @@ resource "aws_iam_instance_profile" "ec2_ssm_profile" {
   role = aws_iam_role.ec2_ssm_role.name
 }
 
+# ✅ Attach AmazonSSMManagedInstanceCore
 resource "aws_iam_role_policy_attachment" "ssm_core" {
   role       = aws_iam_role.ec2_ssm_role.name
-  policy_arn = var.ssm_policy_arn
+  policy_arn = var.ssm_policy_arn # Example: "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+# ✅ Attach CloudWatch Logs Agent Policy
 resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
   role       = aws_iam_role.ec2_ssm_role.name
-  policy_arn = var.cloudwatch_agent_policy_arn
+  policy_arn = var.cloudwatch_agent_policy_arn # Example: "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
+# ✅ S3 Read Access to Docker Artifact Bucket
 resource "aws_iam_policy" "s3_docker_backup_access" {
   name = "${var.environment}-ec2-s3-docker-backup-access"
 
@@ -56,7 +59,7 @@ resource "aws_iam_role_policy_attachment" "s3_docker_backup_access" {
   policy_arn = aws_iam_policy.s3_docker_backup_access.arn
 }
 
-# ✅ ECR PULL POLICY
+# ✅ ECR Pull Access Policy
 resource "aws_iam_policy" "ecr_pull" {
   name = "${var.environment}-ec2-ecr-pull-access"
 
@@ -80,4 +83,30 @@ resource "aws_iam_policy" "ecr_pull" {
 resource "aws_iam_role_policy_attachment" "ecr_pull" {
   role       = aws_iam_role.ec2_ssm_role.name
   policy_arn = aws_iam_policy.ecr_pull.arn
+}
+
+# ✅ ELBv2 Describe Permissions (for describe-target-health, etc.)
+resource "aws_iam_policy" "elb_describe" {
+  name = "${var.environment}-ec2-elb-describe-access"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "elasticloadbalancing:DescribeTargetHealth",
+          "elasticloadbalancing:DescribeLoadBalancers",
+          "elasticloadbalancing:DescribeListeners",
+          "elasticloadbalancing:DescribeTargetGroups"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "elb_describe" {
+  role       = aws_iam_role.ec2_ssm_role.name
+  policy_arn = aws_iam_policy.elb_describe.arn
 }
