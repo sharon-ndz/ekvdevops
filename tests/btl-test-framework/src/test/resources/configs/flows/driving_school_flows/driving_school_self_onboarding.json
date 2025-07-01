@@ -1,6 +1,20 @@
-[
+{
+  "metadata": {
+    "epic": "Driving School",
+    "feature": "Self Onboarding",
+    "severity": "critical",
+    "tags": ["driving_school", "self_onboarding", "inspection"],
+    "expectedResults": [
+      "Driving school creation returns status 201 with identifier.",
+      "Application completion returns status 201 and success.",
+      "Officer assignment returns status 200 and success.",
+      "Inspection submission returns status 200 and success."
+    ]
+  },
+  "steps": [
     {
-      "name": "driving_school_self_onboarding: create  a driving school",
+      "story": "01: Create a driving school via self-service onboarding",
+      "name": "driving_school_self_onboarding: create a driving school",
       "method": "POST",
       "path": "driving-school/self-service/create",
       "body": {
@@ -31,6 +45,7 @@
       }
     },
     {
+      "story": "02: Complete the application for the created driving school",
       "name": "driving_school_self_onboarding: complete application",
       "method": "POST",
       "path": "driving-school/complete-application",
@@ -57,6 +72,7 @@
       }
     },
     {
+      "story": "03: Assign an LASDRI officer to the driving school",
       "name": "driving_school_self_onboarding: assign officer",
       "method": "POST",
       "path": "driving-school/lasdri/assign-officer",
@@ -75,7 +91,8 @@
       }
     },
     {
-      "name": "driving_school_self_onboarding: submit inspectionr",
+      "story": "04: Submit LASDRI inspection for the driving school",
+      "name": "driving_school_self_onboarding: submit inspection",
       "method": "POST",
       "path": "driving-school/lasdri/assign-inspection",
       "body": {
@@ -105,5 +122,5 @@
         }
       }
     }
-]
-
+  ]
+}

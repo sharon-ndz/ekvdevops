@@ -1,5 +1,18 @@
-[
+{
+  "metadata": {
+    "epic": "Authentication",
+    "feature": "AuthenticationSuper Admin All",
+    "severity": "critical",
+    "tags": ["auth", "login", "negative-test", "positive-test"],
+    "expectedResults": [
+      "Successfully login as super admin with valid credentials.",
+      "Return 400 status with invalid password and appropriate error message.",
+      "Return 400 status with malformed email and descriptive validation error."
+    ]
+  },
+  "steps": [
     {
+      "story": "01: Login with valid credentials",
       "name": "Login as super admin",
       "method": "POST",
       "path": "auth/login",
@@ -16,13 +29,12 @@
           "accessToken": {
             "exists": true
           },
-          "": {
-            "success": true
-          }
+          "success": true
         }
       }
     },
     {
+      "story": "02: Login with wrong password",
       "name": "Login Failure with any user",
       "method": "POST",
       "path": "auth/login",
@@ -40,6 +52,7 @@
       }
     },
     {
+      "story": "03: Login with malformed email",
       "name": "Login Failure and user wrong e-mail",
       "method": "POST",
       "path": "auth/login",
@@ -56,4 +69,5 @@
         }
       }
     }
-]
+  ]
+}

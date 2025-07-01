@@ -43,6 +43,12 @@ public class TestBase {
     protected static String baseUrl;
     protected static ObjectMapper mapper;
 
+    protected static  boolean enablePayloadLogging;
+
+
+
+
+
     // Context holds runtime variables for placeholder substitution
     protected static Map<String, String> context = new HashMap<>();
 
@@ -58,6 +64,14 @@ public class TestBase {
     @BeforeAll
     public static void setupBase() throws Exception {
         String env = System.getProperty("env", "dev");
+
+        String val = System.getenv("ENABLE_PAYLOAD_LOGGING");
+        if (val == null) {
+            val = System.getProperty("enablePayloadLogging", "false");
+            System.out.println("########      "+val + "##################");
+        }
+        enablePayloadLogging = Boolean.parseBoolean(val);
+
         mapper = new ObjectMapper();
 
         try (InputStream stream = getResourceStream("configs/environments/" + env + ".json")) {

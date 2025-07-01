@@ -1,5 +1,16 @@
-[
+{
+  "metadata": {
+    "epic": "Authentication",
+    "feature": "Super Admin",
+    "severity": "critical",
+    "tags": ["authentication", "super_admin", "login"],
+    "expectedResults": [
+      "Super admin login returns status 201 with a valid access token."
+    ]
+  },
+  "steps": [
     {
+      "story": "01: Authenticate as super admin",
       "name": "super_admin: Authenticate as super admin",
       "method": "POST",
       "path": "auth/login",
@@ -16,10 +27,9 @@
           "accessToken": {
             "exists": true
           },
-          "": {
-            "success": true
-          }
+          "success": true
         }
       }
     }
   ]
+}

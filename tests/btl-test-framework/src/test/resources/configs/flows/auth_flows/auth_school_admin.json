@@ -1,5 +1,18 @@
- [
+{
+  "metadata": {
+    "epic": "Authentication",
+    "feature": "School Admin ALl",
+    "severity": "critical",
+    "tags": ["auth", "login", "positive", "negative"],
+    "expectedResults": [
+      "Login should succeed with valid credentials and return a 201 status and accessToken.",
+      "Login should fail with wrong password and return 400 with 'Invalid credentials' message.",
+      "Login should fail with invalid email format and return 400 with a validation message."
+    ]
+  },
+  "steps": [
     {
+      "story": "01: Login with valid credentials",
       "name": "Login Success",
       "method": "POST",
       "path": "auth/login",
@@ -16,13 +29,12 @@
           "accessToken": {
             "exists": true
           },
-          "": {
-            "success": true
-          }
+          "success": true
         }
       }
     },
     {
+      "story": "02: Login with incorrect password",
       "name": "Login Failure - Wrong Password",
       "method": "POST",
       "path": "auth/login",
@@ -40,6 +52,7 @@
       }
     },
     {
+      "story": "03: Login with malformed email address",
       "name": "Login Failure - Wrong e-mail format",
       "method": "POST",
       "path": "auth/login",
@@ -56,5 +69,5 @@
         }
       }
     }
- ]
-
+  ]
+}

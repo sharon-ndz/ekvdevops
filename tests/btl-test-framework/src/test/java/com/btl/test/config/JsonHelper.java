@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Map;
+
 /**
  * Utility class for common JSON operations such as reading JSON from files or resources,
  * enumerating JSON object fields, and resolving placeholders inside JSON nodes.
@@ -29,6 +30,7 @@ public class JsonHelper {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
     /**
      * Reads and parses a JSON file from the given filesystem path.
      *
@@ -81,7 +83,7 @@ public class JsonHelper {
             if (is == null) throw new RuntimeException("Resource not found: " + path);
             return mapper.readTree(is);
         } catch (Exception e) {
-            System.err.println("❌ ERROR:"+"Failed to load JSON from: " + path);
+            System.err.println("❌ ERROR:" + "Failed to load JSON from: " + path);
             throw new RuntimeException("Failed to load JSON from: " + path, e);
         }
     }
@@ -120,5 +122,27 @@ public class JsonHelper {
 
         // For other node types (number, boolean, null) just return as is
         return node;
+    }
+
+    /**
+     * Extracts the 'metadata' object node from the root JSON.
+     * Returns null if not found or not an object.
+     */
+    public static JsonNode getMetadata(JsonNode root) {
+        if (root != null && root.has("metadata") && root.get("metadata").isObject()) {
+            return root.get("metadata");
+        }
+        return null;
+    }
+
+    /**
+     * Extracts the 'steps' array node from the root JSON.
+     * Returns null if not found or not an array.
+     */
+    public static JsonNode getSteps(JsonNode root) {
+        if (root != null && root.has("steps") && root.get("steps").isArray()) {
+            return root.get("steps");
+        }
+        return null;
     }
 }

@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+
 /**
  * Utility class for loading and discovering API flow configurations.
  *
@@ -78,13 +79,29 @@ public class ConfigLoader {
     }
 
     /**
-     * Loads the JSON node representing the endpoints defined in the specified test file.
+     * Loads the JSON array of steps (test cases) defined in the specified test file.
+     *
+     * <p>The file root is expected to be a JSON object with "metadata" and "steps" keys,
+     * where "steps" is an array of API call definitions.</p>
      *
      * @param fullFilePath the full path to the endpoint JSON file
-     * @return the parsed JSON node representing the endpoint definitions
-     * @throws IOException if reading or parsing the file fails
+     * @return the JSON array node representing the steps of the test flow
+     * @throws IOException if reading, parsing, or structure validation fails
      */
     public static JsonNode loadEndpoints(Path fullFilePath) throws IOException {
-        return JsonHelper.readJsonFromFile(fullFilePath);
+        JsonNode root = JsonHelper.readJsonFromFile(fullFilePath);
+
+        // Optional: retrieve metadata if needed
+        JsonNode metadata = root.get("metadata");
+        if (metadata != null) {
+            // You can use metadata if required by your app logic
+        }
+
+        JsonNode steps = root.get("steps");
+        if (steps == null || !steps.isArray()) {
+            throw new IOException("Expected 'steps' array missing or invalid in file: " + fullFilePath);
+        }
+
+        return steps;
     }
 }

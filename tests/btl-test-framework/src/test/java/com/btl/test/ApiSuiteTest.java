@@ -4,6 +4,7 @@ import com.btl.test.base.TestBase;
 import com.btl.test.config.ConfigLoader;
 import com.btl.test.config.JsonHelper;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.qameta.allure.Allure;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 
@@ -12,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
@@ -86,25 +88,70 @@ public class ApiSuiteTest extends TestBase {
 
                 for (String fileRef : endpointFileRefs) {
                     Path resolvedPath = flowDir.resolve(fileRef).normalize();
-                    JsonNode endpoints = ConfigLoader.loadEndpoints(resolvedPath);
 
-                    String testName = flowName + " - " + fileRef;
+                    // Load the full root JSON node (with metadata and steps)
+                    JsonNode rootNode = JsonHelper.readJsonFromFile(resolvedPath);
 
-                    // One test per flow file that runs all its steps in sequence
+                    // Extract metadata and steps
+                    JsonNode metadata = rootNode.get("metadata");
+                    JsonNode steps = rootNode.get("steps");
+
+                    if (steps == null || !steps.isArray()) {
+                        throw new IllegalStateException("'steps' array missing or invalid in " + resolvedPath);
+                    }
+
+                    //String metadataName = metadata != null && metadata.has("name") ? metadata.get("name").asText() : "[Unnamed Flow]";
+                    String testName = flowName + " - " + fileRef ;
+
                     DynamicTest flowTest = DynamicTest.dynamicTest(testName, () -> {
                         System.out.println("\n=== 🧪 Running Flow: " + testName + " ===");
-                        for (JsonNode endpoint : endpoints) {
-                            String endpointName = endpoint.has("name")
-                                    ? endpoint.get("name").asText()
-                                    : "[Unnamed Test]";
+
+                        // Apply metadata labels once per flow if present
+                        if (metadata != null) {
+                            System.out.println("📋 Applying metadata labels:");
+                            metadata.fields().forEachRemaining(entry ->
+                                    System.out.printf("  %s: %s%n", entry.getKey(), entry.getValue().asText())
+                            );
+                            com.btl.test.reports.AllureLabelHelper.applyAllureLabels(metadata);
+                        }
+
+                        // Attach top-level expected results if present
+                        com.btl.test.reports.AllureLabelHelper.attachExpectedResultsHtml("Expected Results - Flow", metadata.get("expectedResults"));
+
+
+                        String uuid = UUID.randomUUID().toString();
+                        int i=0;
+                        for (JsonNode step : steps) {
+                            //String stepName = step.has("name") ? step.get("name").asText() : "[Unnamed Step]";
+                            String stepName = step.has("name") ? step.get("name").asText() : "Unnamed Step " + (i + 1);
+                            //String displayName = String.format("%s - %s - %s", flowName, fileRef, stepName);
+
                             try {
-                                System.out.println("➡️ Running: " + endpointName);
-                                runRequest(endpoint);
+                                System.out.println("➡️ Running Step: " + stepName);
+
+                                // Apply step-specific labels if any
+                                com.btl.test.reports.AllureLabelHelper.applyAllureLabels(step);
+
+
+
+
+                                // Add step to the timeline in Allure
+                                Allure.step(stepName, () -> {
+                                    // Attach expected results per step
+                                    com.btl.test.reports.AllureLabelHelper.attachExpectedResultsHtml("Expected Results - Step: " + stepName, step.get("expectedResults"));
+
+                                    runRequest(step);
+                                });
+
+                                // Run the API request step
+                                //runRequest(step);
+
                             } catch (Exception e) {
-                                System.err.println("❌ Failure in: " + endpointName);
-                                fail("Flow failed at: " + endpointName + "\n" + e.getMessage(), e);
+                                System.err.println("❌ Failure in Step: " + stepName);
+                                fail("Flow failed at step: " + stepName + "\n" + e.getMessage(), e);
                             }
                         }
+
                         System.out.println("✅ Flow completed: " + testName);
                     });
 
@@ -113,11 +160,14 @@ public class ApiSuiteTest extends TestBase {
             }
 
             return dynamicTests.stream();
+
         } catch (Exception e) {
             e.printStackTrace();
-            return Stream.empty();  // or rethrow as unchecked if you want failure
+            return Stream.empty();
         }
     }
+
+
 
     /**
      * Executes a single API endpoint request defined in the JSON configuration.
@@ -135,9 +185,11 @@ public class ApiSuiteTest extends TestBase {
 
         JsonNode bodyNode = endpoint.get("body");
         String bodyJson = null;
+        String bodyPrettyJson = null;
         if (bodyNode != null) {
             JsonNode resolvedBodyNode = JsonHelper.resolvePlaceholdersInNode(bodyNode, context);
             bodyJson = resolvedBodyNode.toString();
+            bodyPrettyJson = resolvedBodyNode.toPrettyString();
         }
 
         var request = given();
@@ -167,6 +219,14 @@ public class ApiSuiteTest extends TestBase {
                 }
             }
         }
+        // Example: log request info to Allure
+        if (enablePayloadLogging) {
+            Allure.addAttachment("Request Method", method);
+            Allure.addAttachment("Request Path", path);
+            if (bodyPrettyJson != null && !bodyPrettyJson.isEmpty()) {
+                Allure.addAttachment("Request Body", "application/json", bodyPrettyJson, ".json");
+            }
+        }
 
         Response response;
         try {
@@ -183,9 +243,23 @@ public class ApiSuiteTest extends TestBase {
             throw new RuntimeException("Request failed for: /" + path, e);
         }
 
-        System.out.println("→ [" + method + "] /" + path);
+        /*System.out.println("→ [" + method + "] /" + path);
         System.out.println("← Status: " + response.getStatusCode());
-        System.out.println("← Body: " + response.asPrettyString());
+        System.out.println("← Body: " + response.asPrettyString());*/
+
+        int statusCode = response.getStatusCode();
+        // Add HTTP status code as a separate attachment or step
+        Allure.addAttachment("HTTP Status Code", String.valueOf(statusCode));
+
+
+        // After making the API call and obtaining the response body as String
+        String responseBody = response.asPrettyString();  // Or however you get response content
+
+        if (responseBody != null && !responseBody.isEmpty()) {
+            Allure.addAttachment("Response Body", "application/json", responseBody, ".json");
+        }
+
+        // Add Allure response loggin here
 
         // Assertions
         assertResponse(endpoint.get("assertions"), response);
@@ -206,7 +280,7 @@ public class ApiSuiteTest extends TestBase {
      * Used for sanity check and simple logging.
      */
     @Test
-    public void dummyTest() {
+    public void checkConfigTest() {
         System.out.println("✅ Config is using URL " + baseUrl );
     }
 }

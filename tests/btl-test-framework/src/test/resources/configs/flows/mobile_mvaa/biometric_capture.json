@@ -1,95 +1,142 @@
-[
-
-  {
-    "name": "mobile_mvaa: Send OTP ",
-    "method": "POST",
-    "path": "auth/send-otp",
-    "body": {
-      "email": "vickkycodegenius@gmail.com"
-    },
-    "requires": ["token"],
-    "assertions": {
-      "status": 201
-    }
+{
+  "metadata": {
+    "epic": "Mobile MVAA",
+    "feature": "Biometric Capture",
+    "severity": "normal",
+    "tags": ["regression", "mobile", "mvaa"],
+    "expectedResults": [
+      "User can complete full mobile licensing process",
+      "All endpoints respond with expected status codes",
+      "Correct data is returned for each step"
+    ]
   },
-  {
-    "name": "mobile_mvaa: Validate OTP ",
-    "method": "POST",
-    "path": "auth/validate-otp",
-    "body": {
-      "email": "vickkycodegenius@gmail.com",
-      "otp": "377101"
+  "steps": [
+    {
+      "story": "01: Send OTP",
+      "name": "mobile_mvaa: Send OTP",
+      "method": "POST",
+      "path": "auth/send-otp",
+      "body": {
+        "email": "vickkycodegenius@gmail.com"
+      },
+      "requires": ["token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "OTP sent to the user's email"
+      ],
+      "assertions": {
+        "status": 201
+      }
     },
-    "requires": ["token"],
-    "assertions": {
-      "status": 201
-    }
-  },
-  {
-    "name": "mobile_mvaa: License Pre-Registration ",
-    "method": "POST",
-    "path": "license/single/pre-registration",
-    "body": {
-      "applicationNo": "DRLP/2025/849367"
+    {
+      "story": "02: Validate OTP",
+      "name": "mobile_mvaa: Validate OTP",
+      "method": "POST",
+      "path": "auth/validate-otp",
+      "body": {
+        "email": "vickkycodegenius@gmail.com",
+        "otp": "377101"
+      },
+      "requires": ["token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "OTP validation is successful"
+      ],
+      "assertions": {
+        "status": 201
+      }
     },
-    "requires": ["token"],
-    "assertions": {
-      "status": 201
-    }
-  },
-  {
-    "name": "mobile_mvaa: Submit Pre-registration files ",
-    "method": "POST",
-    "path": "license/submit-pre-registration-files",
-    "body": {
-      "reference": "BIOARQTXT12BIO1741767893420",
-      "applicationNo": "DRLP/2025/760385",
-      "files": [
-        {
-          "fileId": 1,
-          "documentType": "finger",
-          "fingerType": "index_1"
-        }
-      ]
+    {
+      "story": "03: Pre-Register License",
+      "name": "mobile_mvaa: License Pre-Registration",
+      "method": "POST",
+      "path": "license/single/pre-registration",
+      "body": {
+        "applicationNo": "DRLP/2025/849367"
+      },
+      "requires": ["token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "License pre-registration should be created"
+      ],
+      "assertions": {
+        "status": 201
+      }
     },
-    "requires": ["token"],
-    "assertions": {
-      "status": 201
-    }
-  },
-  {
-    "name": "mobile_mvaa: License submit new requset ",
-    "method": "POST",
-    "path": "license/submit-new-request",
-    "body": {
-      "certificateNo": "DR8C20L5I3DR-648932",
-      "source": "mobile",
-      "files": []
+    {
+      "story": "04: Upload Pre-Registration Files",
+      "name": "mobile_mvaa: Submit Pre-registration files",
+      "method": "POST",
+      "path": "license/submit-pre-registration-files",
+      "body": {
+        "reference": "BIOARQTXT12BIO1741767893420",
+        "applicationNo": "DRLP/2025/760385",
+        "files": [
+          {
+            "fileId": 1,
+            "documentType": "finger",
+            "fingerType": "index_1"
+          }
+        ]
+      },
+      "requires": ["token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "Biometric file submitted successfully"
+      ],
+      "assertions": {
+        "status": 201
+      }
     },
-    "requires": ["token"],
-    "assertions": {
-      "status": 201
-    }
-  },
-  {
-    "name": "mobile_mvaa: Generate License Card ",
-    "method": "GET",
-    "path": "license/generate-license/86427159",
-    "requires": ["token"],
-    "assertions": {
-      "status": 200
-    }
-  },
-  {
-    "name": "mvaa_mobile: License Details ",
-    "method": "POST",
-    "path": "license/details",
-    "body": {
-      "applicationNo": "DRLP/2025/087956"
+    {
+      "story": "05: Submit New License Request",
+      "name": "mobile_mvaa: License submit new request",
+      "method": "POST",
+      "path": "license/submit-new-request",
+      "body": {
+        "certificateNo": "DR8C20L5I3DR-648932",
+        "source": "mobile",
+        "files": []
+      },
+      "requires": ["token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "New license request is submitted successfully"
+      ],
+      "assertions": {
+        "status": 201
+      }
     },
-    "requires": ["token"],
-    "assertions": {
-      "status": 201
+    {
+      "story": "06: Generate License Card",
+      "name": "mobile_mvaa: Generate License Card",
+      "method": "GET",
+      "path": "license/generate-license/86427159",
+      "requires": ["token"],
+      "expectedResults": [
+        "Status code should be 200",
+        "License card is generated and returned"
+      ],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "07: View License Details",
+      "name": "mvaa_mobile: License Details",
+      "method": "POST",
+      "path": "license/details",
+      "body": {
+        "applicationNo": "DRLP/2025/087956"
+      },
+      "requires": ["token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "License details returned successfully"
+      ],
+      "assertions": {
+        "status": 201
+      }
     }
-  }
-]
+  ]
+}

@@ -1,6 +1,19 @@
- [
+{
+  "metadata": {
+    "epic": "Mobile LSDRI",
+    "feature": "Mobile LSDRI",
+    "severity": "critical",
+    "tags": ["device_management", "lsdri", "mobile", "biometrics"],
+    "expectedResults": [
+      "Check device activation status returns status 200.",
+      "Pre-activation device enrollment returns status 201.",
+      "Biometric update returns status 201."
+    ]
+  },
+  "steps": [
     {
-      "name": "Mobile LSDRI: Check Device ACtivation Status",
+      "story": "01: Check Device Activation Status",
+      "name": "Mobile LSDRI: Check Device Activation Status",
       "method": "GET",
       "path": "device/check-activation-status",
       "query": {
@@ -12,7 +25,8 @@
       }
     },
     {
-      "name": "Mobile LSDRI: Post ",
+      "story": "02: Pre-activate Device Enrollment",
+      "name": "Mobile LSDRI: Post",
       "method": "POST",
       "path": "device/pre-activation",
       "body": {
@@ -32,7 +46,8 @@
       }
     },
     {
-      "name": "Mobile LSDRI: Update Biometrics ",
+      "story": "03: Update Biometrics",
+      "name": "Mobile LSDRI: Update Biometrics",
       "method": "POST",
       "path": "users/update-biometrics",
       "body": {
@@ -50,5 +65,5 @@
         "status": 201
       }
     }
-
   ]
+}

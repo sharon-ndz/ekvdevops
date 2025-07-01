@@ -1,5 +1,24 @@
-[
+{
+  "metadata": {
+    "epic": "Driving School",
+    "feature": "Self Service",
+    "severity": "critical",
+    "tags": [
+      "driving_school",
+      "api",
+      "self_service"
+    ],
+    "expectedResults": [
+      "Self-service create driving school returns status 201 with identifier.",
+      "Get single driving school returns status 200 and valid data.",
+      "Get all driving schools returns status 200.",
+      "Get training durations returns status 200 and valid data.",
+      "Get single training duration returns status 200 and valid data."
+    ]
+  },
+  "steps": [
     {
+      "story": "01: Self-service  create  a driving School",
       "name": "Self-service  create  a driving School",
       "method": "POST",
       "path": "driving-school/self-service/create",
@@ -31,6 +50,7 @@
       }
     },
     {
+      "story": "02: Get a driving school",
       "name": "Get  a driving School",
       "method": "GET",
       "path": "driving-school/single/1",
@@ -44,15 +64,17 @@
       }
     },
     {
+      "story": "03: Get all driving schools",
       "name": "Get  all driving Schools",
       "method": "GET",
       "path": "driving-school?stateId=25&lgaId=518",
       "assertions": {
         "status": 200
-        }
+      }
     },
     {
-      "name": "Get  a driving school training durations",
+      "story": "04: Get  driving school training durations",
+      "name": "Get  driving school training durations",
       "method": "GET",
       "path": "driving-school/training-durations/1",
       "assertions": {
@@ -65,6 +87,7 @@
       }
     },
     {
+      "story": "05: Get a single training duration",
       "name": "Get  a single  training duration",
       "method": "GET",
       "path": "driving-school/training-duration/1",
@@ -77,5 +100,5 @@
         }
       }
     }
-]
-
+  ]
+}

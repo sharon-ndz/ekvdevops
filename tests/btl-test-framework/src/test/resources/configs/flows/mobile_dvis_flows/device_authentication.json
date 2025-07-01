@@ -1,5 +1,23 @@
-[
+{
+  "metadata": {
+    "epic": "Mobile DVIS",
+    "feature": "Device Authentication",
+    "severity": "critical",
+    "tags": [
+      "device",
+      "authentication",
+      "biometrics",
+      "api"
+    ],
+    "expectedResults": [
+      "Check activation status returns status 200.",
+      "Device enrollment returns status 201.",
+      "Update biometrics returns status 201."
+    ]
+  },
+  "steps": [
     {
+      "story": "01: Check device activation status",
       "name": "device_authentication: Check Activation Status",
       "method": "GET",
       "path": "device/check-activation-status",
@@ -9,10 +27,10 @@
       "requires": ["token"],
       "assertions": {
         "status": 200
-
-        }
+      }
     },
     {
+      "story": "02: Enroll device for pre-activation",
       "name": "device_authentication: Enroll Device",
       "method": "POST",
       "path": "device/pre-activation",
@@ -29,11 +47,11 @@
       },
       "assertions": {
         "status": 201
-
       }
     },
     {
-      "name": "device_authentication: Update  Biometrics",
+      "story": "03: Update user biometrics",
+      "name": "device_authentication: Update Biometrics",
       "method": "POST",
       "path": "users/update-biometrics",
       "requires": ["token"],
@@ -54,7 +72,7 @@
       },
       "assertions": {
         "status": 201
-
       }
     }
-]
+  ]
+}

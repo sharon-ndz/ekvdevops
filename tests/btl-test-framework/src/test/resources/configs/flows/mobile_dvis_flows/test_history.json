@@ -1,6 +1,17 @@
- [
+{
+  "metadata": {
+    "epic": "Mobile DVIS",
+    "feature": "Test History",
+    "severity": "critical",
+    "tags": ["driving_test", "history", "api"],
+    "expectedResults": [
+      "Get all test history returns status 200 with paginated results."
+    ]
+  },
+  "steps": [
     {
-      "name": "test_history: Get ALl Test history",
+      "story": "01: Get all driving test history",
+      "name": "test_history: Get All Test history",
       "method": "GET",
       "path": "driving-test/test-history",
       "query": {
@@ -10,8 +21,7 @@
       "requires": ["token"],
       "assertions": {
         "status": 200
-
-        }
+      }
     }
   ]
-
+}

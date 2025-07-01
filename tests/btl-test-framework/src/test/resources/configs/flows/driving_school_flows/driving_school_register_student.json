@@ -1,6 +1,17 @@
- [
+{
+  "metadata": {
+    "epic": "Driving School",
+    "feature": "Student Registration",
+    "severity": "critical",
+    "tags": ["student", "verification", "nin"],
+    "expectedResults": [
+      "NIN verification should return status 200."
+    ]
+  },
+  "steps": [
     {
-      "name": "Driving school Resgiter Student: Verfify NIN",
+      "story": "01: Verify NIN for student registration",
+      "name": "Driving school Register Student: Verify NIN",
       "method": "GET",
       "path": "auth/verify-nin/22345678938",
       "requires": ["token"],
@@ -8,4 +19,5 @@
         "status": 200
       }
     }
- ]
+  ]
+}

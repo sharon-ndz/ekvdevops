@@ -1,6 +1,28 @@
-[
+{
+  "metadata": {
+    "epic": "Mobile DVIS",
+    "feature": "CBT Registration and Scheduling",
+    "severity": "critical",
+    "tags": [
+      "cbt",
+      "registration",
+      "scheduling",
+      "auth"
+    ],
+    "expectedResults": [
+      "OTP send request returns status 201.",
+      "OTP validation returns status 201.",
+      "License pre-registration returns status 201.",
+      "CBT slots retrieval returns status 201.",
+      "CBT slot booking returns status 201.",
+      "Failed attempts retrieval returns status 200.",
+      "CBT rescheduling returns status 201."
+    ]
+  },
+  "steps": [
     {
-      "name": "cbt_registration_scheduling: Send Otp Request ",
+      "story": "01: Send OTP request",
+      "name": "cbt_registration_scheduling: Send Otp Request",
       "method": "POST",
       "path": "auth/send-otp",
       "body": {
@@ -12,7 +34,8 @@
       }
     },
     {
-      "name": "cbt_registration_scheduling: Validate Otp Request ",
+      "story": "02: Validate OTP request",
+      "name": "cbt_registration_scheduling: Validate Otp Request",
       "method": "POST",
       "path": "auth/validate-otp",
       "body": {
@@ -25,7 +48,8 @@
       }
     },
     {
-      "name": "cbt_registration_scheduling: License Pre-registration ",
+      "story": "03: License pre-registration",
+      "name": "cbt_registration_scheduling: License Pre-registration",
       "method": "POST",
       "path": "license/single/pre-registration",
       "body": {
@@ -36,6 +60,7 @@
       }
     },
     {
+      "story": "04: Get CBT slots",
       "name": "cbt_registration_scheduling: Get CBT SLots",
       "method": "POST",
       "path": "cbt/slots",
@@ -47,7 +72,8 @@
       }
     },
     {
-      "name": "cbt_registration_scheduling: Book CBT Slot ",
+      "story": "05: Book CBT slot",
+      "name": "cbt_registration_scheduling: Book CBT Slot",
       "method": "POST",
       "path": "cbt/book-slot",
       "body": {
@@ -64,6 +90,7 @@
       }
     },
     {
+      "story": "06: Get failed attempts",
       "name": "cbt_registration_scheduling: Get Failed attempts",
       "method": "GET",
       "path": "cbt/failed-attempts/5",
@@ -73,7 +100,8 @@
       }
     },
     {
-      "name": "cbt_registration_scheduling: Reschedule CBT ",
+      "story": "07: Reschedule CBT",
+      "name": "cbt_registration_scheduling: Reschedule CBT",
       "method": "POST",
       "path": "cbt/reschedule",
       "body": {
@@ -90,4 +118,5 @@
         "status": 201
       }
     }
-]
+  ]
+}

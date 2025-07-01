@@ -1,5 +1,20 @@
-[
+{
+  "metadata": {
+    "epic": "Driving School",
+    "feature": "Student Management",
+    "severity": "normal",
+    "tags": ["student", "driving-school", "api"],
+    "expectedResults": [
+      "Issue a certificate to a student successfully.",
+      "Retrieve student stats successfully.",
+      "Retrieve list of all students successfully.",
+      "Register a new student successfully.",
+      "Retrieve student details successfully."
+    ]
+  },
+  "steps": [
     {
+      "story": "01: Issue Certificate to Student",
       "name": "Student: Issue Certificate",
       "method": "POST",
       "path": "driving-school/students/issue-cert",
@@ -27,8 +42,7 @@
           "Vehicle Maintenance Basics",
           "Test 3"
         ]
-      }
-    ,
+      },
       "extract": {
         "identifier": "data.identifier",
         "drivingSchoolId": "data.id"
@@ -43,15 +57,17 @@
       }
     },
     {
-      "name": "Student: Get  Stats",
+      "story": "02: Get Student Stats",
+      "name": "Student: Get Stats",
       "method": "GET",
       "path": "driving-school/students/stats",
       "assertions": {
         "status": 200
-        }
+      }
     },
     {
-      "name": "Student: Get  All Students",
+      "story": "03: Get All Students",
+      "name": "Student: Get All Students",
       "method": "GET",
       "path": "driving-school/students",
       "query": {
@@ -63,7 +79,8 @@
       }
     },
     {
-      "name": "Student: Resgiter Student",
+      "story": "04: Register a New Student",
+      "name": "Student: Register Student",
       "method": "POST",
       "path": "driving-school/students/register",
       "body": {
@@ -79,7 +96,7 @@
         "genderId": 1,
         "nationalityId": 1,
         "placeOfBirth": "Uguda",
-        "address": "Admiral Rufus Eyitayo Street, House 2 ,Sam Nujoma  Estate, Galadimawa, Abuja",
+        "address": "Admiral Rufus Eyitayo Street, House 2 ,Sam Nujoma Estate, Galadimawa, Abuja",
         "dateOfBirth": "20-01-1981",
         "maritalStatusId": 1,
         "bloodGroupId": 7,
@@ -106,14 +123,16 @@
       },
       "assertions": {
         "status": 200
-        }
+      }
     },
     {
-      "name": "Student: Get  Student Details",
+      "story": "05: Get Student Details",
+      "name": "Student: Get Student Details",
       "method": "GET",
       "path": "driving-school/students/details/DR03NLEU58DR-135269",
       "assertions": {
         "status": 201
-        }
+      }
     }
   ]
+}

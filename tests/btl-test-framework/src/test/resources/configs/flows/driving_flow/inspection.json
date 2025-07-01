@@ -1,6 +1,18 @@
- [
+{
+  "metadata": {
+    "epic": "Driving School",
+    "feature": "Inspection",
+    "severity": "normal",
+    "tags": ["inspection", "driving_school", "api"],
+    "expectedResults": [
+      "Retrieve inspection list successfully.",
+      "Create new inspection log successfully."
+    ]
+  },
+  "steps": [
     {
-      "name": "Inspection: Get Inspection List ",
+      "story": "01: Get Inspection List",
+      "name": "Inspection: Get Inspection List",
       "method": "GET",
       "path": "inspections",
       "query": {
@@ -14,7 +26,8 @@
       }
     },
     {
-      "name": "Inspection: Create Inspection Log ",
+      "story": "02: Create Inspection Log",
+      "name": "Inspection: Create Inspection Log",
       "method": "POST",
       "path": "inspections",
       "body": {
@@ -33,3 +46,4 @@
       }
     }
   ]
+}

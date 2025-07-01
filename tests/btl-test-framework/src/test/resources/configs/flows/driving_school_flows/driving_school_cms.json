@@ -1,6 +1,19 @@
- [
+{
+  "metadata": {
+    "epic": "Driving School Flows",
+    "feature": "CMS",
+    "severity": "critical",
+    "tags": ["driving-school", "admin", "cms"],
+    "expectedResults": [
+      "Driving school creation should succeed with status 201.",
+      "Driving school update should succeed with status 200.",
+      "Driving school status toggle should succeed with status 200."
+    ]
+  },
+  "steps": [
     {
-      "name": "driving_school_cms: Admin creates  a driving School",
+      "story": "01: Admin creates a driving school",
+      "name": "driving_school_cms: Admin creates a driving School",
       "method": "POST",
       "path": "driving-school",
       "requires": ["token"],
@@ -11,11 +24,9 @@
         "phone": "${phoneNumber:090,11}",
         "stateId": 25,
         "lgaId": 518,
-        "address": "46 Agbado Ijaye, Ikeja, Lagos\"",
+        "address": "46 Agbado Ijaye, Ikeja, Lagos",
         "isActive": 0,
-        "trainingDurations": [
-          3,6,9
-        ]
+        "trainingDurations": [3, 6, 9]
       },
       "extract": {
         "drivingSchoolId": "data.id",
@@ -33,37 +44,38 @@
       }
     },
     {
-      "name": "driving_school_cms: Update a driving School ",
+      "story": "02: Admin updates a driving school",
+      "name": "driving_school_cms: Update a driving School",
       "method": "PATCH",
       "path": "driving-school",
-      "requires": ["token","drivingSchoolId"],
+      "requires": ["token", "drivingSchoolId", "name", "email", "phone"],
       "body": {
-        "id": 56,
+        "id": "${drivingSchoolId}",
         "name": "${name}",
         "email": "${email}",
         "phone": "${phone}",
         "stateId": 25,
         "lgaId": 518,
-        "address": "Swift Ave, Lekki Phase 1, Leki, Lago",
+        "address": "Swift Ave, Lekki Phase 1, Leki, Lagos",
         "isActive": 1,
         "trainingDurations": [3, 6, 9]
       },
-      "requires": ["token","drivingSchoolId","name","email","phone"],
       "assertions": {
         "status": 200
       }
     },
     {
-      "name": "driving_school_cms: Driving School Toggle Status ",
+      "story": "03: Admin toggles driving school status",
+      "name": "driving_school_cms: Driving School Toggle Status",
       "method": "PATCH",
-      "path": "driving-school/toggle-status/56",
+      "path": "driving-school/toggle-status/${drivingSchoolId}",
+      "requires": ["token", "drivingSchoolId"],
       "body": {
         "status": "0"
       },
-      "requires": ["token"],
       "assertions": {
         "status": 200
       }
     }
   ]
-
+}

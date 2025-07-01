@@ -1,5 +1,19 @@
- [
+{
+  "metadata": {
+    "epic": "Authentication",
+    "feature": "School Admin",
+    "severity": "critical",
+    "tags": ["auth", "login", "school_admin"],
+    "expectedResults": [
+      "Authenticate successfully as school admin with valid credentials.",
+      "Return 201 status code.",
+      "Response should contain a valid accessToken.",
+      "Response should indicate success."
+    ]
+  },
+  "steps": [
     {
+      "story": "01: Authenticate school admin",
       "name": "school_admin: Authenticate as school admin",
       "method": "POST",
       "path": "auth/login",
@@ -16,10 +30,9 @@
           "accessToken": {
             "exists": true
           },
-          "": {
-            "success": true
-          }
+          "success": true
         }
       }
     }
   ]
+}
