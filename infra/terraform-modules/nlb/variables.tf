@@ -112,3 +112,12 @@ variable "environment" {
   type        = string
 }
 
+variable "subnet_with_az" {
+  description = "List of objects with AZ and subnet_id used for subnet mapping"
+  type = list(object({
+    az        = string
+    subnet_id = string
+  }))
+  default = []
+}
+
