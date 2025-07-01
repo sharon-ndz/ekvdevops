@@ -170,7 +170,7 @@ jobs:
             --output text
 
           # 1. Get the parameter (plaintext)
-          PARAM_NAME=$(echo "$SSM_ENV_PARAM" | tr -d '\r\n' | sed 's#^ssm://##')
+          PARAM_NAME=$(echo "$SSM_ENV_PARAM" | tr -d '\r\n')
           ENV_CONTENT=$(aws ssm get-parameter \
             --name "$PARAM_NAME" \
             --query "Parameter.Value" \
