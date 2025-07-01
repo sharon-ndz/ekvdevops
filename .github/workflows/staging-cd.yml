@@ -164,19 +164,25 @@ jobs:
           echo "Deploying to instance: $INSTANCE_ID"
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
           
-              ENV_PATH="/idlms/shared/${ENV}/.env"
-              aws ssm send-command \
-               --instance-ids "$INSTANCE_ID" \
-               --document-name "AWS-RunShellScript" \
-               --comment "Retrieve .env from SSM inside EC2" \
-               --parameters "commands=[
-                 \"set -e\",
-                 \"echo 'Fetching .env from SSM: ${ENV_PATH}'\",
-                 \"ENV=\$(aws ssm get-parameter --name '${ENV_PATH}' --with-decryption --query 'Parameter.Value' --output text)\",
-                 \"echo 'Fetched ENV length: \${#ENV}'\",
-                 \"echo \\\"\$ENV\\\" > /home/ubuntu/.env\",
-                 \"echo 'BUILD_TAG=${BUILD_TAG}' >> /home/ubuntu/.env\"
-               ]"
+          ENV_CONTENT=$(aws ssm get-parameter \
+             --name "/idlms/shared/${ENV}/.env" \
+             --with-decryption \
+             --query "Parameter.Value" \
+             --output text)
+          ENCODED_ENV=$(echo "$ENV_CONTENT" | base64 -w 0)
+          aws ssm send-command \
+           --instance-ids "$INSTANCE_ID" \
+           --document-name "AWS-RunShellScript" \
+           --comment "Write .env to EC2 from GitHub Actions" \
+           --parameters "commands=[
+            \"echo '$ENCODED_ENV' | base64 -d > /home/ubuntu/.env\",
+            \"echo 'BUILD_TAG=${BUILD_TAG}' >> /home/ubuntu/.env\"
+          ]" \
+          --timeout-seconds 300 \
+          --region "$AWS_REGION" \
+          --output text
+
+
 
           # Upload docker-compose.yml to S3
           aws s3 cp docker/docker-compose.yml s3://${BACKUP_BUCKET}/${{ github.event.inputs.ENV }}/docker-compose.yml
