@@ -190,18 +190,31 @@ jobs:
             --region $AWS_REGION \
             --output text
 
-           # Restart Docker containers using new docker-compose.yml
-            aws ssm send-command \
-            --instance-ids "$INSTANCE_ID" \
-            --document-name "AWS-RunShellScript" \
-            --comment "Pull and restart License API with latest image" \
-            --parameters 'commands=[
-              "set -e",
-              "aws ecr get-login-password --region '${AWS_REGION}' | docker login --username AWS --password-stdin '${ECR_REPO_URL%/*}'",
-              "cd /home/ubuntu/",
-              "docker-compose pull",
-              "docker-compose down",
-              "docker-compose up -d"
-            ]' \
-            --timeout-seconds 900 \
-            --region $AWS_REGION \
+          aws ssm send-command \
+           --instance-ids "$INSTANCE_ID" \
+           --document-name "AWS-RunShellScript" \
+           --comment "Install Docker if needed, then restart License API" \
+           --parameters 'commands=[
+             "set -e",
+             "if ! command -v docker &> /dev/null; then",
+             "  echo Installing Docker...",
+             "  sudo apt-get update -y",
+             "  sudo apt-get install -y docker.io",
+             "  sudo systemctl enable docker",
+             "  sudo systemctl start docker",
+            "fi",
+            "if ! command -v docker-compose &> /dev/null; then",
+            "  echo Installing Docker Compose...",
+            "  sudo curl -L \"https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose",
+            "  sudo chmod +x /usr/local/bin/docker-compose",
+            "  sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose || true",
+            "fi",
+            "aws ecr get-login-password --region '${AWS_REGION}' | docker login --username AWS --password-stdin '${ECR_REPO_URL%/*}'",
+            "cd /home/ubuntu/",
+            "docker-compose pull",
+            "docker-compose down",
+            "docker-compose up -d"
+          ]' \
+           --timeout-seconds 900 \
+           --region $AWS_REGION \
+           --output text
