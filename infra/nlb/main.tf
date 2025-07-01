@@ -18,16 +18,24 @@ provider "aws" {
 }
 
 locals {
-  # Build a map of AZ => subnet ID
-  subnets_by_az = {
-    for idx, az in data.terraform_remote_state.vpc.outputs.private_subnets_azs :
-    az => data.terraform_remote_state.vpc.outputs.private_subnets_ids[idx]
+  # Pair each subnet ID with its AZ
+  az_subnet_pairs = [
+    for idx in range(length(data.terraform_remote_state.vpc.outputs.private_subnets_ids)) : {
+      az        = data.terraform_remote_state.vpc.outputs.private_subnets_azs[idx]
+      subnet_id = data.terraform_remote_state.vpc.outputs.private_subnets_ids[idx]
+    }
+  ]
+
+  # Take only the first subnet per unique AZ (deduped map)
+  unique_subnets_by_az = {
+    for pair in local.az_subnet_pairs :
+    pair.az => pair.subnet_id...
   }
 
-  # Unique subnet per AZ for NLB
+  # Flatten into subnet_mapping list
   unique_subnets_per_az = [
-    for az, subnet_id in local.subnets_by_az :
-    { az = az, subnet_id = subnet_id }
+    for az, subnet_ids in local.unique_subnets_by_az :
+    { az = az, subnet_id = subnet_ids[0] }
   ]
 }
 
