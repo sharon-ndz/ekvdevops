@@ -164,7 +164,7 @@ jobs:
           if [ -z "$ENV" ]; then
            echo "❌ ERROR: ENV is not set. Please pass a valid environment (dev/staging/prod)."
            exit 1
-         fi
+          fi
 
           SSM_PARAM_PATH="/idlms/shared/${ENV}/.env"
 
