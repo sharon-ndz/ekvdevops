@@ -167,10 +167,11 @@ jobs:
                aws ssm send-command \
                --instance-ids "$INSTANCE_ID" \
                --document-name "AWS-RunShellScript" \
+               --comment "Retrieve .env from SSM inside EC2" \
                --parameters commands="[
-                 \"ENV=\$(aws ssm get-parameter --name '/idlms/shared/${{ github.event.inputs.ENV }}/.env' --with-decryption --query 'Parameter.Value' --output text)\",
-                  \"echo \\\"\\\$ENV\\\" > /home/ubuntu/.env\",
-                   \"echo \\\"BUILD_TAG=${BUILD_TAG}\\\" >> /home/ubuntu/.env\"
+                "ENV=$(aws ssm get-parameter --name \"/idlms/shared/'"${ENV}"'/.env\" --with-decryption --query \"Parameter.Value\" --output text)",
+                "echo \"$ENV\" > /home/ubuntu/.env",
+                "echo \"BUILD_TAG='${BUILD_TAG}'\" >> /home/ubuntu/.env"
                  ]" \
                   --timeout-seconds 300 \
                    --region $AWS_REGION \
