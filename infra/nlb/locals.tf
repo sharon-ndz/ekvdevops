@@ -46,9 +46,10 @@ locals {
 
   # Final subnet_mapping
   subnet_mapping = [
-    for subnet_id in local.selected_subnets : {
-      subnet_id = subnet_id
-    }
-  ]
+  for subnet_id in local.selected_subnets : {
+    subnet_id = subnet_id
+  } if subnet_id != null && subnet_id != ""
+]
+
 }
 
