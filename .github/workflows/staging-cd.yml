@@ -73,9 +73,6 @@ jobs:
           RAW_OUTPUT=$(terraform output -raw ecr_repository_url 2>&1)
           ECR_REPO_URL=$(${TERRAFORM_CLI_PATH}/terraform-bin output -raw ecr_repository_url)
           echo "Raw Terraform Output: [$RAW_OUTPUT]"
-
-          #ECR_REPO_URL=$(terraform output -raw ecr_repository_url | xargs)
-          #ECR_REPO_URL1=$(terraform output -raw ecr_repository_url | xargs)
           echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
           echo $ECR_REPO_URL
           echo $GITHUB_ENV
@@ -89,29 +86,16 @@ jobs:
             --with-decryption \
             --query "Parameter.Value" \
             --output text)
-
           BASE64_ENV=$(echo "$ENV_CONTENT" | base64 -w 0)
-
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars" -var="app_env_content=${BASE64_ENV}"
           SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm:\/\///')
-
-          #echo "SSM_ENV_PARAM=${SSM_ENV_PARAM}" >> $GITHUB_ENV
-          #SSM_ENV_PARAM=$(cd infra/ssm && terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's#^ssm://##')
-          echo "SSM_ENV_PARAM=$SSM_ENV_PARAM"
           echo "SSM_ENV_PARAM=$SSM_ENV_PARAM" >> $GITHUB_ENV
-
-
-          #SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm://')
-
-          #echo "SSM_ENV_PARAM=${SSM_ENV_PARAM}" >> $GITHUB_ENV
 
       - name: Print ECR URL
         run: echo "Using ECR:$ECR_REPO_URL"
         env:
           ECR_REPO_URL: ${{ env.ECR_REPO_URL }}
-
-
 
       - name: Log in to Amazon ECR
         id: login-ecr
@@ -120,14 +104,12 @@ jobs:
       - name: Generate build tags
         id: tags
         run: |
-          #ECR_REPO_URL=$(/home/runner/work/_temp/5fb89a93-29a6-4999-af6e-8ca5aa1a0535/terraform-bin output -raw ecr_repository_url)
           ECR_REPO_URL="${{ env.ECR_REPO_URL }}"
           DATE_TAG=$(date +'%Y.%m.%d')
           BUILD_NUM=$(printf "%03d" $GITHUB_RUN_NUMBER)
           BUILD_TAG="${DATE_TAG}.${BUILD_NUM}"
           IMAGE_URI="${ECR_REPO_URL}:${BUILD_TAG}"
           LATEST_URI="${ECR_REPO_URL}:latest"
-
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
           echo "LATEST_URI=$LATEST_URI" >> $GITHUB_ENV
           echo "BUILD_TAG=$BUILD_TAG" >> $GITHUB_ENV
@@ -151,66 +133,63 @@ jobs:
 
       - name: Deploy to EC2 via SSM
         run: |
+          set -e
+
           INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=Backend API IDLMS-${{ github.event.inputs.ENV }}" "Name=instance-state-name,Values=running" \
+            --filters "Name=tag:Name,Values=Backend API IDLMS-${ENV}" "Name=instance-state-name,Values=running" \
             --query "Reservations[].Instances[].InstanceId" \
             --output text)
 
           if [ -z "$INSTANCE_ID" ]; then
-            echo "❌ ERROR: No running EC2 instance found with tag Backend API IDLMS-${{ github.event.inputs.ENV }}"
+            echo "❌ ERROR: No running EC2 instance found with tag Backend API IDLMS-${ENV}"
             exit 1
           fi
 
           echo "Deploying to instance: $INSTANCE_ID"
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
-          # Upload docker-compose.yml to S3
-          aws s3 cp docker/docker-compose.yml s3://${BACKUP_BUCKET}/${{ github.event.inputs.ENV }}/docker-compose.yml
+          aws s3 cp docker/docker-compose.yml s3://${BACKUP_BUCKET}/${ENV}/docker-compose.yml
 
-          # Trigger EC2 to pull docker-compose.yml from S3
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --instance-ids "$INSTANCE_ID" \
             --comment "Download docker-compose.yml from S3" \
-            --parameters 'commands=["aws s3 cp s3://'"$BACKUP_BUCKET"'/'"${{ github.event.inputs.ENV }}"'/docker-compose.yml /home/ubuntu/docker-compose.yml"]' \
-            --region $AWS_REGION \
+            --parameters commands=["aws s3 cp s3://${BACKUP_BUCKET}/${ENV}/docker-compose.yml /home/ubuntu/docker-compose.yml"] \
+            --region "$AWS_REGION" \
             --output text
 
-          # 1. Get the parameter (plaintext)
-          PARAM_NAME=$(echo "$SSM_ENV_PARAM" | tr -d '\r\n')
+          PARAM_NAME="/idlms/shared/${ENV}/.env"
+
           ENV_CONTENT=$(aws ssm get-parameter \
             --name "$PARAM_NAME" \
+            --with-decryption \
             --query "Parameter.Value" \
             --output text)
 
-          # 2. Base64 encode to preserve line breaks
           ENCODED_ENV=$(echo "$ENV_CONTENT" | base64 -w 0)
 
-          # 3. Send it to EC2 to create the .env file
-            aws ssm send-command \
-           --instance-ids "$INSTANCE_ID" \
-           --document-name "AWS-RunShellScript" \
-           --comment "Write .env to EC2" \
-           --parameters "{\"commands\":[
-                \"echo '$ENCODED_ENV' | base64 -d > /home/ubuntu/.env\",
-                 \"echo 'BUILD_TAG=$BUILD_TAG' >> /home/ubuntu/.env\"
-              ]}" \
-             --timeout-seconds 300 \
-             --region "$AWS_REGION" \
-             --output text
+          aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Write .env to EC2" \
+            --parameters commands=["echo '$ENCODED_ENV' | base64 -d > /home/ubuntu/.env", "echo 'BUILD_TAG=$BUILD_TAG' >> /home/ubuntu/.env"] \
+            --timeout-seconds 300 \
+            --region "$AWS_REGION" \
+            --output text
 
-
-           # Restart Docker containers using new docker-compose.yml
-            aws ssm send-command \
+          aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Pull and restart License API with latest image" \
-            --parameters 'commands=[
+            --parameters commands=[
               "set -e",
-              "aws ecr get-login-password --region '${AWS_REGION}' | docker login --username AWS --password-stdin '${ECR_REPO_URL%/*}'",
+              "aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${ECR_REPO_URL%/*}",
               "cd /home/ubuntu/",
               "docker-compose pull",
+              "docker-compose down"
               "docker-compose up -d"
-            ]' \
+            ] \
             --timeout-seconds 900 \
-            --region $AWS_REGION \
+            --region "$AWS_REGION" \
+            --output text
+   
