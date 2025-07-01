@@ -35,12 +35,14 @@ locals {
   }
 
   target_az = data.terraform_remote_state.vpc.outputs.ec2_az
+  unique_subnets = [
+  for az in keys(local.az_to_subnet_ids) : local.az_to_subnet_ids[az][0]
+]
 
-  selected_subnets = lookup(local.az_to_subnet_ids, local.target_az, [])
+subnet_mapping = [
+  for subnet_id in local.unique_subnets : {
+    subnet_id = subnet_id
+  }
+]
 
-  subnet_mapping = [
-    for subnet_id in local.selected_subnets : {
-      subnet_id = subnet_id
-    }
-  ]
 }
