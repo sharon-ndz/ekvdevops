@@ -151,6 +151,7 @@ jobs:
 
       - name: Deploy to EC2 via SSM
         run: |
+          ENV="${{ github.event.inputs.ENV }}"
           INSTANCE_ID=$(aws ec2 describe-instances \
             --filters "Name=tag:Name,Values=Backend API IDLMS-${{ github.event.inputs.ENV }}" "Name=instance-state-name,Values=running" \
             --query "Reservations[].Instances[].InstanceId" \
