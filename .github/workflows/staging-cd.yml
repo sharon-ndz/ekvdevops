@@ -160,11 +160,6 @@ jobs:
             echo "❌ ERROR: No running EC2 instance found with tag Backend API IDLMS-${{ github.event.inputs.ENV }}"
             exit 1
           fi
-          # Check that ENV is set
-          if [ -z "$ENV" ]; then
-           echo "❌ ERROR: ENV is not set. Please pass a valid environment (dev/staging/prod)."
-           exit 1
-          fi
 
           SSM_PARAM_PATH="/idlms/shared/${ENV}/.env"
 
