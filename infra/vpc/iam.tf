@@ -155,3 +155,23 @@ resource "aws_iam_role_policy_attachment" "ec2_describe" {
   role       = aws_iam_role.ec2_ssm_role.name
   policy_arn = aws_iam_policy.ec2_describe.arn
 }
+
+resource "aws_iam_policy" "ssm_get_parameter" {
+  name = "${var.environment}-ec2-ssm-get-parameter"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = ["ssm:GetParameter"],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_get_parameter_attach" {
+  role       = aws_iam_role.ec2_ssm_role.name
+  policy_arn = aws_iam_policy.ssm_get_parameter.arn
+}
