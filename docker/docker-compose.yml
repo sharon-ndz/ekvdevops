@@ -21,7 +21,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   app:
-    image: license-api-29062025141743:latest
+    image:  084828592148.dkr.ecr.us-east-1.amazonaws.com/license-api-dev:${BUILD_TAG}
     container_name: backend
     restart: always
     env_file:
