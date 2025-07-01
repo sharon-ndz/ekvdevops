@@ -43,8 +43,6 @@ locals {
   # Subnets in that AZ
   selected_subnets = lookup(local.az_to_subnet_ids, local.target_az, [])
 
-  # ⚠️ Fail early if no subnet found
-  check_subnet_selected = length(local.selected_subnets) > 0 ? true : error("❌ No private subnet found for EC2 AZ: ${local.target_az}")
 
   # Final subnet_mapping
   subnet_mapping = [
