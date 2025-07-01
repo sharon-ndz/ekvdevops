@@ -112,7 +112,8 @@ jobs:
       - name: Generate build tags
         id: tags
         run: |
-          ECR_REPO_URL=$(/home/runner/work/_temp/5fb89a93-29a6-4999-af6e-8ca5aa1a0535/terraform-bin output -raw ecr_repository_url)
+          #ECR_REPO_URL=$(/home/runner/work/_temp/5fb89a93-29a6-4999-af6e-8ca5aa1a0535/terraform-bin output -raw ecr_repository_url)
+          ECR_REPO_URL="${{ env.ECR_REPO_URL }}"
           DATE_TAG=$(date +'%Y.%m.%d')
           BUILD_NUM=$(printf "%03d" $GITHUB_RUN_NUMBER)
           BUILD_TAG="${DATE_TAG}.${BUILD_NUM}"
