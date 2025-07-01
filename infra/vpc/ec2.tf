@@ -11,7 +11,7 @@ resource "aws_instance" "web" {
               set -e
 
               apt-get update -y
-              apt-get install -y curl unzip wget snapd gnupg software-properties-common docker.io jq
+              apt-get install -y curl unzip wget snapd gnupg software-properties-common jq
 
               # Install AWS CLI if not present
               if ! command -v aws &> /dev/null; then
@@ -30,42 +30,17 @@ resource "aws_instance" "web" {
               dpkg -i /tmp/amazon-cloudwatch-agent.deb
               chmod +x /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl
 
-              /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
-                -a fetch-config \
-                -m ec2 \
-                -c ssm:${var.cloudwatch_ssm_config_path} \
-                -s
+              # Retry fetching config and starting CloudWatch Agent
+              for i in {1..60}; do
+                /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+                  -a fetch-config \
+                  -m ec2 \
+                  -c ssm:${var.cloudwatch_ssm_config_path} \
+                  -s && break
 
-              # Create docker-compose.yml directly
-              mkdir -p /home/ubuntu
-              cat <<EOC > /home/ubuntu/docker-compose.yml
-              version: '3.8'
-
-              services:
-                app:
-                  image: latest
-                  container_name: backend
-                  ports:
-                    - "4000:4000"
-                  env_file:
-                    - .env
-
-                postgres:
-                  image: postgres:15
-                  environment:
-                    POSTGRES_USER: user
-                    POSTGRES_PASSWORD: password
-                    POSTGRES_DB: appdb
-                  ports:
-                    - "5432:5432"
-                  volumes:
-                    - pgdata:/var/lib/postgresql/data
-
-              volumes:
-                pgdata:
-              EOC
-
-              chown ubuntu:ubuntu /home/ubuntu/docker-compose.yml
+                echo "CloudWatch config not ready, retrying in 20s..."
+                sleep 20
+              done
               EOF
 
   tags = var.ec2_tags
