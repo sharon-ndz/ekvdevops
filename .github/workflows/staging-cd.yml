@@ -73,10 +73,10 @@ jobs:
           RAW_OUTPUT=$(terraform output -raw ecr_repository_url 2>&1)
           echo "Raw Terraform Output: [$RAW_OUTPUT]"
 
-          ECR_REPO_URL=$(terraform output -raw ecr_repository_url | tr -d '\r\n')
-          ECR_REPO_URL1=$(terraform output -raw ecr_repository_url | xargs)
+          ECR_REPO_URL=$(terraform output -raw ecr_repository_url | xargs)
+          #ECR_REPO_URL1=$(terraform output -raw ecr_repository_url | xargs)
           echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
-          echo $ECR_REPO_URL1
+          echo $ECR_REPO_URL
           echo $GITHUB_ENV
 
       - name: Terraform Apply SSM
@@ -96,6 +96,12 @@ jobs:
 
           SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n')
           echo "SSM_ENV_PARAM=${SSM_ENV_PARAM}" >> $GITHUB_ENV
+
+      - name: Print ECR URL
+        run: echo "Using ECR: $ECR_REPO_URL"
+        env:
+         ECR_REPO_URL: ${{ env.ECR_REPO_URL }}
+
 
       - name: Log in to Amazon ECR
         id: login-ecr
