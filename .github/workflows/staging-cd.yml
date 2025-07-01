@@ -160,6 +160,29 @@ jobs:
             echo "❌ ERROR: No running EC2 instance found with tag Backend API IDLMS-${{ github.event.inputs.ENV }}"
             exit 1
           fi
+          # Check that ENV is set
+          if [ -z "$ENV" ]; then
+           echo "❌ ERROR: ENV is not set. Please pass a valid environment (dev/staging/prod)."
+           exit 1
+         fi
+
+          SSM_PARAM_PATH="/idlms/shared/${ENV}/.env"
+
+          aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Retrieve .env from SSM inside EC2" \
+            --parameters "commands=[
+              \"set -e\",
+              \"echo 'Fetching .env from SSM: ${SSM_PARAM_PATH}'\",
+              \"ENV_CONTENT=\$(aws ssm get-parameter --name '${SSM_PARAM_PATH}' --with-decryption --query 'Parameter.Value' --output text)\",
+              \"echo 'Fetched ENV length: \${#ENV_CONTENT}'\",
+              \"echo \\\"\$ENV_CONTENT\\\" > /home/ubuntu/.env\",
+              \"echo 'BUILD_TAG=${BUILD_TAG}' >> /home/ubuntu/.env\"
+            ]" \
+            --timeout-seconds 300 \
+            --region "$AWS_REGION" \
+            --output text
 
           echo "Deploying to instance: $INSTANCE_ID"
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
