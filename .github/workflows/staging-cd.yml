@@ -169,14 +169,14 @@ jobs:
                --instance-ids "$INSTANCE_ID" \
                --document-name "AWS-RunShellScript" \
                --comment "Retrieve .env from SSM inside EC2" \
-               --parameters 'commands=[
-                "ENV=$(aws ssm get-parameter --name \"/idlms/shared/'"${ENV_NAME}"'/.env\" --with-decryption --query '\''Parameter.Value'\'' --output text)",
-                "echo \"$ENV\" > /home/ubuntu/.env",
-                "echo \"BUILD_TAG='"${BUILD_TAG}"'\" >> /home/ubuntu/.env"
-                 ]' \
-                  --timeout-seconds 300 \
-                   --region $AWS_REGION \
-                    --output text
+               --parameters "commands=[
+                 \"set -e\",
+                 \"echo 'Fetching .env from SSM: ${ENV_PATH}'\",
+                 \"ENV=\$(aws ssm get-parameter --name '${ENV_PATH}' --with-decryption --query 'Parameter.Value' --output text)\",
+                 \"echo 'Fetched ENV length: \${#ENV}'\",
+                 \"echo \\\"\$ENV\\\" > /home/ubuntu/.env\",
+                 \"echo 'BUILD_TAG=${BUILD_TAG}' >> /home/ubuntu/.env\"
+               ]"
 
           # Upload docker-compose.yml to S3
           aws s3 cp docker/docker-compose.yml s3://${BACKUP_BUCKET}/${{ github.event.inputs.ENV }}/docker-compose.yml
