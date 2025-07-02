@@ -155,6 +155,7 @@ jobs:
           INSTANCE_ID=$(aws ec2 describe-instances \
             --filters "Name=tag:Name,Values=Backend API IDLMS-${{ github.event.inputs.ENV }}" "Name=instance-state-name,Values=running" \
             --query "Reservations[].Instances[].InstanceId" \
+            --region "$AWS_REGION" \
             --output text)
 
           if [ -z "$INSTANCE_ID" ]; then
