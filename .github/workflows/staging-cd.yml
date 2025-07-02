@@ -221,7 +221,7 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --instance-ids "$INSTANCE_ID" \
             --comment "Download license_backup.sql from S3" \
-            --parameters 'commands=["aws s3 cp s3://'"$BACKUP_BUCKET"'/back-up-db/license_backup.sql /home/ubuntu/license_backup.sql"]'
+            --parameters 'commands=["aws s3 cp s3://'"$BACKUP_BUCKET"'/back-up-db/license_backup.sql /home/ubuntu/license_backup.sql"]' \
             --region $AWS_REGION \
             --output text
 
