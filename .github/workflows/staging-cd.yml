@@ -182,7 +182,7 @@ jobs:
 
           echo "Deploying to instance: $INSTANCE_ID"
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
-          
+
           ENV_CONTENT=$(aws ssm get-parameter \
              --name "/idlms/shared/${ENV}/.env" \
              --with-decryption \
@@ -214,6 +214,16 @@ jobs:
             --parameters 'commands=["aws s3 cp s3://'"$BACKUP_BUCKET"'/'"${{ github.event.inputs.ENV }}"'/docker-compose.yml /home/ubuntu/docker-compose.yml"]' \
             --region $AWS_REGION \
             --output text
+
+          # Trigger EC2 to pull license_backup.sql from S3
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --instance-ids "$INSTANCE_ID" \
+            --comment "Download license_backup.sql from S3" \
+            --parameters 'commands=["aws s3 cp s3://'"$BACKUP_BUCKET"'/back-up-db/license_backup.sql /home/ubuntu/license_backup.sql"]'
+            --region $AWS_REGION \
+            --output text
+
 
           aws ssm send-command \
            --instance-ids "$INSTANCE_ID" \
