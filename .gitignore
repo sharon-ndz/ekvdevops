@@ -1,3 +1,4 @@
 idlms-secrets.json
 main.tf
 lambda/
+.terraform/
