@@ -2,3 +2,12 @@ idlms-secrets.json
 main.tf
 lambda/
 .terraform/
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+crash.log
+*.zip
+*.tar.gz
+*.bin
+*.backup
