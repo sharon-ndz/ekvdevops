@@ -1,0 +1,45 @@
+variable "function_name" {
+  type        = string
+  description = "Name of the Lambda function"
+}
+
+variable "lambda_package" {
+  type        = string
+  description = "Local path to the Lambda ZIP file"
+}
+
+variable "handler" {
+  type        = string
+  description = "Handler for the Lambda function"
+}
+
+variable "runtime" {
+  type        = string
+  description = "Lambda runtime"
+}
+
+variable "memory_size" {
+  type        = number
+  description = "Lambda memory size"
+}
+
+variable "timeout" {
+  type        = number
+  description = "Lambda timeout in seconds"
+}
+
+variable "lambda_role_arn" {
+  type        = string
+  description = "IAM Role ARN for the Lambda function"
+}
+
+variable "environment_variables" {
+  type        = map(string)
+  description = "Environment variables for the Lambda function"
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "Tags to apply to resources"
+}
+
