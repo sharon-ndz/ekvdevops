@@ -33,7 +33,7 @@ jobs:
       - name: 📁 Package Lambda as ZIP
         working-directory: ./src
         run: |
-          zip -r ../infra/lambda/lambda.zip dist node_modules package.json
+          zip -r ../infra/lambda/backend-api.zip dist node_modules package.json
 
       - name: ⚙️ Set up Terraform
         uses: hashicorp/setup-terraform@v3
