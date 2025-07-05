@@ -11,3 +11,4 @@ crash.log
 *.tar.gz
 *.bin
 *.backup
+!/infra/lambda/
