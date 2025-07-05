@@ -6,7 +6,7 @@ on:
       - master
     paths:
       - 'src/**'
-      - 'infra/lambda/**'
+      - 'infra/**'
       - '.github/workflows/deploy-lambda.yml'
 
 jobs:
