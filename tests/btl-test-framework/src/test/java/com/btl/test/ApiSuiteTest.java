@@ -112,7 +112,7 @@ public class ApiSuiteTest extends TestBase {
                             metadata.fields().forEachRemaining(entry ->
                                     System.out.printf("  %s: %s%n", entry.getKey(), entry.getValue().asText())
                             );
-                            com.btl.test.reports.AllureLabelHelper.applyAllureLabels(metadata);
+                            com.btl.test.reports.AllureLabelHelper.applyAllureLabels(metadata,0);
                         }
 
                         // Attach top-level expected results if present
@@ -123,14 +123,15 @@ public class ApiSuiteTest extends TestBase {
                         int i=0;
                         for (JsonNode step : steps) {
                             //String stepName = step.has("name") ? step.get("name").asText() : "[Unnamed Step]";
-                            String stepName = step.has("name") ? step.get("name").asText() : "Unnamed Step " + (i + 1);
+                            i++;
+                            String stepName = step.has("name") ? i + ": "+ step.get("name").asText() : i + ": "+"Unnamed Step ";
                             //String displayName = String.format("%s - %s - %s", flowName, fileRef, stepName);
 
                             try {
                                 System.out.println("➡️ Running Step: " + stepName);
 
                                 // Apply step-specific labels if any
-                                com.btl.test.reports.AllureLabelHelper.applyAllureLabels(step);
+                                com.btl.test.reports.AllureLabelHelper.applyAllureLabels(step,i);
 
 
 

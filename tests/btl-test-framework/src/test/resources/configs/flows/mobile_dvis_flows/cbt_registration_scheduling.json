@@ -21,7 +21,7 @@
   },
   "steps": [
     {
-      "story": "01: Send OTP request",
+      "story": "Send OTP request",
       "name": "cbt_registration_scheduling: Send Otp Request",
       "method": "POST",
       "path": "auth/send-otp",
@@ -34,7 +34,7 @@
       }
     },
     {
-      "story": "02: Validate OTP request",
+      "story": "Validate OTP request",
       "name": "cbt_registration_scheduling: Validate Otp Request",
       "method": "POST",
       "path": "auth/validate-otp",
@@ -48,7 +48,7 @@
       }
     },
     {
-      "story": "03: License pre-registration",
+      "story": "License pre-registration",
       "name": "cbt_registration_scheduling: License Pre-registration",
       "method": "POST",
       "path": "license/single/pre-registration",
@@ -60,7 +60,7 @@
       }
     },
     {
-      "story": "04: Get CBT slots",
+      "story": "Get CBT slots",
       "name": "cbt_registration_scheduling: Get CBT SLots",
       "method": "POST",
       "path": "cbt/slots",
@@ -72,7 +72,7 @@
       }
     },
     {
-      "story": "05: Book CBT slot",
+      "story": "Book CBT slot",
       "name": "cbt_registration_scheduling: Book CBT Slot",
       "method": "POST",
       "path": "cbt/book-slot",
@@ -90,7 +90,7 @@
       }
     },
     {
-      "story": "06: Get failed attempts",
+      "story": "Get failed attempts",
       "name": "cbt_registration_scheduling: Get Failed attempts",
       "method": "GET",
       "path": "cbt/failed-attempts/5",
@@ -100,7 +100,7 @@
       }
     },
     {
-      "story": "07: Reschedule CBT",
+      "story": "Reschedule CBT",
       "name": "cbt_registration_scheduling: Reschedule CBT",
       "method": "POST",
       "path": "cbt/reschedule",

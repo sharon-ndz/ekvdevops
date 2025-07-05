@@ -13,7 +13,7 @@
   },
   "steps": [
     {
-      "story": "01: Get single driving school details",
+      "story": "Get single driving school details",
       "name": "get_driving: Get Single Driving School",
       "method": "GET",
       "path": "driving-school/single/1",
@@ -23,7 +23,7 @@
       }
     },
     {
-      "story": "02: Get training durations for driving school",
+      "story": "Get training durations for driving school",
       "name": "get_driving: Get Training Durations",
       "method": "GET",
       "path": "driving-school/training-durations/1",
@@ -33,7 +33,7 @@
       }
     },
     {
-      "story": "03: Get CBT centers with pagination",
+      "story": "Get CBT centers with pagination",
       "name": "get_driving: Get CBT Centers",
       "method": "GET",
       "path": "cbt/centers",

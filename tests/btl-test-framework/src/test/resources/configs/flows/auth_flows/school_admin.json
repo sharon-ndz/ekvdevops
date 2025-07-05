@@ -13,7 +13,7 @@
   },
   "steps": [
     {
-      "story": "01: Authenticate school admin",
+      "story": "Authenticate school admin",
       "name": "school_admin: Authenticate as school admin",
       "method": "POST",
       "path": "auth/login",

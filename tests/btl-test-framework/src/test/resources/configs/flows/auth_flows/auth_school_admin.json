@@ -12,7 +12,7 @@
   },
   "steps": [
     {
-      "story": "01: Login with valid credentials",
+      "story": "Login with valid credentials",
       "name": "Login Success",
       "method": "POST",
       "path": "auth/login",
@@ -34,7 +34,7 @@
       }
     },
     {
-      "story": "02: Login with incorrect password",
+      "story": "Login with incorrect password",
       "name": "Login Failure - Wrong Password",
       "method": "POST",
       "path": "auth/login",
@@ -52,7 +52,7 @@
       }
     },
     {
-      "story": "03: Login with malformed email address",
+      "story": "Login with malformed email address",
       "name": "Login Failure - Wrong e-mail format",
       "method": "POST",
       "path": "auth/login",

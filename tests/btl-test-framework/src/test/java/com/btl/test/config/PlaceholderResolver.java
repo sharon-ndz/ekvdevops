@@ -40,7 +40,7 @@ public class PlaceholderResolver {
         StringBuffer sb = new StringBuffer();
 
         while (matcher.find()) {
-            String content = matcher.group(1); // e.g. "randomString:8" or "token"
+           /* String content = matcher.group(1); // e.g. "randomString:8" or "token"
 
             String key;
             String param = null;
@@ -53,6 +53,31 @@ public class PlaceholderResolver {
                 key = content;
             }
 
+            */
+            String content = matcher.group(1); // e.g. "randomString:8|number"
+
+            String key;
+            String param = null;
+            String cast = "string"; // default type
+
+            // First split on pipe (|) to extract cast type if present
+            int pipeIndex = content.indexOf('|');
+            String beforePipe = content;
+            if (pipeIndex != -1) {
+                beforePipe = content.substring(0, pipeIndex);
+                cast = content.substring(pipeIndex + 1).trim();
+            }
+
+            // Then split on colon (:) to extract param if present
+            int colonIndex = beforePipe.indexOf(':');
+            if (colonIndex != -1) {
+                key = beforePipe.substring(0, colonIndex);
+                param = beforePipe.substring(colonIndex + 1);
+            } else {
+                key = beforePipe;
+            }
+
+
             // First check context map for direct value replacement
             String replacement = context.get(key);
 
@@ -62,8 +87,30 @@ public class PlaceholderResolver {
             }
 
             // If still null, leave placeholder unchanged
-            if (replacement == null) {
+            /*if (replacement == null) {
                 replacement = matcher.group(0);
+            }*/
+
+            if (replacement == null) {
+                replacement = matcher.group(0); // leave placeholder unchanged
+            } else {
+                // Apply cast if needed
+                switch (cast.toLowerCase()) {
+                    case "number":
+                        try {
+                            // Cast to number (long), fallback to original string if invalid
+                            replacement = String.valueOf(Long.parseLong(replacement));
+                        } catch (NumberFormatException e) {
+                            // Leave as string if parsing fails
+                        }
+                        break;
+                    case "boolean":
+                        replacement = String.valueOf(Boolean.parseBoolean(replacement));
+                        break;
+                    case "string":
+                    default:
+                        // No cast needed
+                }
             }
 
             replacement = Matcher.quoteReplacement(replacement);

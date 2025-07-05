@@ -12,7 +12,7 @@
   },
   "steps": [
     {
-      "story": "01: Send OTP",
+      "story": "Send OTP",
       "name": "mobile_mvaa: Send OTP",
       "method": "POST",
       "path": "auth/send-otp",
@@ -29,7 +29,7 @@
       }
     },
     {
-      "story": "02: Validate OTP",
+      "story": "Validate OTP",
       "name": "mobile_mvaa: Validate OTP",
       "method": "POST",
       "path": "auth/validate-otp",
@@ -47,7 +47,7 @@
       }
     },
     {
-      "story": "03: Pre-Register License",
+      "story": "Pre-Register License",
       "name": "mobile_mvaa: License Pre-Registration",
       "method": "POST",
       "path": "license/single/pre-registration",
@@ -64,7 +64,7 @@
       }
     },
     {
-      "story": "04: Upload Pre-Registration Files",
+      "story": "Upload Pre-Registration Files",
       "name": "mobile_mvaa: Submit Pre-registration files",
       "method": "POST",
       "path": "license/submit-pre-registration-files",
@@ -89,14 +89,22 @@
       }
     },
     {
-      "story": "05: Submit New License Request",
+      "story": "Submit New License Request",
       "name": "mobile_mvaa: License submit new request",
       "method": "POST",
       "path": "license/submit-new-request",
       "body": {
-        "certificateNo": "DR8C20L5I3DR-648932",
-        "source": "mobile",
-        "files": []
+        "height": 179,
+        "weight": 70,
+        "facialMarks": "Yes",
+        "glasses": "Yes",
+        "disability": "Yes",
+        "eyeColor": "BLUE",
+        "licenseClassId": 0,
+        "years": 0,
+        "applicationNo": "${numericString:10}",
+        "email": "john.doe@mailinator.com",
+        "phone": "${phoneNumber:090,11}"
       },
       "requires": ["token"],
       "expectedResults": [
@@ -108,7 +116,7 @@
       }
     },
     {
-      "story": "06: Generate License Card",
+      "story": "Generate License Card",
       "name": "mobile_mvaa: Generate License Card",
       "method": "GET",
       "path": "license/generate-license/86427159",
@@ -122,7 +130,7 @@
       }
     },
     {
-      "story": "07: View License Details",
+      "story": "View License Details",
       "name": "mvaa_mobile: License Details",
       "method": "POST",
       "path": "license/details",

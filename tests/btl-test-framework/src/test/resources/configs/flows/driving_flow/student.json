@@ -14,7 +14,7 @@
   },
   "steps": [
     {
-      "story": "01: Issue Certificate to Student",
+      "story": "Issue Certificate to Student",
       "name": "Student: Issue Certificate",
       "method": "POST",
       "path": "driving-school/students/issue-cert",
@@ -57,7 +57,7 @@
       }
     },
     {
-      "story": "02: Get Student Stats",
+      "story": "Get Student Stats",
       "name": "Student: Get Stats",
       "method": "GET",
       "path": "driving-school/students/stats",
@@ -66,7 +66,7 @@
       }
     },
     {
-      "story": "03: Get All Students",
+      "story": "Get All Students",
       "name": "Student: Get All Students",
       "method": "GET",
       "path": "driving-school/students",
@@ -79,7 +79,7 @@
       }
     },
     {
-      "story": "04: Register a New Student",
+      "story": "Register a New Student",
       "name": "Student: Register Student",
       "method": "POST",
       "path": "driving-school/students/register",
@@ -126,7 +126,7 @@
       }
     },
     {
-      "story": "05: Get Student Details",
+      "story": "Get Student Details",
       "name": "Student: Get Student Details",
       "method": "GET",
       "path": "driving-school/students/details/DR03NLEU58DR-135269",

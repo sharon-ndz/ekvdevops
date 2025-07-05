@@ -13,7 +13,7 @@
   },
   "steps": [
     {
-      "story": "01: Get Driving School Application List",
+      "story": "Get Driving School Application List",
       "name": "Auth_API: Get Driving School Application List",
       "method": "GET",
       "path": "driving-school/applications/list",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "story": "02: Get Driving School Application Detail",
+      "story": "Get Driving School Application Detail",
       "name": "Auth_API: Get Driving School Application Detail",
       "method": "GET",
       "path": "driving-school/applications/details/3",
@@ -37,7 +37,7 @@
       }
     },
     {
-      "story": "03: Get Driving School Application Stats",
+      "story": "Get Driving School Application Stats",
       "name": "Auth_API: Get Driving School Application Stats",
       "method": "GET",
       "path": "driving-school/applications/stats",
@@ -47,7 +47,7 @@
       }
     },
     {
-      "story": "04: Change Application Status",
+      "story": "Change Application Status",
       "name": "Auth_API: Change Application Status",
       "method": "POST",
       "path": "driving-school/change-application-status",

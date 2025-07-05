@@ -114,11 +114,32 @@ public class JsonHelper {
             node.forEach(element -> arr.add(resolvePlaceholdersInNode(element, context)));
             return arr;
         }
-
+        /*
         if (node.isTextual()) {
             String resolved = PlaceholderResolver.resolve(node.asText(), context);
             return mapper.convertValue(resolved, JsonNode.class);
         }
+        */
+
+
+        if (node.isTextual()) {
+            String raw = node.asText();
+            String resolved = PlaceholderResolver.resolve(raw, context);
+
+            // Check if the original raw string contained a cast operator
+            boolean explicitCast = raw.contains("|");
+
+            if (explicitCast && resolved.matches("^-?\\d+$")) {
+                return mapper.getNodeFactory().numberNode(Long.parseLong(resolved));
+            }
+
+            if (explicitCast && ("true".equalsIgnoreCase(resolved) || "false".equalsIgnoreCase(resolved))) {
+                return mapper.getNodeFactory().booleanNode(Boolean.parseBoolean(resolved));
+            }
+
+            return mapper.getNodeFactory().textNode(resolved);
+        }
+
 
         // For other node types (number, boolean, null) just return as is
         return node;

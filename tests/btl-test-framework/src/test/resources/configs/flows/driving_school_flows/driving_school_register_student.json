@@ -10,13 +10,18 @@
   },
   "steps": [
     {
-      "story": "01: Verify NIN for student registration",
+      "story": "Verify NIN for student registration",
       "name": "Driving school Register Student: Verify NIN",
       "method": "GET",
       "path": "auth/verify-nin/22345678938",
       "requires": ["token"],
       "assertions": {
-        "status": 200
+        "status": 200,
+        "body": {
+          "success": {
+            "equals": true
+          }
+        }
       }
     }
   ]

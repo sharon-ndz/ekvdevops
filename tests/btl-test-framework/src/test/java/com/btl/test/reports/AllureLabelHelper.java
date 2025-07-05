@@ -9,7 +9,7 @@ import java.util.List;
 
 public class AllureLabelHelper {
 
-    public static void applyAllureLabels(JsonNode testCase) {
+    public static void applyAllureLabels(JsonNode testCase,int storyId) {
         // Get the UUID of the currently running test case
         var currentTestCaseUuid = Allure.getLifecycle().getCurrentTestCase().orElse(null);
         if (currentTestCaseUuid == null) {
@@ -22,14 +22,13 @@ public class AllureLabelHelper {
             List<Label> labels = new ArrayList<>();
 
             if (testCase.has("epic")) {
-                System.out.println("#########  Setting epic to " + testCase.get("epic").asText());
                 labels.add(new Label().setName("epic").setValue(testCase.get("epic").asText()));
             }
             if (testCase.has("feature")) {
                 labels.add(new Label().setName("feature").setValue(testCase.get("feature").asText()));
             }
             if (testCase.has("story")) {
-                labels.add(new Label().setName("story").setValue(testCase.get("story").asText()));
+                labels.add(new Label().setName("story").setValue(storyId+ ": "+testCase.get("story").asText()));
             }
             if (testCase.has("severity")) {
                 labels.add(new Label().setName("severity").setValue(testCase.get("severity").asText()));

@@ -14,7 +14,7 @@
   },
   "steps": [
     {
-      "story": "01: Retrieve paginated CBT enrolls",
+      "story": "Retrieve paginated CBT enrolls",
       "name": "cbt_enrolls: Get CBT Enrolls",
       "method": "GET",
       "path": "cbt/enrolls",

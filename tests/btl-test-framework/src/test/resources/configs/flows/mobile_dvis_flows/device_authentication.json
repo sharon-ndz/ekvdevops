@@ -17,7 +17,7 @@
   },
   "steps": [
     {
-      "story": "01: Check device activation status",
+      "story": "Check device activation status",
       "name": "device_authentication: Check Activation Status",
       "method": "GET",
       "path": "device/check-activation-status",
@@ -30,7 +30,7 @@
       }
     },
     {
-      "story": "02: Enroll device for pre-activation",
+      "story": "Enroll device for pre-activation",
       "name": "device_authentication: Enroll Device",
       "method": "POST",
       "path": "device/pre-activation",
@@ -50,7 +50,7 @@
       }
     },
     {
-      "story": "03: Update user biometrics",
+      "story": "Update user biometrics",
       "name": "device_authentication: Update Biometrics",
       "method": "POST",
       "path": "users/update-biometrics",

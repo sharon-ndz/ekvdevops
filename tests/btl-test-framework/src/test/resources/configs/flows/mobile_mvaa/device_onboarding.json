@@ -11,7 +11,7 @@
   },
   "steps": [
     {
-      "story": "01: Create a new device",
+      "story": "Create a new device",
       "name": "create_device: Create a device",
       "method": "POST",
       "path": "device",

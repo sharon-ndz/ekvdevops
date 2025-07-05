@@ -12,7 +12,7 @@
   },
   "steps": [
     {
-      "story": "01: Check Device Activation Status",
+      "story": "Check Device Activation Status",
       "name": "Mobile LASDRI: Check Device Activation Status",
       "method": "GET",
       "path": "device/check-activation-status",
@@ -30,7 +30,7 @@
       }
     },
     {
-      "story": "02: Pre-Activation of device",
+      "story": "Pre-Activation of device",
       "name": "Mobile LASDRI: Pre-Activation of device",
       "method": "POST",
       "path": "device/pre-activation",
@@ -51,7 +51,7 @@
       }
     },
     {
-      "story": "03: Update Biometrics",
+      "story": "Update Biometrics",
       "name": "Mobile LASDRI: Update Biometrics",
       "method": "POST",
       "path": "users/update-biometrics",

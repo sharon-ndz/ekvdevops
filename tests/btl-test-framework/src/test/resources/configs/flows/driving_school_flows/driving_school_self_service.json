@@ -18,7 +18,7 @@
   },
   "steps": [
     {
-      "story": "01: Self-service  create  a driving School",
+      "story": "Self-service  create  a driving School",
       "name": "Self-service  create  a driving School",
       "method": "POST",
       "path": "driving-school/self-service/create",
@@ -50,7 +50,7 @@
       }
     },
     {
-      "story": "02: Get a driving school",
+      "story": "Get a driving school",
       "name": "Get  a driving School",
       "method": "GET",
       "path": "driving-school/single/1",
@@ -64,7 +64,7 @@
       }
     },
     {
-      "story": "03: Get all driving schools",
+      "story": "Get all driving schools",
       "name": "Get  all driving Schools",
       "method": "GET",
       "path": "driving-school?stateId=25&lgaId=518",
@@ -73,7 +73,7 @@
       }
     },
     {
-      "story": "04: Get  driving school training durations",
+      "story": "Get  driving school training durations",
       "name": "Get  driving school training durations",
       "method": "GET",
       "path": "driving-school/training-durations/1",
@@ -87,7 +87,7 @@
       }
     },
     {
-      "story": "05: Get a single training duration",
+      "story": "Get a single training duration",
       "name": "Get  a single  training duration",
       "method": "GET",
       "path": "driving-school/training-duration/1",

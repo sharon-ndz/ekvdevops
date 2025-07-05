@@ -14,7 +14,7 @@
   },
   "steps": [
     {
-      "story": "01: Get Driving School (Page 1)",
+      "story": "Get Driving School (Page 1)",
       "name": "get_driving_school: Get Driving School (Page1)",
       "method": "GET",
       "path": "driving-school",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "story": "02: Get single driving school details",
+      "story": "Get single driving school details",
       "name": "get_driving_school: Get single driving school",
       "method": "GET",
       "path": "driving-school/single/1",
@@ -36,7 +36,7 @@
       }
     },
     {
-      "story": "03: Get training durations for driving school",
+      "story": "Get training durations for driving school",
       "name": "get_driving_school: Get training durations",
       "method": "GET",
       "path": "driving-school/training-durations/1",
@@ -45,7 +45,7 @@
       }
     },
     {
-      "story": "04: Get CBT centers list",
+      "story": "Get CBT centers list",
       "name": "get_driving_school: Get CBT centers",
       "method": "GET",
       "path": "cbt/centers",
@@ -58,7 +58,7 @@
       }
     },
     {
-      "story": "05: Book CBT slot",
+      "story": "Book CBT slot",
       "name": "get_driving_school: Book slot",
       "method": "POST",
       "path": "cbt/book-slot",

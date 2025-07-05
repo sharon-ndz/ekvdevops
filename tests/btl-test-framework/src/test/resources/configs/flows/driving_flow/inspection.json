@@ -11,7 +11,7 @@
   },
   "steps": [
     {
-      "story": "01: Get Inspection List",
+      "story": "Get Inspection List",
       "name": "Inspection: Get Inspection List",
       "method": "GET",
       "path": "inspections",
@@ -26,7 +26,7 @@
       }
     },
     {
-      "story": "02: Create Inspection Log",
+      "story": "Create Inspection Log",
       "name": "Inspection: Create Inspection Log",
       "method": "POST",
       "path": "inspections",

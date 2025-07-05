@@ -13,7 +13,7 @@
   },
   "steps": [
     {
-      "story": "01: Authenticate LASDRI officer",
+      "story": "Authenticate LASDRI officer",
       "name": "lasdri_officer: Authenticate as lasdri officer",
       "method": "POST",
       "path": "auth/login",
