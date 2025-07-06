@@ -40,7 +40,9 @@ dependencies {
 
 test {
     useJUnitPlatform()
-
+    doFirst {
+        delete 'build/allure-results'
+    }
 
         // Prefer project property if provided
         if (project.hasProperty('enablePayloadLogging')) {
@@ -74,8 +76,8 @@ test {
     //include '**/ApiSuiteTest.*'
 
     testLogging {
-        events "failed", "skipped", "passed"
-        exceptionFormat "short"
+        events "started", "passed", "failed", "skipped"  // include "started" to see when each test begins
+        exceptionFormat "full"
         showStandardStreams = true
     }
 
@@ -99,5 +101,5 @@ tasks.javadoc {
 allure {
     version = '2.29.0' // Matches allure-junit5 version line
     autoconfigure = true
-    aspectjweaver = true
+    aspectjweaver = false
 }

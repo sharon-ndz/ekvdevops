@@ -18,7 +18,6 @@ import java.util.Random;
  *   <li><code>${phoneNumber:0801,10}</code> — replaced by a phone number string starting with "0801" and total length 10</li>
  * </ul>
  * @author rpillai
- * @see com.btl.test.config.JsonHelper#resolvePlaceholdersInNode(JsonNode, Map)
  */
 public class PlaceholderResolver {
 
@@ -85,11 +84,6 @@ public class PlaceholderResolver {
             if (replacement == null) {
                 replacement = generateValue(key, param, context);
             }
-
-            // If still null, leave placeholder unchanged
-            /*if (replacement == null) {
-                replacement = matcher.group(0);
-            }*/
 
             if (replacement == null) {
                 replacement = matcher.group(0); // leave placeholder unchanged
