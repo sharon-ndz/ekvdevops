@@ -13,3 +13,4 @@ crash.log
 *.backup
 !/infra/lambda/
 !/infra
+.terraform.lock.hcl
