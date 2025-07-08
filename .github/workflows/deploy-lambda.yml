@@ -15,10 +15,11 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      
-env:
+
+    env:
       AWS_REGION: us-east-1
-      steps:
+
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
