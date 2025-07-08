@@ -16,8 +16,7 @@ jobs:
       id-token: write
       contents: read
 
-    env:
-      AWS_REGION: us-east-1
+  
 
     steps:
       - name: Checkout repository
