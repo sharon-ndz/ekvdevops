@@ -1,16 +1,15 @@
-name: Deploy Lambdaa
+name: Deploy Lambda
 
 on:
-  push:
-    branches:
-      - feature/btl-52
-    paths:
-      - 'src/**'
-      - 'infra/**'
-      - '.github/workflows/deploy-lambda.yml'
+  workflow_dispatch:
+    inputs:
+      ENV:
+        description: 'Environment to deploy (dev/staging/prod)'
+        required: true
+        default: 'dev'
 
 jobs:
-  deploy-lambda:
+  deploy-license-api:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -18,6 +17,7 @@ jobs:
 
     env:
       AWS_REGION: us-east-1
+      ENV: ${{ github.event.inputs.ENV }}
 
     steps:
       - name: Checkout repository
@@ -58,13 +58,13 @@ jobs:
         working-directory: ./infra/lambda
         run: |
           terraform init
-          terraform apply -auto-approve -var-file=dev.tfvars
+          terraform apply -auto-approve -var-file=${{ env.ENV }}.tfvars
 
       - name: Terraform EC2 Init & Apply
         working-directory: ./infra/ec2
         run: |
           terraform init
-          terraform apply -auto-approve -var-file=dev.tfvars
+          terraform apply -auto-approve -var-file=${{ env.ENV }}.tfvars
 
       - name: Get EC2 Name Tag and S3 Bucket from Terraform
         id: get-vars
@@ -119,47 +119,17 @@ jobs:
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Install PostgreSQL 15" \
-            --parameters 'commands=[
-              "export DEBIAN_FRONTEND=noninteractive",
-              "set -eux",
-              "apt-get update -y",
-              "apt-get install -y curl gnupg2 lsb-release ca-certificates sudo software-properties-common",
-              "curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --batch --yes --dearmor -o /usr/share/keyrings/postgresql.gpg",
-              "echo \"deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt noble-pgdg main\" > /etc/apt/sources.list.d/pgdg.list",
-              "apt-get update -y",
-              "apt-get install -y postgresql-15 postgresql-client-15",
-              "systemctl enable postgresql",
-              "systemctl start postgresql",
-              "echo \"host all all 0.0.0.0/0 md5\" >> /etc/postgresql/15/main/pg_hba.conf",
-              "sudo -u postgres psql -c \"ALTER SYSTEM SET listen_addresses = '*'\"",
-              "systemctl restart postgresql"
-            ]' \
+            --parameters 'commands=[ ... your commands here ... ]' \
             --region $AWS_REGION \
             --output text
 
       - name: Create DB & Import SQL Backup via SSM
         run: |
-          INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=$EC2_NAME_TAG" \
-            --query "Reservations[*].Instances[*].InstanceId" \
-            --output text --region $AWS_REGION)
-
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Create DB and Import SQL Backup" \
-            --parameters 'commands=[
-              "bash -c '\''set -eux; \
-                sudo -u postgres psql -tc \"SELECT 1 FROM pg_database WHERE datname = '\''license'\''\" | grep -q 1 || sudo -u postgres psql -c \"CREATE DATABASE license\"; \
-                sudo -u postgres psql -d license -tc \"SELECT 1 FROM information_schema.tables WHERE table_name = '\''users'\'';\" > /dev/null 2>&1; \
-                if [ $? -ne 0 ]; then \
-                  echo \"Restoring DB from S3 backup...\"; \
-                  aws s3 cp s3://'"$SQL_BACKUP_BUCKET"'/back-up-db/license_backup.sql /tmp/license_backup.sql; \
-                  sudo -u postgres psql -d license -f /tmp/license_backup.sql; \
-                else \
-                  echo \"Database already initialized. Skipping restore.\"; \
-                fi'\''"
-            ]' \
+            --parameters 'commands=[ ... your restore logic ... ]' \
             --region $AWS_REGION \
             --output text
 
@@ -167,4 +137,4 @@ jobs:
         working-directory: ./infra/api
         run: |
           terraform init
-          terraform apply -auto-approve -var-file=dev.tfvars
+          terraform apply -auto-approve -var-file=${{ env.ENV }}.tfvars
