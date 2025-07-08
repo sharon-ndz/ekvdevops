@@ -3,7 +3,7 @@ name: Deploy Lambda
 on:
   push:
     branches:
-      - master
+      - feature/btl-52
     paths:
       - 'src/**'
       - 'infra/**'
