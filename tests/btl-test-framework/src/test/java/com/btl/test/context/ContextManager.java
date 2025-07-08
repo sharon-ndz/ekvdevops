@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * Thread-safe context manager using ThreadLocal for parallel test isolation.
  */
-public class ContextManager {
+public class ContextManager implements AutoCloseable {
 
     private static final ThreadLocal<Map<String, String>> threadContext = ThreadLocal.withInitial(HashMap::new);
 
@@ -34,5 +34,10 @@ public class ContextManager {
 
     public void remove() {
         threadContext.remove(); // completely removes this thread's context
+    }
+
+    @Override
+    public void close() throws Exception {
+
     }
 }

@@ -19,7 +19,7 @@
       "path": "inspections/submit-inspection",
       "token": ["token","drivingSchoolId"],
       "body": {
-        "drivingSchoolId": "{$drivingSchoolId|number}",
+        "drivingSchoolId": "${drivingSchoolId|number}",
         "questionId": 0,
         "inspectionResult": [
           {

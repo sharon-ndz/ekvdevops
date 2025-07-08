@@ -7,8 +7,7 @@ import com.btl.test.context.ContextManager;
 import com.btl.test.reports.AllureReporter;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.restassured.response.Response;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.Assertions;
 
 public class ApiStepRunner {
 
@@ -24,47 +23,6 @@ public class ApiStepRunner {
                 String method = stepNode.get("method").asText();
                 String rawPath = stepNode.get("path").asText();
                 String resolvedPath = PlaceholderResolver.resolve(rawPath, context.getAll());
-
-                /*
-                // Prepare request
-                var request = given();
-                request.header("Content-Type", "application/json");
-
-                // Apply query params
-                JsonNode queryParams = stepNode.get("query");
-                if (queryParams != null && queryParams.isObject()) {
-                    for (String key : JsonHelper.fieldNames(queryParams)) {
-                        String rawValue = queryParams.get(key).asText();
-                        String resolved = PlaceholderResolver.resolve(rawValue, context.getAll());
-                        request.queryParam(key, resolved);
-                    }
-                }
-
-                // Handle 'requires' block
-                JsonNode requires = stepNode.get("requires");
-                if (requires != null) {
-                    for (JsonNode reqKey : requires) {
-                        String key = reqKey.asText();
-                        if (!context.contains(key)) {
-                            fail("Required context key missing: " + key);
-                        }
-                        if (key.equalsIgnoreCase("token")) {
-                            context.get("token").ifPresent(token ->
-                                    request.header("Authorization", "Bearer " + token));
-                        }
-                    }
-                }
-
-                // Resolve and attach body
-                String prettyBody = null;
-                String rawBody = null;
-                if (stepNode.has("body")) {
-                    JsonNode resolvedBody = JsonHelper.resolvePlaceholdersInNode(stepNode.get("body"), context.getAll());
-                    rawBody = resolvedBody.toString();
-                    prettyBody = resolvedBody.toPrettyString();
-                    request.body(rawBody);
-                }
-                */
 
                 // Use RequestBuiolder . Also take care of the Pretty string
 
@@ -95,21 +53,22 @@ public class ApiStepRunner {
                     }
                 }
 
-            } catch (Exception e) {
-                fail("Error executing step '" + stepName + "': " + e.getMessage(), e);
+            } catch (Throwable e) {
+                if (e instanceof AssertionError) {
+                    throw e;
+                }
+                Assertions.fail("Error executing step '" + stepName + "': " + e.getMessage(), e);
             }
-        //});
     }
 
     private Response sendRequest(String method, String path, io.restassured.specification.RequestSpecification request) {
-        switch (method.toUpperCase()) {
-            case "GET": return request.get("/" + path);
-            case "POST": return request.post("/" + path);
-            case "PUT": return request.put("/" + path);
-            case "PATCH": return request.patch("/" + path);
-            case "DELETE": return request.delete("/" + path);
-            default:
-                throw new IllegalArgumentException("Unsupported method: " + method);
-        }
+        return switch (method.toUpperCase()) {
+            case "GET" -> request.get("/" + path);
+            case "POST" -> request.post("/" + path);
+            case "PUT" -> request.put("/" + path);
+            case "PATCH" -> request.patch("/" + path);
+            case "DELETE" -> request.delete("/" + path);
+            default -> throw new IllegalArgumentException("Unsupported method: " + method);
+        };
     }
 }

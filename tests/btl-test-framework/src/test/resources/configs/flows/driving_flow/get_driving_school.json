@@ -63,7 +63,12 @@
       "method": "POST",
       "path": "cbt/book-slot",
       "body": {
-        "cbtCenterId": "1"
+        "cbtCenterId": 1,
+        "studentId": 1,
+        "lgaId": 518,
+        "stateId": 25,
+        "date": "2025-01-02",
+        "time": "09:30:00"
       },
       "assertions": {
         "status": 201
