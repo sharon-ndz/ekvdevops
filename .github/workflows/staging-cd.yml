@@ -1,4 +1,4 @@
-name: Deploy License API
+name: Deploy License APIi
 
 on:
   workflow_dispatch:
