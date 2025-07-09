@@ -1,9 +1,6 @@
 name: Deploy  Lambda
 
 on:
-  push:
-    branches:
-      - feature/btl-52
   workflow_dispatch:
     inputs:
       ENV:
