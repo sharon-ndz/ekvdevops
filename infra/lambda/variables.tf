@@ -44,3 +44,6 @@ variable "public_subnet_cidr" {
   description = "CIDR block for public subnet"
   type        = string
 }
+
+variable "region"                { type = string }        
+variable "ssm_env_params"        { type = map(string) }   

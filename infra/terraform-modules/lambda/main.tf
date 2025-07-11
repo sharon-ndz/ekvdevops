@@ -28,6 +28,35 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc_access" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
+data "aws_caller_identity" "current" {}
+
+resource "aws_iam_policy" "lambda_ssm_policy" {
+  name = "${var.resource_name_prefix}-ssm-access"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect   = "Allow",
+      Action   = ["ssm:GetParameter", "ssm:GetParameters"],
+      Resource = [
+        for path in values(var.ssm_env_params) :
+        "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter${path}"
+      ]
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_ssm_attach" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = aws_iam_policy.lambda_ssm_policy.arn
+}
+
+data "aws_ssm_parameter" "env_vars" {
+  for_each        = var.ssm_env_params
+  name            = each.value
+  with_decryption = true
+}
+
 resource "aws_vpc" "lambda_vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
@@ -77,7 +106,6 @@ resource "aws_internet_gateway" "lambda_igw" {
 }
 
 resource "aws_eip" "nat_eip" {
-
   tags = {
     Name = "${var.resource_name_prefix}-nat-eip"
   }
@@ -166,6 +194,13 @@ resource "aws_lambda_function" "this" {
   vpc_config {
     subnet_ids         = [aws_subnet.private_1.id, aws_subnet.private_2.id]
     security_group_ids = [aws_security_group.lambda_sg.id]
+  }
+
+  environment {
+    variables = {
+      for key, param in data.aws_ssm_parameter.env_vars :
+      key => param.value
+    }
   }
 
   tags = var.tags

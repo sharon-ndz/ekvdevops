@@ -30,3 +30,6 @@ variable "resource_name_prefix" {
 variable "public_subnet_cidr" { 
    type        = string
 }
+
+variable "region"                { type = string } 
+variable "ssm_env_params"        { type = map(string) }
