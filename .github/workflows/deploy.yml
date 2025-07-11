@@ -41,14 +41,6 @@ jobs:
           npm prune --production
           zip -r ../infra/lambda/backend-api.zip dist node_modules package.json -x "**/*.map" "**/*.d.ts" "**/test/**"
 
-      - name: Debug AWS Credentials
-        run: |
-          echo "AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
-          echo "AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY"
-        env:
-           AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
-           AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
