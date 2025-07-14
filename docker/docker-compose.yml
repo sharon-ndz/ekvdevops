@@ -1,34 +1,12 @@
 version: "3.8"
 
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    env_file:
-      - .env
-    environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
   app:
     image:  084828592148.dkr.ecr.us-east-1.amazonaws.com/license-api-dev:${BUILD_TAG}
     container_name: backend
     restart: always
     env_file:
       - .env
-    depends_on:
-      postgres:
-        condition: service_healthy
     ports:
       - "4000:4000"
     working_dir: /app
