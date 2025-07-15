@@ -1,7 +1,6 @@
-name: Deploy License APIi
+name: Deploy Multi-License API
 
 on:
-
   workflow_dispatch:
     inputs:
       ENV:
@@ -26,8 +25,10 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout code
+      - name: Checkout `feature/btl-48` codebase
         uses: actions/checkout@v4
+        with:
+          ref: feature/btl-48
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -194,22 +195,24 @@ jobs:
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --comment "Generate 3 .env files for 3 APIs" \
-            --parameters 'commands=[
-              "BASE64_ENV='"$ENCODED_ENV"'",
+            --comment "Clean and create .env files for API containers" \
+            --parameters commands='[
+              "set -e",
+              "BASE64_ENV='"${ENCODED_ENV}"'",
               "echo $BASE64_ENV | base64 -d > /home/ubuntu/.env.base",
               "for i in 1 2 3; do cp /home/ubuntu/.env.base /home/ubuntu/.env.api$i; done",
+              "for i in 1 2 3; do sed -i \"/^PORT=/d\" /home/ubuntu/.env.api$i; done",
+              "for i in 1 2 3; do sed -i \"/^BUILD_TAG=/d\" /home/ubuntu/.env.api$i; done",
               "echo PORT=4000 >> /home/ubuntu/.env.api1",
               "echo PORT=4001 >> /home/ubuntu/.env.api2",
               "echo PORT=4002 >> /home/ubuntu/.env.api3",
               "echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api1",
               "echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api2",
               "echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api3"
-            ]' \
-            --timeout-seconds 300 \
-            --region $AWS_REGION \
-            --output text
-
+           ]' \
+             --timeout-seconds 300 \
+             --region "$AWS_REGION" \
+             --output text
 
 
           # Upload docker-compose.yml to S3
@@ -255,10 +258,17 @@ jobs:
             "fi",
             "aws ecr get-login-password --region '${AWS_REGION}' | docker login --username AWS --password-stdin '${ECR_REPO_URL%/*}'",
             "cd /home/ubuntu/",
-            "echo BUILD_TAG=${BUILD_TAG} > .env",
-            "docker-compose pull",
-            "docker-compose down",
-            "docker-compose --env-file .env up -d"
+            "BUILD_TAG=$(grep BUILD_TAG .env.api1 | cut -d '=' -f2)",
+            "echo BUILD_TAG=$BUILD_TAG > .env",
+            "docker-compose -f docker-compose.yml down",
+            "echo === Pulling updated images ===",
+            "docker-compose -f docker-compose.yml --env-file .env.api1 pull api1",
+            "docker-compose -f docker-compose.yml --env-file .env.api2 pull api2",
+            "docker-compose -f docker-compose.yml --env-file .env.api3 pull api3",
+            "echo === Starting updated containers ===",
+            "docker-compose -f docker-compose.yml --env-file .env.api1 up -d api1",
+            "docker-compose -f docker-compose.yml --env-file .env.api2 up -d api2",
+            "docker-compose -f docker-compose.yml --env-file .env.api3 up -d api3"
           ]' \
            --timeout-seconds 900 \
            --region $AWS_REGION \
