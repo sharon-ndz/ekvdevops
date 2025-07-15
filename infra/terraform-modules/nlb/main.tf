@@ -33,16 +33,16 @@ resource "aws_lb" "this" {
 }
 
 resource "aws_lb_target_group" "multi" {
-  for_each    = toset(var.additional_ports)
+  for_each    = { for port in var.additional_ports : tostring(port) => port }
   name        = "${var.name}-tg-${each.key}"
-  port        = each.key
+  port        = each.value
   protocol    = "TCP"
   target_type = "ip"
   vpc_id      = var.vpc_id
 
   health_check {
     protocol            = "TCP"
-    port                = each.key
+    port                = each.value
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 10
@@ -73,11 +73,10 @@ resource "aws_lb_target_group_attachment" "multi" {
   port             = each.value.port
 }
 
-
 resource "aws_lb_listener" "this" {
-  for_each          = toset(var.additional_ports)
+  for_each          = { for port in var.additional_ports : tostring(port) => port }
   load_balancer_arn = aws_lb.this.arn
-  port              = each.key
+  port              = each.value
   protocol          = "TCP"
 
   default_action {
