@@ -200,15 +200,9 @@ jobs:
               "set -e",
               "BASE64_ENV='"$ENCODED_ENV"'",
               "echo $BASE64_ENV | base64 -d > /home/ubuntu/.env.base",
-              "for i in 1 2 3; do cp /home/ubuntu/.env.base /home/ubuntu/.env.api$i; done",
-              "for i in 1 2 3; do sed -i \"/^PORT=/d\" /home/ubuntu/.env.api$i; done",
-              "for i in 1 2 3; do sed -i \"/^BUILD_TAG=/d\" /home/ubuntu/.env.api$i; done",
-              "echo PORT=4000 >> /home/ubuntu/.env.api1",
-              "echo PORT=4001 >> /home/ubuntu/.env.api2",
-              "echo PORT=4002 >> /home/ubuntu/.env.api3",
-              "echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api1",
-              "echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api2",
-              "echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api3"
+              "cat /home/ubuntu/.env.base > /home/ubuntu/.env.api1 && echo PORT=4000 >> /home/ubuntu/.env.api1 && echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api1",
+              "cat /home/ubuntu/.env.base > /home/ubuntu/.env.api2 && echo PORT=4001 >> /home/ubuntu/.env.api2 && echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api2",
+              "cat /home/ubuntu/.env.base > /home/ubuntu/.env.api3 && echo PORT=4002 >> /home/ubuntu/.env.api3 && echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api3"
             ]' \
             --timeout-seconds 300 \
             --region "$AWS_REGION" \
