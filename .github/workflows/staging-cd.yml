@@ -1,6 +1,9 @@
 name: Deploy License APIi
 
 on:
+  push:
+    branches:
+      - feature/btl-48
   workflow_dispatch:
     inputs:
       ENV:
