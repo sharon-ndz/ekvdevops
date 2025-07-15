@@ -1,9 +1,7 @@
 name: Deploy License APIi
 
 on:
-  push:
-    branches:
-      - feature/btl-48
+
   workflow_dispatch:
     inputs:
       ENV:
@@ -257,9 +255,10 @@ jobs:
             "fi",
             "aws ecr get-login-password --region '${AWS_REGION}' | docker login --username AWS --password-stdin '${ECR_REPO_URL%/*}'",
             "cd /home/ubuntu/",
+            "echo BUILD_TAG=${BUILD_TAG} > .env",
             "docker-compose pull",
             "docker-compose down",
-            "docker-compose up -d"
+            "docker-compose --env-file .env up -d"
           ]' \
            --timeout-seconds 900 \
            --region $AWS_REGION \
