@@ -47,14 +47,14 @@ resource "aws_apigatewayv2_integration" "this" {
   connection_type        = "VPC_LINK"
   connection_id          = aws_apigatewayv2_vpc_link.this.id
   integration_method     = "ANY"
-  integration_uri        = each.value
+  integration_uri        = "http://${var.nlb_dns_name}:${each.value}"
   payload_format_version = "1.0"
 }
 
 resource "aws_apigatewayv2_route" "this" {
   for_each   = var.api_routes
   api_id     = aws_apigatewayv2_api.this.id
-  route_key  = "ANY ${each.key}"
+  route_key  = "ANY ${each.key}/{proxy+}"
   target     = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
 }
 
