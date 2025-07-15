@@ -259,11 +259,15 @@ jobs:
             "aws ecr get-login-password --region '${AWS_REGION}' | docker login --username AWS --password-stdin '${ECR_REPO_URL%/*}'",
             "cd /home/ubuntu/",
             "docker-compose -f docker-compose.yml down",
-            "docker-compose -f docker-compose.yml pull",
+            "echo === Pulling updated images ===",
+            "docker-compose -f docker-compose.yml --env-file .env.api1 pull api1",
+            "docker-compose -f docker-compose.yml --env-file .env.api2 pull api2",
+            "docker-compose -f docker-compose.yml --env-file .env.api3 pull api3",
+
+            "echo === Starting updated containers ===",
             "docker-compose -f docker-compose.yml --env-file .env.api1 up -d api1",
             "docker-compose -f docker-compose.yml --env-file .env.api2 up -d api2",
-            "docker-compose -f docker-compose.yml --env-file .env.api3 up -d api3"
-
+            "docker-compose -f docker-compose.yml --env-file .env.api3 up -d api3",
           ]' \
            --timeout-seconds 900 \
            --region $AWS_REGION \
