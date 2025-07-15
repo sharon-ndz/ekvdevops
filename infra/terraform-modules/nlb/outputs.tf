@@ -23,10 +23,11 @@ output "lb_zone_id" {
   value       = concat(aws_lb.this.*.zone_id, [""])[0]
 }
 
-output "lb_listener_arn" {
-  description = "The ARN of the load balancer listener"
-  value       = concat(aws_lb_listener.this.*.arn, [""])[0]
+output "lb_listener_arns" {
+  description = "Map of listener ARNs by port"
+  value       = { for k, v in aws_lb_listener.this : k => v.arn }
 }
+
 
 output "private_subnets_with_az" {
   description = "Selected private subnets with availability zones"
