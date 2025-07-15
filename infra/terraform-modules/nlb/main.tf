@@ -60,13 +60,13 @@ resource "aws_lb_target_group_attachment" "multi" {
     for port in var.additional_ports :
     for ip in var.target_ips :
     "${port}-${ip}" => {
-      port       = port
-      target_ip  = ip
+      port = port
+      ip   = ip
     }
   }
 
   target_group_arn = aws_lb_target_group.multi[each.value.port].arn
-  target_id        = each.value.target_ip
+  target_id        = each.value.ip
   port             = each.value.port
 }
 
