@@ -58,6 +58,12 @@ resource "aws_apigatewayv2_route" "this" {
   target     = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
 }
 
+resource "aws_apigatewayv2_route" "proxy" {
+  for_each  = var.api_routes
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "ANY ${each.key}/{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
+}
 
 resource "aws_cloudwatch_log_group" "http_api" {
   name              = "/aws/http-api/${var.environment}"
