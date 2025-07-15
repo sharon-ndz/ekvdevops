@@ -195,21 +195,25 @@ jobs:
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --comment "Generate 3 .env files for 3 APIs" \
+            --comment "Generate 3 clean .env files for 3 APIs" \
             --parameters 'commands=[
               "BASE64_ENV='"$ENCODED_ENV"'",
               "echo $BASE64_ENV | base64 -d > /home/ubuntu/.env.base",
-              "for i in 1 2 3; do cp /home/ubuntu/.env.base /home/ubuntu/.env.api$i; done",
-              "echo PORT=4000 >> /home/ubuntu/.env.api1",
-              "echo PORT=4001 >> /home/ubuntu/.env.api2",
-              "echo PORT=4002 >> /home/ubuntu/.env.api3",
+              "for i in 1 2 3; do cp /dev/null /home/ubuntu/.env.api$i; done",
+              "echo PORT=4000 > /home/ubuntu/.env.api1",
+              "echo PORT=4001 > /home/ubuntu/.env.api2",
+              "echo PORT=4002 > /home/ubuntu/.env.api3",
               "echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api1",
               "echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api2",
-              "echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api3"
+              "echo BUILD_TAG='"${BUILD_TAG}"' >> /home/ubuntu/.env.api3",
+              "cat /home/ubuntu/.env.base >> /home/ubuntu/.env.api1",
+              "cat /home/ubuntu/.env.base >> /home/ubuntu/.env.api2",
+              "cat /home/ubuntu/.env.base >> /home/ubuntu/.env.api3"
             ]' \
             --timeout-seconds 300 \
             --region $AWS_REGION \
             --output text
+
 
 
 
