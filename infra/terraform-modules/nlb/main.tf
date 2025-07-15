@@ -57,12 +57,15 @@ resource "aws_lb_target_group" "multi" {
 
 resource "aws_lb_target_group_attachment" "multi" {
   for_each = {
-    for port in var.additional_ports :
-    for ip in var.target_ips :
-    "${port}-${ip}" => {
-      port = port
-      ip   = ip
-    }
+    for combo in flatten([
+      for port in var.additional_ports : [
+        for ip in var.target_ips : {
+          key = "${port}-${ip}"
+          port = port
+          ip   = ip
+        }
+      ]
+    ]) : combo.key => combo
   }
 
   target_group_arn = aws_lb_target_group.multi[each.value.port].arn
