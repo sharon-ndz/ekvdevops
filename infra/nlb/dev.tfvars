@@ -4,6 +4,7 @@ environment     = "dev"
 load_balancer_type = "network"
 internal           = true
 target_port        = 4000
+additional_ports = [4000, 4001, 4002]
 lb_create_sg       = true
 #access_logs_prefix = "dev/nlb"
 

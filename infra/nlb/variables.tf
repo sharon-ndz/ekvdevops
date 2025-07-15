@@ -112,3 +112,8 @@ variable "subnet_with_az" {
   }))
   default = []
 }
+
+variable "additional_ports" {
+  description = "List of ports the NLB should listen on and forward to"
+  type        = list(number)
+}

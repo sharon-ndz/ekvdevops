@@ -36,6 +36,7 @@ module "group_1_nlb" {
   sg_name       = "${var.environment}-group-1-nlb-sg"
   ingress_roles = local.lb_sg_ingress_roles
   egress_roles  = var.lb_egress_roles
+  additional_ports   = var.additional_ports
   tags          = var.common_tags
 }
 
