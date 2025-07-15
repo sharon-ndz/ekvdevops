@@ -47,7 +47,7 @@ resource "aws_apigatewayv2_integration" "this" {
   connection_type        = "VPC_LINK"
   connection_id          = aws_apigatewayv2_vpc_link.this.id
   integration_method     = "ANY"
-  integration_uri        = "http://${var.nlb_dns_name}:${each.value}"
+  integration_uri        = each.value
   payload_format_version = "1.0"
 }
 
