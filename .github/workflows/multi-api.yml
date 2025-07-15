@@ -258,16 +258,17 @@ jobs:
             "fi",
             "aws ecr get-login-password --region '${AWS_REGION}' | docker login --username AWS --password-stdin '${ECR_REPO_URL%/*}'",
             "cd /home/ubuntu/",
+            "BUILD_TAG=$(grep BUILD_TAG .env.api1 | cut -d '=' -f2)",
+            "echo BUILD_TAG=$BUILD_TAG > .env",   # <-- Dynamically write .env for docker-compose
             "docker-compose -f docker-compose.yml down",
             "echo === Pulling updated images ===",
             "docker-compose -f docker-compose.yml --env-file .env.api1 pull api1",
             "docker-compose -f docker-compose.yml --env-file .env.api2 pull api2",
             "docker-compose -f docker-compose.yml --env-file .env.api3 pull api3",
-
             "echo === Starting updated containers ===",
             "docker-compose -f docker-compose.yml --env-file .env.api1 up -d api1",
             "docker-compose -f docker-compose.yml --env-file .env.api2 up -d api2",
-            "docker-compose -f docker-compose.yml --env-file .env.api3 up -d api3",
+            "docker-compose -f docker-compose.yml --env-file .env.api3 up -d api3"
           ]' \
            --timeout-seconds 900 \
            --region $AWS_REGION \
