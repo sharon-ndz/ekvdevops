@@ -1,16 +1,36 @@
 version: "3.8"
 
 services:
-  app:
-    image:  084828592148.dkr.ecr.us-east-1.amazonaws.com/license-api-dev:${BUILD_TAG}
-    container_name: backend
+  api1:
+    image: 084828592148.dkr.ecr.us-east-1.amazonaws.com/license-api-dev:${BUILD_TAG}
+    container_name: api1
     restart: always
     env_file:
-      - .env
+      - .env.api1
     ports:
       - "4000:4000"
     working_dir: /app
     command: node dist/main.js
 
-volumes:
-  pgdata:
+  api2:
+    image: 084828592148.dkr.ecr.us-east-1.amazonaws.com/license-api-dev:${BUILD_TAG}
+    container_name: api2
+    restart: always
+    env_file:
+      - .env.api2
+    ports:
+      - "4001:4001"
+    working_dir: /app
+    command: node dist/main.js
+
+  api3:
+    image: 084828592148.dkr.ecr.us-east-1.amazonaws.com/license-api-dev:${BUILD_TAG}
+    container_name: api3
+    restart: always
+    env_file:
+      - .env.api3
+    ports:
+      - "4002:4002"
+    working_dir: /app
+    command: node dist/main.js
+
