@@ -181,3 +181,9 @@ variable "docker_artifact_bucket" {
   type        = string
 }
 
+variable "app_ports" {
+  description = "List of application ports to allow"
+  type        = list(number)
+  default     = [4000] # optional default
+}
+
