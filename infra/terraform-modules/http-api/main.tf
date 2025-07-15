@@ -41,20 +41,23 @@ resource "aws_apigatewayv2_vpc_link" "this" {
 }
 
 resource "aws_apigatewayv2_integration" "this" {
+  for_each               = var.api_routes
   api_id                 = aws_apigatewayv2_api.this.id
   integration_type       = "HTTP_PROXY"
   connection_type        = "VPC_LINK"
   connection_id          = aws_apigatewayv2_vpc_link.this.id
   integration_method     = "ANY"
-  integration_uri        = var.nlb_listener_arn
+  integration_uri        = each.value
   payload_format_version = "1.0"
 }
 
-resource "aws_apigatewayv2_route" "proxy" {
-  api_id    = aws_apigatewayv2_api.this.id
-  route_key = "ANY /{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.this.id}"
+resource "aws_apigatewayv2_route" "this" {
+  for_each   = var.api_routes
+  api_id     = aws_apigatewayv2_api.this.id
+  route_key  = "ANY ${each.key}"
+  target     = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
 }
+
 
 resource "aws_cloudwatch_log_group" "http_api" {
   name              = "/aws/http-api/${var.environment}"

@@ -9,3 +9,9 @@ common_tags = {
   Project     = "IDMS"
   Environment = "dev"
 }
+
+path_to_port_map = {
+  "/api1" = "4000"
+  "/api2" = "4001"
+  "/api3" = "4002"
+}

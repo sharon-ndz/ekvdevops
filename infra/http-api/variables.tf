@@ -26,3 +26,7 @@ variable "log_retention_days" {
   type        = number
 }
 
+variable "path_to_port_map" {
+  description = "Map of API paths to NLB listener ports"
+  type        = map(string)
+}

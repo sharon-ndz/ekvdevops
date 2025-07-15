@@ -31,10 +31,11 @@ variable "security_group_ids" {
   type        = list(string)
 }
 
-variable "nlb_listener_arn" {
-  description = "ARN of the NLB Listener"
-  type        = string
+variable "api_routes" {
+  description = "Map of API paths to NLB listener ARNs"
+  type        = map(string)
 }
+
 
 variable "vpc_link_subnet_ids" {
   description = "Subnet IDs for VPC link (only from supported AZs)"

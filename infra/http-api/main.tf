@@ -1,7 +1,8 @@
+
 module "http_api" {
   source             = "../terraform-modules/http-api"
   environment        = var.environment
-  nlb_listener_arn   = data.terraform_remote_state.nlb.outputs.nlb_listener_arn
+  api_routes            = local.api_routes
   nlb_dns_name       = data.terraform_remote_state.nlb.outputs.nlb_dns_name
   log_retention_days = var.log_retention_days
   private_subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets_ids
@@ -13,3 +14,4 @@ module "http_api" {
 provider "aws" {
   region = var.region
 }
+
