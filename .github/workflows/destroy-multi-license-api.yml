@@ -1,0 +1,75 @@
+name: Destroy Multi License API
+
+on:
+  workflow_dispatch:
+    inputs:
+      ENV:
+        description: 'Environment to destroy (dev/staging/prod)'
+        required: true
+        default: "dev"
+
+env:
+  AWS_REGION: us-east-1
+  TF_BUCKET: my-terraform-state-bckt43
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.ENV }}
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout `feature/btl-48` codebase
+        uses: actions/checkout@v4
+        with:
+          ref: feature/btl-48
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Destroy CloudWatch
+        run: |
+          cd infra/cloudwatch
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
+          terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+
+      - name: Destroy API Gateway
+        run: |
+          cd infra/rest-api
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate"
+          terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+
+      - name: Destroy NLB
+        run: |
+          cd infra/nlb
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/nlb/terraform.tfstate"
+          terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+
+      - name: Destroy VPC
+        run: |
+          cd infra/vpc
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/vpc/terraform.tfstate"
+          terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+
+      - name: Destroy SSM
+        run: |
+          cd infra/ssm
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
+          terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+
+      - name: Destroy ECR
+        run: |
+          cd infra/ecr
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
+          terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
