@@ -3,7 +3,7 @@ environment          = "dev"
 stage_name           = "dev"
 log_retention_days   = 7
 api_description      = "dev REST API to NLB"
-binary_media_types = ["application/json"]
+binary_media_types = ["*/*"]
 
 common_tags = {
   Environment = "dev"
