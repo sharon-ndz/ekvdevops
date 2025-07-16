@@ -1,5 +1,6 @@
 resource "aws_iam_role" "api_gw_cloudwatch" {
   name = "${var.environment}-apigw-cloudwatch-role"
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
@@ -10,6 +11,7 @@ resource "aws_iam_role" "api_gw_cloudwatch" {
       Action = "sts:AssumeRole"
     }]
   })
+
   tags = var.common_tags
 }
 
@@ -29,10 +31,16 @@ resource "aws_api_gateway_vpc_link" "this" {
   tags        = var.common_tags
 }
 
+resource "aws_cloudwatch_log_group" "api_logs" {
+  name              = "/aws/api-gateway/${var.environment}-api"
+  retention_in_days = var.log_retention_days
+  tags              = var.common_tags
+}
+
 resource "aws_api_gateway_rest_api" "this" {
-  name                = "${var.environment}-rest-api"
-  description         = "${var.api_description} — ${timestamp()}"
-  binary_media_types  = var.binary_media_types
+  name               = "${var.environment}-rest-api"
+  description        = "${var.api_description} — ${timestamp()}"
+  binary_media_types = var.binary_media_types
 
   endpoint_configuration {
     types = ["REGIONAL"]
@@ -41,70 +49,12 @@ resource "aws_api_gateway_rest_api" "this" {
   tags = var.common_tags
 }
 
-resource "aws_cloudwatch_log_group" "api_logs" {
-  name              = "/aws/api-gateway/${var.environment}-api"
-  retention_in_days = var.log_retention_days
-  tags              = var.common_tags
-}
-
 resource "aws_api_gateway_resource" "proxy" {
   rest_api_id = aws_api_gateway_rest_api.this.id
   parent_id   = aws_api_gateway_rest_api.this.root_resource_id
   path_part   = "{proxy+}"
 }
 
-# ───────────────────── Root Method ─────────────────────
-resource "aws_api_gateway_method" "root" {
-  rest_api_id   = aws_api_gateway_rest_api.this.id
-  resource_id   = aws_api_gateway_rest_api.this.root_resource_id
-  http_method   = "ANY"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "root" {
-  rest_api_id             = aws_api_gateway_rest_api.this.id
-  resource_id             = aws_api_gateway_rest_api.this.root_resource_id
-  http_method             = aws_api_gateway_method.root.http_method
-  integration_http_method = "ANY"
-  type                    = "HTTP"
-  uri                     = "http://${var.nlb_dns_name}:4000/"
-  connection_type         = "VPC_LINK"
-  connection_id           = aws_api_gateway_vpc_link.this.id
-  passthrough_behavior    = "WHEN_NO_MATCH"
-  content_handling        = "CONVERT_TO_TEXT"
-}
-
-resource "aws_api_gateway_method_response" "root_200" {
-  rest_api_id = aws_api_gateway_rest_api.this.id
-  resource_id = aws_api_gateway_rest_api.this.root_resource_id
-  http_method = aws_api_gateway_method.root.http_method
-  status_code = "200"
-
-  response_parameters = {
-    "method.response.header.Content-Type"                 = true
-    "method.response.header.Access-Control-Allow-Origin"  = true
-    "method.response.header.Access-Control-Allow-Methods" = true
-    "method.response.header.Access-Control-Allow-Headers" = true
-  }
-}
-
-resource "aws_api_gateway_integration_response" "root_200" {
-  rest_api_id = aws_api_gateway_rest_api.this.id
-  resource_id = aws_api_gateway_rest_api.this.root_resource_id
-  http_method = aws_api_gateway_method.root.http_method
-  status_code = aws_api_gateway_method_response.root_200.status_code
-
-  response_parameters = {
-    "method.response.header.Content-Type"                 = "integration.response.header.Content-Type"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-  }
-
-  depends_on = [aws_api_gateway_integration.root]
-}
-
-# ───────────────────── Proxy ANY Method ─────────────────────
 resource "aws_api_gateway_method" "proxy" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
   resource_id   = aws_api_gateway_resource.proxy.id
@@ -155,15 +105,14 @@ resource "aws_api_gateway_integration_response" "proxy_200" {
 
   response_parameters = {
     "method.response.header.Content-Type"                 = "integration.response.header.Content-Type"
-    "method.response.header.Access-Control-Allow-Origin"  = "integration.response.header.Access-Control-Allow-Origin"
-    "method.response.header.Access-Control-Allow-Methods" = "integration.response.header.Access-Control-Allow-Methods"
-    "method.response.header.Access-Control-Allow-Headers" = "integration.response.header.Access-Control-Allow-Headers"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
   }
 
   depends_on = [aws_api_gateway_integration.proxy]
 }
 
-# ───────────────────── Proxy OPTIONS (CORS) ─────────────────────
 resource "aws_api_gateway_method" "proxy_options" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
   resource_id   = aws_api_gateway_resource.proxy.id
@@ -172,11 +121,11 @@ resource "aws_api_gateway_method" "proxy_options" {
 }
 
 resource "aws_api_gateway_integration" "proxy_options" {
-  rest_api_id             = aws_api_gateway_rest_api.this.id
-  resource_id             = aws_api_gateway_resource.proxy.id
-  http_method             = aws_api_gateway_method.proxy_options.http_method
-  type                    = "MOCK"
-  passthrough_behavior    = "WHEN_NO_MATCH"
+  rest_api_id          = aws_api_gateway_rest_api.this.id
+  resource_id          = aws_api_gateway_resource.proxy.id
+  http_method          = aws_api_gateway_method.proxy_options.http_method
+  type                 = "MOCK"
+  passthrough_behavior = "WHEN_NO_MATCH"
 
   request_templates = {
     "application/json" = jsonencode({ statusCode = 200 })
@@ -209,7 +158,6 @@ resource "aws_api_gateway_integration_response" "proxy_options_200" {
   }
 }
 
-# ───────────────────── Deployment & Stage ─────────────────────
 resource "aws_api_gateway_deployment" "this" {
   rest_api_id = aws_api_gateway_rest_api.this.id
   description = "Deployed on ${timestamp()}"
