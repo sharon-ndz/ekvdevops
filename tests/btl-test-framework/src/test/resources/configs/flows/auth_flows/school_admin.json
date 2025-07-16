@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "epic": "Authentication",
+    "feature": "School Admin",
+    "severity": "critical",
+    "tags": ["auth", "login", "school_admin"],
+    "expectedResults": [
+      "Authenticate successfully as school admin with valid credentials.",
+      "Return 201 status code.",
+      "Response should contain a valid accessToken.",
+      "Response should indicate success."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Authenticate school admin",
+      "name": "school_admin: Authenticate as school admin",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "josiah.adgbola@mailinator.com",
+        "password": "password"
+      },
+      "extract": {
+        "token": "accessToken"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "accessToken": {
+            "exists": true
+          },
+          "success": true
+        }
+      }
+    }
+  ]
+}
