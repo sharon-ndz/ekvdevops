@@ -1,6 +1,3 @@
-locals {
-  nlb_dns_name = data.terraform_remote_state.nlb.outputs.nlb_dns_name
-}
 
 module "api_gateway" {
   source               = "../terraform-modules/rest-api"
@@ -10,7 +7,7 @@ module "api_gateway" {
   log_retention_days   = var.log_retention_days
   api_description      = var.api_description
   binary_media_types   = var.binary_media_types
-  vpc_link_target_arns = [data.terraform_remote_state.nlb.outputs.nlb_arn]
+  vpc_link_target_arns = local.vpc_link_target_arns
   nlb_dns_name         = local.nlb_dns_name
   common_tags          = var.common_tags
 }
