@@ -84,6 +84,39 @@ resource "aws_api_gateway_integration" "root" {
   content_handling        = "CONVERT_TO_BINARY"
 }
 
+resource "aws_api_gateway_method_response" "root_200" {
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  resource_id = aws_api_gateway_rest_api.this.root_resource_id
+  http_method = aws_api_gateway_method.root.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Content-Type"                 = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "root_200" {
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  resource_id = aws_api_gateway_rest_api.this.root_resource_id
+  http_method = aws_api_gateway_method.root.http_method
+  status_code = aws_api_gateway_method_response.root_200.status_code
+
+  response_parameters = {
+    "method.response.header.Content-Type"                 = "integration.response.header.Content-Type"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+  }
+
+  depends_on = [
+    aws_api_gateway_integration.root,
+    aws_api_gateway_method_response.root_200
+  ]
+}
+
 
 resource "aws_api_gateway_integration" "proxy" {
   rest_api_id             = aws_api_gateway_rest_api.this.id
