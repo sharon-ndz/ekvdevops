@@ -71,7 +71,7 @@ resource "aws_api_gateway_integration" "root" {
   connection_type         = "VPC_LINK"
   connection_id           = aws_api_gateway_vpc_link.this.id
   passthrough_behavior    = "WHEN_NO_MATCH"
-  content_handling        = "CONVERT_TO_BINARY"
+  content_handling        = "CONVERT_TO_TEXT"
 }
 
 resource "aws_api_gateway_method_response" "root_200" {
@@ -126,7 +126,7 @@ resource "aws_api_gateway_integration" "proxy" {
   connection_type         = "VPC_LINK"
   connection_id           = aws_api_gateway_vpc_link.this.id
   passthrough_behavior    = "WHEN_NO_TEMPLATES"
-  content_handling        = "CONVERT_TO_BINARY"
+  content_handling        = "CONVERT_TO_TEXT"
 
   request_parameters = {
     "integration.request.path.proxy" = "method.request.path.proxy"
