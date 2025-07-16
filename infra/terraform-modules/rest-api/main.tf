@@ -53,17 +53,7 @@ resource "aws_api_gateway_resource" "proxy" {
   path_part   = "{proxy+}"
 }
 
-resource "aws_api_gateway_method" "proxy" {
-  rest_api_id   = aws_api_gateway_rest_api.this.id
-  resource_id   = aws_api_gateway_resource.proxy.id
-  http_method   = "ANY"
-  authorization = "NONE"
-
-  request_parameters = {
-    "method.request.path.proxy" = true
-  }
-}
-
+# ───────────────────── Root Method ─────────────────────
 resource "aws_api_gateway_method" "root" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
   resource_id   = aws_api_gateway_rest_api.this.root_resource_id
@@ -111,12 +101,20 @@ resource "aws_api_gateway_integration_response" "root_200" {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
   }
 
-  depends_on = [
-    aws_api_gateway_integration.root,
-    aws_api_gateway_method_response.root_200
-  ]
+  depends_on = [aws_api_gateway_integration.root]
 }
 
+# ───────────────────── Proxy ANY Method ─────────────────────
+resource "aws_api_gateway_method" "proxy" {
+  rest_api_id   = aws_api_gateway_rest_api.this.id
+  resource_id   = aws_api_gateway_resource.proxy.id
+  http_method   = "ANY"
+  authorization = "NONE"
+
+  request_parameters = {
+    "method.request.path.proxy" = true
+  }
+}
 
 resource "aws_api_gateway_integration" "proxy" {
   rest_api_id             = aws_api_gateway_rest_api.this.id
@@ -162,12 +160,10 @@ resource "aws_api_gateway_integration_response" "proxy_200" {
     "method.response.header.Access-Control-Allow-Headers" = "integration.response.header.Access-Control-Allow-Headers"
   }
 
-  depends_on = [
-    aws_api_gateway_integration.proxy,
-    aws_api_gateway_method_response.proxy_200
-  ]
+  depends_on = [aws_api_gateway_integration.proxy]
 }
 
+# ───────────────────── Proxy OPTIONS (CORS) ─────────────────────
 resource "aws_api_gateway_method" "proxy_options" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
   resource_id   = aws_api_gateway_resource.proxy.id
@@ -180,10 +176,11 @@ resource "aws_api_gateway_integration" "proxy_options" {
   resource_id             = aws_api_gateway_resource.proxy.id
   http_method             = aws_api_gateway_method.proxy_options.http_method
   type                    = "MOCK"
-  request_templates       = {
-    "application/json" = "{\"statusCode\": 200}"
-  }
   passthrough_behavior    = "WHEN_NO_MATCH"
+
+  request_templates = {
+    "application/json" = jsonencode({ statusCode = 200 })
+  }
 }
 
 resource "aws_api_gateway_method_response" "proxy_options_200" {
@@ -193,9 +190,9 @@ resource "aws_api_gateway_method_response" "proxy_options_200" {
   status_code = "200"
 
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = true,
-    "method.response.header.Access-Control-Allow-Methods" = true,
-    "method.response.header.Access-Control-Allow-Origin"  = true,
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
   }
 }
 
@@ -206,21 +203,22 @@ resource "aws_api_gateway_integration_response" "proxy_options_200" {
   status_code = "200"
 
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
-    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'",
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'",
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
-
+# ───────────────────── Deployment & Stage ─────────────────────
 resource "aws_api_gateway_deployment" "this" {
   rest_api_id = aws_api_gateway_rest_api.this.id
   description = "Deployed on ${timestamp()}"
 
   depends_on = [
     aws_api_gateway_integration.proxy,
-    aws_api_gateway_method_response.proxy_200,
-    aws_api_gateway_integration_response.proxy_200
+    aws_api_gateway_integration.proxy_options,
+    aws_api_gateway_integration_response.proxy_200,
+    aws_api_gateway_integration_response.proxy_options_200,
   ]
 }
 
@@ -229,31 +227,30 @@ resource "aws_api_gateway_stage" "default" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
   deployment_id = aws_api_gateway_deployment.this.id
 
-access_log_settings {
-  destination_arn = aws_cloudwatch_log_group.api_logs.arn
-  format = jsonencode({
-    requestId          = "$context.requestId"
-    apiId              = "$context.apiId"
-    domainName         = "$context.domainName"
-    stage              = "$context.stage"
-    resourcePath       = "$context.resourcePath"
-    resourceId         = "$context.resourceId"
-    httpMethod         = "$context.httpMethod"
-    path               = "$context.path"
-    status             = "$context.status"
-    responseLatency    = "$context.responseLatency"
-    responseLength     = "$context.responseLength"
-    ip                 = "$context.identity.sourceIp"
-    caller             = "$context.identity.caller"
-    user               = "$context.identity.user"
-    userAgent          = "$context.identity.userAgent"
-    accountId          = "$context.identity.accountId"
-    integrationStatus  = "$context.integration.status"
-    integrationLatency = "$context.integration.latency"
-    integrationError   = "$context.integration.error"
-  })
-}
-
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_logs.arn
+    format = jsonencode({
+      requestId          = "$context.requestId"
+      apiId              = "$context.apiId"
+      domainName         = "$context.domainName"
+      stage              = "$context.stage"
+      resourcePath       = "$context.resourcePath"
+      resourceId         = "$context.resourceId"
+      httpMethod         = "$context.httpMethod"
+      path               = "$context.path"
+      status             = "$context.status"
+      responseLatency    = "$context.responseLatency"
+      responseLength     = "$context.responseLength"
+      ip                 = "$context.identity.sourceIp"
+      caller             = "$context.identity.caller"
+      user               = "$context.identity.user"
+      userAgent          = "$context.identity.userAgent"
+      accountId          = "$context.identity.accountId"
+      integrationStatus  = "$context.integration.status"
+      integrationLatency = "$context.integration.latency"
+      integrationError   = "$context.integration.error"
+    })
+  }
 
   depends_on = [
     aws_cloudwatch_log_group.api_logs,
