@@ -56,7 +56,7 @@ jobs:
 
       - name: Terraform Apply API Gateway
         run: |
-          cd infra/http-api
+          cd infra/rest-api
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
