@@ -41,7 +41,7 @@ resource "aws_apigatewayv2_vpc_link" "this" {
 }
 
 resource "aws_apigatewayv2_integration" "this" {
-  for_each               = var.api_routes
+  for_each               = local.api_routes
   api_id                 = aws_apigatewayv2_api.this.id
   integration_type       = "HTTP_PROXY"
   connection_type        = "VPC_LINK"
