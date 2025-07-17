@@ -194,6 +194,7 @@ resource "aws_api_gateway_stage" "default" {
   stage_name    = var.stage_name
   rest_api_id   = aws_api_gateway_rest_api.this.id
   deployment_id = aws_api_gateway_deployment.this.id
+  binary_media_types   = var.binary_media_types
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_logs.arn
