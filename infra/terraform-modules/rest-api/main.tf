@@ -62,7 +62,7 @@ resource "aws_api_gateway_integration" "root" {
   resource_id             = aws_api_gateway_rest_api.this.root_resource_id
   http_method             = aws_api_gateway_method.root.http_method
   integration_http_method = "ANY"
-  type                    = "HTTP"
+  type                    = "HTTP_PROXY"
   uri                     = "http://${var.nlb_dns_name}:4000/"
   connection_type         = "VPC_LINK"
   connection_id           = aws_api_gateway_vpc_link.this.id
@@ -134,36 +134,13 @@ resource "aws_api_gateway_integration" "proxy" {
 #  depends_on = [aws_api_gateway_integration.proxy]
 #}
 
-resource "aws_api_gateway_method_response" "proxy_200" {
-  rest_api_id = aws_api_gateway_rest_api.this.id
-  resource_id = aws_api_gateway_resource.proxy.id
-  http_method = "ANY"
-  status_code = "200"
-
-  response_models = {
-    "application/json" = "Empty"
-  }
-}
-
-resource "aws_api_gateway_integration_response" "proxy_200" {
-  rest_api_id = aws_api_gateway_rest_api.this.id
-  resource_id = aws_api_gateway_resource.proxy.id
-  http_method = "ANY"
-  status_code = "200"
-
-  response_templates = {
-    "application/json" = ""
-  }
-}
-
-
 resource "aws_api_gateway_deployment" "this" {
   rest_api_id = aws_api_gateway_rest_api.this.id
   description = "Deployed on ${timestamp()}"
 
   depends_on = [
     aws_api_gateway_integration.proxy,
-    aws_api_gateway_integration_response.proxy_200,
+#    aws_api_gateway_integration_response.proxy_200,
   ]
 }
 
