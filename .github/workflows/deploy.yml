@@ -92,6 +92,7 @@ jobs:
             --query "Reservations[*].Instances[*].InstanceId" \
             --output text --region $AWS_REGION)
 
+          INSTANCE_ID=$(echo "$INSTANCE_ID" | tr -d '\r' | tr -d '\n' | xargs)
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
           for i in {1..10}; do
