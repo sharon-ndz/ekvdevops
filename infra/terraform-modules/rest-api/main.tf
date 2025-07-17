@@ -197,6 +197,17 @@ resource "aws_api_gateway_stage" "default" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
   deployment_id = aws_api_gateway_deployment.this.id
 
+  method_settings {
+    method_path = "*/*"
+    settings {
+      metrics_enabled        = true
+      logging_level          = "INFO"
+      data_trace_enabled     = false
+      throttling_burst_limit = 500
+      throttling_rate_limit  = 1000
+    }
+  }
+
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_logs.arn
     format = jsonencode({
@@ -237,7 +248,6 @@ resource "aws_api_gateway_method_settings" "disable_api_key" {
   method_path = "*/*"
 
   settings {
-    require_api_key         = false
     metrics_enabled         = true
     logging_level           = "INFO"
     data_trace_enabled      = false
