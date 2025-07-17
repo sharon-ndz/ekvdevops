@@ -142,7 +142,6 @@ resource "aws_api_gateway_deployment" "this" {
 
   depends_on = [
     aws_api_gateway_integration.proxy,
-    aws_api_gateway_integration.proxy_options,
     aws_api_gateway_integration_response.proxy_200,
   ]
 }
