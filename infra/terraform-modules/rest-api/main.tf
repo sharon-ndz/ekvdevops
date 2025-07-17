@@ -54,6 +54,7 @@ resource "aws_api_gateway_method" "root" {
   resource_id   = aws_api_gateway_rest_api.this.root_resource_id
   http_method   = "ANY"
   authorization = "NONE"
+  api_key_required = false
 }
 
 resource "aws_api_gateway_integration" "root" {
@@ -138,6 +139,7 @@ resource "aws_api_gateway_method" "proxy_options" {
   resource_id   = aws_api_gateway_resource.proxy.id
   http_method   = "OPTIONS"
   authorization = "NONE"
+  api_key_required = false
 }
 
 resource "aws_api_gateway_integration" "proxy_options" {
