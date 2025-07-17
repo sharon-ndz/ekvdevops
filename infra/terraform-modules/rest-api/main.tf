@@ -233,10 +233,11 @@ resource "aws_api_gateway_stage" "default" {
 
 resource "aws_api_gateway_method_settings" "disable_api_key" {
   rest_api_id = aws_api_gateway_rest_api.this.id
-  stage_name  = aws_api_gateway_stage.default.stage_name
+  stage_name  = var.stage_name     
   method_path = "*/*"
 
   settings {
+    require_api_key         = false
     metrics_enabled         = true
     logging_level           = "INFO"
     data_trace_enabled      = false
@@ -244,6 +245,11 @@ resource "aws_api_gateway_method_settings" "disable_api_key" {
     throttling_rate_limit   = 500
   }
 
-  depends_on = [aws_api_gateway_stage.default]
+  depends_on = [
+    aws_api_gateway_stage.default,
+    aws_api_gateway_method.proxy,
+    aws_api_gateway_method.root,
+    aws_api_gateway_method.proxy_options
+  ]
 }
 
