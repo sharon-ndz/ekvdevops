@@ -134,6 +134,27 @@ resource "aws_api_gateway_integration" "proxy" {
 #  depends_on = [aws_api_gateway_integration.proxy]
 #}
 
+resource "aws_api_gateway_method_response" "proxy_200" {
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  resource_id = aws_api_gateway_resource.proxy.id
+  http_method = "ANY"
+  status_code = "200"
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "proxy_200" {
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  resource_id = aws_api_gateway_resource.proxy.id
+  http_method = "ANY"
+  status_code = "200"
+
+  response_templates = {
+    "application/json" = ""
+  }
+}
 
 
 resource "aws_api_gateway_deployment" "this" {
@@ -142,7 +163,7 @@ resource "aws_api_gateway_deployment" "this" {
 
   depends_on = [
     aws_api_gateway_integration.proxy,
- #   aws_api_gateway_integration_response.proxy_200,
+    aws_api_gateway_integration_response.proxy_200,
   ]
 }
 
