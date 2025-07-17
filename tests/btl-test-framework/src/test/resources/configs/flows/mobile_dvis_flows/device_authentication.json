@@ -24,7 +24,7 @@
       "query": {
         "deviceId": "a8bb60d6e58b0af9"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -34,7 +34,7 @@
       "name": "device_authentication: Enroll Device",
       "method": "POST",
       "path": "device/pre-activation",
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "body": {
         "deviceImei": "9848748474874847484",
         "license": "LICENSE038383777262664",
@@ -54,7 +54,7 @@
       "name": "device_authentication: Update Biometrics",
       "method": "POST",
       "path": "users/update-biometrics",
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "body": {
         "email": "garrett@mailinator.com",
         "files": [

@@ -19,7 +19,7 @@
         "password": "password"
       },
       "extract": {
-        "token": "accessToken"
+        "super_admin_token": "accessToken"
       },
       "assertions": {
         "status": 201,

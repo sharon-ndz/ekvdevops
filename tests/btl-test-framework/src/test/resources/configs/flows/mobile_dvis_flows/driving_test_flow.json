@@ -25,7 +25,7 @@
       "body": {
         "email": "vickkycodegenius@gmail.com"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 201
       }
@@ -39,7 +39,7 @@
         "email": "vickkycodegenius@gmail.com",
         "otp": "377101"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 201
       }
@@ -52,7 +52,7 @@
       "body": {
         "applicationNo": "DRLP/2025/849367"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 201
       }
@@ -87,7 +87,7 @@
           }
         ]
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 201
       }

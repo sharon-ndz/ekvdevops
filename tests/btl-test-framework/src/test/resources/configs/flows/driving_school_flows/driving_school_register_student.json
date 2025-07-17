@@ -14,7 +14,7 @@
       "name": "Driving school Register Student: Verify NIN",
       "method": "GET",
       "path": "auth/verify-nin/22345678938",
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200,
         "body": {

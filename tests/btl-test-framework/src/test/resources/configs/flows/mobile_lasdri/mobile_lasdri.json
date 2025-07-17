@@ -19,7 +19,7 @@
       "query": {
         "deviceId": "8490474847333837872827288UIRIOP8373937383784748"
       },
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -40,7 +40,7 @@
         "requesterLastName": "Agent",
         "requesterPhone": "08170000044"
       },
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 201
       }
@@ -60,7 +60,7 @@
           }
         ]
       },
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 201
       }

@@ -50,8 +50,8 @@ public class RequestBuilder {
             for (JsonNode required : requires) {
                 String key = required.asText();
 
-                if ("token".equalsIgnoreCase(key)) {
-                    String token = context.get("token").orElse(null);
+                if (key.endsWith("_token")) {
+                    String token = context.get(key).orElse(null);
                     if (token != null) {
                         request.header("Authorization", "Bearer " + token);
                     } else {

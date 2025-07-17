@@ -14,7 +14,7 @@
       "name": "driving_school_cms_toggle: Driving School Toggle Status",
       "method": "PATCH",
       "path": "driving-school/toggle-status/${drivingSchoolId}",
-      "requires": ["token", "drivingSchoolId"],
+      "requires": ["lasdri_admin_token", "drivingSchoolId"],
       "body": {
         "status": "0"
       },

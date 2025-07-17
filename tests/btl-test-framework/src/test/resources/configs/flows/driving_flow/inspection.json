@@ -20,7 +20,7 @@
         "resultsPerPage": "10",
         "drivingSchoolId": 1
       },
-      "requires": ["token"],
+      "requires": ["lasdri_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -40,7 +40,7 @@
         "comment": "Up to standard",
         "status": "cleared"
       },
-      "requires": ["token"],
+      "requires": ["lasdri_admin_token"],
       "assertions": {
         "status": 201
       }
