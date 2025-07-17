@@ -76,7 +76,7 @@ resource "aws_api_gateway_integration" "proxy" {
   connection_type         = "VPC_LINK"
   connection_id           = aws_api_gateway_vpc_link.this.id
   passthrough_behavior    = "WHEN_NO_TEMPLATES"
-  content_handling        = "CONVERT_TO_TEXT"
+  content_handling        = "CONVERT_TO_BINARY"
 
   request_parameters = {
     "integration.request.path.proxy" = "method.request.path.proxy"
