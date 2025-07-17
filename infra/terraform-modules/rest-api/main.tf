@@ -38,7 +38,7 @@ resource "aws_cloudwatch_log_group" "api_logs" {
 }
 
 resource "aws_api_gateway_rest_api" "this" {
-  name               = "${var.environment}-rest-api"
+  name               = "${var.environment}-rest-api-idlms"
   description        = "${var.api_description} — ${timestamp()}"
   binary_media_types = var.binary_media_types
 
