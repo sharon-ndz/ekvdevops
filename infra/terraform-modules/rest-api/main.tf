@@ -229,3 +229,18 @@ resource "aws_api_gateway_stage" "default" {
 
   tags = var.common_tags
 }
+
+resource "aws_api_gateway_method_settings" "disable_api_key" {
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  stage_name  = aws_api_gateway_stage.default.stage_name
+  method_path = "*/*"
+
+  settings {
+    metrics_enabled         = true
+    logging_level           = "INFO"
+    data_trace_enabled      = false
+    throttling_burst_limit  = 1000
+    throttling_rate_limit   = 500
+    require_api_key         = false  
+  }
+}
