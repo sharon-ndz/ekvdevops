@@ -49,6 +49,25 @@ resource "aws_api_gateway_rest_api" "this" {
   tags = var.common_tags
 }
 
+resource "aws_api_gateway_method" "root" {
+  rest_api_id   = aws_api_gateway_rest_api.this.id
+  resource_id   = aws_api_gateway_rest_api.this.root_resource_id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "root" {
+  rest_api_id             = aws_api_gateway_rest_api.this.id
+  resource_id             = aws_api_gateway_rest_api.this.root_resource_id
+  http_method             = aws_api_gateway_method.root.http_method
+  integration_http_method = "ANY"
+  type                    = "HTTP"
+  uri                     = "http://${var.nlb_dns}:4000/"
+  connection_type         = "VPC_LINK"
+  connection_id           = aws_api_gateway_vpc_link.this.id
+}
+
+
 resource "aws_api_gateway_resource" "proxy" {
   rest_api_id = aws_api_gateway_rest_api.this.id
   parent_id   = aws_api_gateway_rest_api.this.root_resource_id
