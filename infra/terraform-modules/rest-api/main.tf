@@ -62,7 +62,7 @@ resource "aws_api_gateway_integration" "root" {
   http_method             = aws_api_gateway_method.root.http_method
   integration_http_method = "ANY"
   type                    = "HTTP"
-  uri                     = "http://${var.nlb_dns}:4000/"
+  uri                     = "http://${var.nlb_dns_name}:4000/"
   connection_type         = "VPC_LINK"
   connection_id           = aws_api_gateway_vpc_link.this.id
 }
