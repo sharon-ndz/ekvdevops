@@ -50,7 +50,8 @@ jobs:
       - name: Create dummy backend-api.zip for Lambda
         working-directory: ./infra/lambda
         run: |
-          zip -r backend-api.zip . -x "*"
+          echo "dummy" > dummy.txt
+          zip backend-api.zip dummy.txt
 
       - name: Destroy Lambda Infra
         working-directory: ./infra/lambda
