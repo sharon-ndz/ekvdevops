@@ -128,4 +128,7 @@ resource "aws_api_gateway_stage" "stage" {
       userAgent       = "$context.identity.userAgent"
     })
   }
+  depends_on = [
+    aws_api_gateway_account.api_account
+  ]
 }
