@@ -18,7 +18,7 @@
         "page": 1,
         "resultsPerPage": "10"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -32,7 +32,7 @@
         "page": "1",
         "resultsPerPage": "10"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -67,7 +67,7 @@
           }
         ]
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 201
       }
@@ -103,7 +103,7 @@
         ],
         "reference": "NL4ZUSRDHVNL1747327821784"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 201
       }
@@ -135,7 +135,7 @@
         ],
         "reference": "LR3Z11QUO3LR1739957392526"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 201
       }
@@ -168,7 +168,7 @@
         ],
         "reference": "LRILRVLVO1ALRI1739958309029"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 201
       }

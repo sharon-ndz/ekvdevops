@@ -19,7 +19,7 @@
       "body": {
         "email": "vickkycodegenius@gmail.com"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "expectedResults": [
         "Status code should be 201",
         "OTP sent to the user's email"
@@ -37,7 +37,7 @@
         "email": "vickkycodegenius@gmail.com",
         "otp": "377101"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "expectedResults": [
         "Status code should be 201",
         "OTP validation is successful"
@@ -54,7 +54,7 @@
       "body": {
         "applicationNo": "DRLP/2025/849367"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "expectedResults": [
         "Status code should be 201",
         "License pre-registration should be created"
@@ -79,7 +79,7 @@
           }
         ]
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "expectedResults": [
         "Status code should be 201",
         "Biometric file submitted successfully"
@@ -100,13 +100,13 @@
         "glasses": "Yes",
         "disability": "Yes",
         "eyeColor": "BLUE",
-        "licenseClassId": 0,
+        "licenseClassId": 2,
         "years": 0,
         "applicationNo": "${numericString:10}",
         "email": "john.doe@mailinator.com",
         "phone": "${phoneNumber:090,11}"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "expectedResults": [
         "Status code should be 201",
         "New license request is submitted successfully"
@@ -120,7 +120,7 @@
       "name": "mobile_mvaa: Generate License Card",
       "method": "GET",
       "path": "license/generate-license/86427159",
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "expectedResults": [
         "Status code should be 200",
         "License card is generated and returned"
@@ -137,7 +137,7 @@
       "body": {
         "applicationNo": "DRLP/2025/087956"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "expectedResults": [
         "Status code should be 201",
         "License details returned successfully"

@@ -17,7 +17,7 @@
       "name": "Permit: Get Permit stats",
       "method": "GET",
       "path": "permit/stats",
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -31,7 +31,7 @@
         "page": "1",
         "resultsPerPage": "10"
       },
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -41,7 +41,7 @@
       "name": "Permit: Get Permit Details",
       "method": "GET",
       "path": "permit/details/PM203181989165146712",
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -57,7 +57,7 @@
         "studentNo": "DR03NLEU58DR-135269",
         "reference": "PIME6LUIR2PI1738109830031"
       },
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 201
       }

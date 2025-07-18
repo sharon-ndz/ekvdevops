@@ -62,13 +62,19 @@ public class ApiStepRunner {
     }
 
     private Response sendRequest(String method, String path, io.restassured.specification.RequestSpecification request) {
-        return switch (method.toUpperCase()) {
-            case "GET" -> request.get("/" + path);
-            case "POST" -> request.post("/" + path);
-            case "PUT" -> request.put("/" + path);
-            case "PATCH" -> request.patch("/" + path);
-            case "DELETE" -> request.delete("/" + path);
-            default -> throw new IllegalArgumentException("Unsupported method: " + method);
-        };
+        switch (method.toUpperCase()) {
+            case "GET":
+                return request.get("/" + path);
+            case "POST":
+                return request.post("/" + path);
+            case "PUT":
+                return request.put("/" + path);
+            case "PATCH":
+                return request.patch("/" + path);
+            case "DELETE":
+                return request.delete("/" + path);
+            default:
+                throw new IllegalArgumentException("Unsupported method: " + method);
+        }
     }
 }

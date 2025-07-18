@@ -17,7 +17,7 @@
       "name": "driving_school_self_onboarding: submit inspection",
       "method": "POST",
       "path": "inspections/submit-inspection",
-      "token": ["token","drivingSchoolId"],
+      "token": ["lasdri_admin_token","drivingSchoolId"],
       "body": {
         "drivingSchoolId": "${drivingSchoolId|number}",
         "questionId": 0,

@@ -16,7 +16,7 @@
       "name": "driving_school_cms: Create a driving School",
       "method": "POST",
       "path": "driving-school",
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "body": {
         "name": "Test Driving School ${randomString:8}",
         "email": "tdscool.${randomString:8}@mailinnator.com",
@@ -50,7 +50,7 @@
       "name": "driving_school_cms: Update a driving School",
       "method": "PATCH",
       "path": "driving-school",
-      "requires": ["token", "drivingSchoolId", "name", "email", "phone"],
+      "requires": ["super_admin_token", "drivingSchoolId", "name", "email", "phone"],
       "body": {
         "id": "${drivingSchoolId|number}",
         "name": "${name}",
@@ -76,7 +76,7 @@
       "name": "driving_school_cms: Driving School Toggle Status",
       "method": "PATCH",
       "path": "driving-school/toggle-status/${drivingSchoolId}",
-      "requires": ["token", "drivingSchoolId"],
+      "requires": ["super_admin_token", "drivingSchoolId"],
       "body": {
         "status": "0"
       },
