@@ -21,7 +21,7 @@
         "password": "password"
       },
       "extract": {
-        "token": "accessToken"
+        "school_admin_token": "accessToken"
       },
       "assertions": {
         "status": 201,

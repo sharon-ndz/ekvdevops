@@ -87,11 +87,9 @@ jobs:
 
       - name: Wait for EC2 to register in SSM
         run: |
-          INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=$EC2_NAME_TAG" \
-            --query "Reservations[*].Instances[*].InstanceId" \
-            --output text --region $AWS_REGION)
 
+
+          INSTANCE_ID=$(terraform -chdir=infra/ec2 output -raw ec2_instance_id)
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
           for i in {1..10}; do

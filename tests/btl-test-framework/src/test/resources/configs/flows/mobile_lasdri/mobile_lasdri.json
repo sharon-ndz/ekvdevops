@@ -19,7 +19,7 @@
       "query": {
         "deviceId": "${deviceId}"
       },
-      "requires": ["token","deviceImei"],
+      "requires": ["school_admin_token","deviceImei"],
       "assertions": {
         "status": 200
       }
@@ -40,7 +40,7 @@
         "requesterLastName": "Agent",
         "requesterPhone": "08170000044"
       },
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 201
       }
@@ -60,7 +60,7 @@
           }
         ]
       },
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 201
       }

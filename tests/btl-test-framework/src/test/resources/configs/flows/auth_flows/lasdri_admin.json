@@ -22,7 +22,7 @@
         "password": "password"
       },
       "extract": {
-        "token": "accessToken"
+        "lasdri_admin_token": "accessToken"
       },
       "assertions": {
         "status": 201,

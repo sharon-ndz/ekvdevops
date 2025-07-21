@@ -22,7 +22,7 @@
         "page": "1",
         "resultsPerPage": "10"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 200
       }

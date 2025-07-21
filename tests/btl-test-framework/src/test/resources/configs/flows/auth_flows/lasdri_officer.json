@@ -22,10 +22,10 @@
         "password": "password"
       },
       "extract": {
-        "token": "accessToken"
+        "lasdri_officer_token": "accessToken"
       },
       "assertions": {
-        "status": 200,
+        "status": 201,
         "body": {
           "accessToken": {
             "exists": true

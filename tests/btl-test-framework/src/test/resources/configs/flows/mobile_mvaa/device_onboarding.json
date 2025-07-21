@@ -21,7 +21,7 @@
         "type": "android",
         "organizationCode": "MVAA"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "expectedResults": [
         "Status code should be 201",
         "Device entry is created and returned in the response"
