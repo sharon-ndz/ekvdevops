@@ -17,9 +17,9 @@
       "method": "GET",
       "path": "device/check-activation-status",
       "query": {
-        "deviceId": "8490474847333837872827288UIRIOP8373937383784748"
+        "deviceId": "${deviceId}"
       },
-      "requires": ["token"],
+      "requires": ["school_admin_token","deviceImei"],
       "assertions": {
         "status": 200
       }
@@ -30,9 +30,9 @@
       "method": "POST",
       "path": "device/pre-activation",
       "body": {
-        "deviceImei": "9848748474874847484",
+        "deviceImei": "${deviceImei}",
         "license": "LICENSE038383777262664",
-        "deviceId": "8490474847333837872827288UIRIOP8373937383784748",
+        "deviceId": "${deviceId}",
         "type": "android",
         "organizationCode": "MVAA",
         "requesterEmail": "mvaaagent@mailinator.com",
@@ -40,7 +40,7 @@
         "requesterLastName": "Agent",
         "requesterPhone": "08170000044"
       },
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 201
       }
@@ -60,7 +60,7 @@
           }
         ]
       },
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 201
       }

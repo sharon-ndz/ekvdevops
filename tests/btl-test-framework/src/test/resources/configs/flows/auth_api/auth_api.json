@@ -21,7 +21,7 @@
         "page": "1",
         "resultPerPage": "10"
       },
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -31,7 +31,7 @@
       "name": "Auth_API: Get Driving School Application Detail",
       "method": "GET",
       "path": "driving-school/applications/details/3",
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -41,7 +41,7 @@
       "name": "Auth_API: Get Driving School Application Stats",
       "method": "GET",
       "path": "driving-school/applications/stats",
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -51,7 +51,7 @@
       "name": "Auth_API: Change Application Status",
       "method": "POST",
       "path": "driving-school/change-application-status",
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "body": {
         "applicationId": "DRLF/2025/823970",
         "status": 1

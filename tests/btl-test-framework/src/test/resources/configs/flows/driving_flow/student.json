@@ -43,6 +43,7 @@
           "Test 3"
         ]
       },
+      "requires": ["school_admin_token"],
       "extract": {
         "identifier": "data.identifier",
         "drivingSchoolId": "data.id"
@@ -61,6 +62,7 @@
       "name": "Student: Get Stats",
       "method": "GET",
       "path": "driving-school/students/stats",
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -74,6 +76,7 @@
         "page": 1,
         "resultsPerPage": 10
       },
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -121,6 +124,7 @@
         "nextOfKinNationalityId": 1,
         "courseLevel": "beginner"
       },
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -130,6 +134,7 @@
       "name": "Student: Get Student Details",
       "method": "GET",
       "path": "driving-school/students/details/DR03NLEU58DR-135269",
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 201
       }

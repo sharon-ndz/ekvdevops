@@ -17,7 +17,7 @@
       "name": "get_driving: Get Single Driving School",
       "method": "GET",
       "path": "driving-school/single/1",
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -27,7 +27,7 @@
       "name": "get_driving: Get Training Durations",
       "method": "GET",
       "path": "driving-school/training-durations/1",
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -41,7 +41,7 @@
         "page": "",
         "resultsPerPage": ""
       },
-      "requires": ["token"],
+      "requires": ["school_admin_token"],
       "assertions": {
         "status": 200
       }

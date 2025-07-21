@@ -22,15 +22,29 @@ public class ResponseAsserter {
 
 
     private static void validateType(Object value, String expectedType, String jsonPath) {
-        boolean isValid = switch (expectedType.toLowerCase()) {
-            case "string" -> value instanceof String;
-            case "number" -> value instanceof Number;
-            case "boolean" -> value instanceof Boolean;
-            case "array" -> value instanceof List;
-            case "object" -> value instanceof Map;
-            case "null" -> value == null;
-            default -> throw new IllegalArgumentException("Unsupported type: " + expectedType);
-        };
+        boolean isValid;
+        switch (expectedType.toLowerCase()) {
+            case "string":
+                isValid = value instanceof String;
+                break;
+            case "number":
+                isValid = value instanceof Number;
+                break;
+            case "boolean":
+                isValid = value instanceof Boolean;
+                break;
+            case "array":
+                isValid = value instanceof List;
+                break;
+            case "object":
+                isValid = value instanceof Map;
+                break;
+            case "null":
+                isValid = value == null;
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported type: " + expectedType);
+        }
 
         Assertions.assertTrue(isValid,
                 String.format("Expected path [%s] to be of type [%s] but got type [%s]",

@@ -28,7 +28,7 @@
       "body": {
         "email": "vickkycodegenius@gmail.com"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 201
       }
@@ -42,7 +42,7 @@
         "email": "vickkycodegenius@gmail.com",
         "otp": "377101"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 201
       }
@@ -84,7 +84,7 @@
         "date": "2025-06-07",
         "time": "08:00:00"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 201
       }
@@ -94,7 +94,7 @@
       "name": "cbt_registration_scheduling: Get Failed attempts",
       "method": "GET",
       "path": "cbt/failed-attempts/5",
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 200
       }
@@ -113,7 +113,7 @@
         "date": "2025-04-07",
         "time": "09:00:00"
       },
-      "requires": ["token"],
+      "requires": ["super_admin_token"],
       "assertions": {
         "status": 201
       }

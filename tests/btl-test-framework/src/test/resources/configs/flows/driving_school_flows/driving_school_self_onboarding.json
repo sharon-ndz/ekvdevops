@@ -49,7 +49,7 @@
       "name": "driving_school_self_onboarding: complete application",
       "method": "POST",
       "path": "driving-school/complete-application",
-      "requires": ["token","drivingSchoolId"],
+      "requires": ["school_admin_token","drivingSchoolId"],
       "body": {
         "drivingSchoolId": "${drivingSchoolId|number}",
         "vehicleTypes": ["Mini Pick-ups", "Motorcycle", "SUVs"],
@@ -77,7 +77,7 @@
       "name": "driving_school_self_onboarding: assign officer",
       "method": "POST",
       "path": "driving-school/lasdri/assign-officer",
-      "requires": ["token","drivingSchoolId"],
+      "requires": ["lasdri_admin_token","drivingSchoolId"],
       "body": {
         "drivingSchoolId": "${drivingSchoolId|number}",
         "officerId": 2,
@@ -97,7 +97,7 @@
       "name": "driving_school_self_onboarding: submit inspection",
       "method": "POST",
       "path": "inspections/submit-inspection",
-      "token": ["token","drivingSchoolId"],
+      "token": ["lasdri_admin_token","drivingSchoolId"],
       "body": {
         "drivingSchoolId": "${drivingSchoolId|number}",
         "questionId": 0,
