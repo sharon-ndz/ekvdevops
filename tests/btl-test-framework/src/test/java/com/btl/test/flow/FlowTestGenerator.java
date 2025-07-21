@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DynamicTest;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -43,11 +44,38 @@ public class FlowTestGenerator {
 
     private void processFlowIndex(Path indexPath, List<DynamicTest> allTests) throws IOException {
         Path flowDir = indexPath.getParent();
+        Path variablesPath = flowDir.resolve("variables.json");
         String flowName = flowDir.getFileName().toString();
         List<String> endpointFiles = ConfigLoader.loadEndpointFileList(indexPath);
 
         ContextManager context = new ContextManager();
+
+        if (Files.exists(variablesPath)) {
+            // Load the variables file
+            JsonNode variablesNode = JsonHelper.readJsonFromFile(variablesPath);
+
+            // First pass: resolve any placeholders in the variables using current context
+            JsonNode resolvedVariables = JsonHelper.resolvePlaceholdersInNode(
+                    variablesNode,
+                    context.getAll()
+            );
+
+            // Add the resolved variables to the context as key/value pairs
+            if (resolvedVariables.isObject()) {
+                resolvedVariables.fields().forEachRemaining(entry -> {
+                    String key = entry.getKey();
+                    String value = entry.getValue().asText();
+                    context.put(key, value);
+                });
+            }
+
+        }
+
+
+
+
         try {
+
             for (String fileRef : endpointFiles) {
                 processEndpointFile(flowDir, flowName, fileRef, context, allTests);
             }
