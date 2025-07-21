@@ -185,6 +185,11 @@ resource "aws_security_group" "lambda_sg" {
     Name = "${var.resource_name_prefix}-sg"
   }
 }
+data "aws_ssm_parameter" "lambda_env" {
+  name            = aws_ssm_parameter.lambda_env.name
+  with_decryption = true
+}
+
 
 resource "aws_lambda_function" "this" {
   function_name = var.function_name
@@ -203,7 +208,7 @@ resource "aws_lambda_function" "this" {
   }
 
   environment {
-  variables = jsondecode(aws_ssm_parameter.lambda_env.value)
+  variables = jsondecode(data.aws_ssm_parameter.lambda_env.value)
 }
 
 
