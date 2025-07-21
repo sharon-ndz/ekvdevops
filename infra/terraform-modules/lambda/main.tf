@@ -38,10 +38,7 @@ resource "aws_iam_policy" "lambda_ssm_policy" {
     Statement = [{
       Effect   = "Allow",
       Action   = ["ssm:GetParameter", "ssm:GetParameters"],
-      Resource = [
-        for path in values(var.ssm_env_params) :
-        "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter${path}"
-      ]
+      Resource = "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter${var.env_ssm_parameter_name}"
     }]
   })
 }
@@ -51,11 +48,20 @@ resource "aws_iam_role_policy_attachment" "lambda_ssm_attach" {
   policy_arn = aws_iam_policy.lambda_ssm_policy.arn
 }
 
-data "aws_ssm_parameter" "env_vars" {
-  for_each        = var.ssm_env_params
-  name            = each.value
-  with_decryption = true
+resource "aws_ssm_parameter" "lambda_env" {
+  name  = var.lambda_env_param_name
+  type  = "SecureString"
+  value = jsonencode({})
+
+  tags = {
+    Name = "lambda-env-vars"
+  }
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
+
 
 resource "aws_vpc" "lambda_vpc" {
   cidr_block           = var.vpc_cidr
@@ -197,11 +203,9 @@ resource "aws_lambda_function" "this" {
   }
 
   environment {
-    variables = {
-      for key, param in data.aws_ssm_parameter.env_vars :
-      key => param.value
-    }
-  }
+  variables = jsondecode(aws_ssm_parameter.lambda_env.value)
+}
+
 
   tags = var.tags
 }

@@ -32,4 +32,8 @@ variable "public_subnet_cidr" {
 }
 
 variable "region"                { type = string } 
-variable "ssm_env_params"        { type = map(string) }
+variable "lambda_env_param_name" {
+  description = "SSM parameter name containing all env vars for Lambda"
+  type        = string
+}
+

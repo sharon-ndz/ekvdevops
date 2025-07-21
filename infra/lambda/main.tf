@@ -13,6 +13,6 @@ module "lambda" {
   resource_name_prefix = var.resource_name_prefix
   public_subnet_cidr  = var.public_subnet_cidr
   region               = var.region
-  ssm_env_params       = var.ssm_env_params
+  env_ssm_parameter_name = var.env_ssm_parameter_name
 }
 
