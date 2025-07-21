@@ -38,7 +38,7 @@ resource "aws_iam_policy" "lambda_ssm_policy" {
     Statement = [{
       Effect   = "Allow",
       Action   = ["ssm:GetParameter", "ssm:GetParameters"],
-      Resource = "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter${var.env_ssm_parameter_name}"
+      Resource = "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter${var.lambda_env_param_name}"
     }]
   })
 }
