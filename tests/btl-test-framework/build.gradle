@@ -1,5 +1,6 @@
 import java.text.SimpleDateFormat
 
+
 plugins {
     id 'java'
     id 'io.qameta.allure' version '2.11.2' // Allure plugin
@@ -15,6 +16,23 @@ sourceSets {
     }
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+// Ensure all tasks use Java 21
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += '--enable-preview'
+    options.release = 21
+}
+
+// Configure JavaExec tasks (including your generateDocs task) to use Java 21
+tasks.withType(JavaExec).configureEach {
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 repositories {
     mavenCentral()
@@ -44,16 +62,16 @@ test {
         delete 'build/allure-results'
     }
 
-        // Prefer project property if provided
-        if (project.hasProperty('enablePayloadLogging')) {
-            systemProperty 'enablePayloadLogging', project.getProperty('enablePayloadLogging')
-        }
+    // Prefer project property if provided
+    if (project.hasProperty('enablePayloadLogging')) {
+        systemProperty 'enablePayloadLogging', project.getProperty('enablePayloadLogging')
+    }
 
-        // Fallback to environment variable (useful for CI environments)
-        def envLogging = System.getenv("ENABLE_PAYLOAD_LOGGING")
-        if (envLogging != null) {
-            systemProperty 'enablePayloadLogging', envLogging
-        }
+    // Fallback to environment variable (useful for CI environments)
+    def envLogging = System.getenv("ENABLE_PAYLOAD_LOGGING")
+    if (envLogging != null) {
+        systemProperty 'enablePayloadLogging', envLogging
+    }
 
 
 
@@ -103,3 +121,50 @@ allure {
     autoconfigure = true
     aspectjweaver = false
 }
+
+tasks.register('json2md', JavaExec) {
+    group = 'documentation'
+    description = 'Converts JSON test cases to Markdown documentation'
+
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.btl.test.documentation.Main'
+
+    args 'json2md'
+
+    // Handle input and output directories
+    if (project.hasProperty('input')) {
+        args project.property('input')
+    } else {
+        args 'src/test/resources/testcases/json'  // default input directory
+    }
+
+    if (project.hasProperty('output')) {
+        args project.property('output')
+    } else {
+        args 'src/test/resources/testcases/markdown'  // default output directory
+    }
+}
+
+tasks.register('md2json', JavaExec) {
+    group = 'documentation'
+    description = 'Converts Markdown documentation to JSON test cases'
+
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.btl.test.documentation.Main'
+
+    args 'md2json'
+
+    // Handle input and output directories
+    if (project.hasProperty('input')) {
+        args project.property('input')
+    } else {
+        args 'src/test/resources/flows/markdown'  // default input directory
+    }
+
+    if (project.hasProperty('output')) {
+        args project.property('output')
+    } else {
+        args 'src/test/resources/flows/json'  // default output directory
+    }
+}
+
