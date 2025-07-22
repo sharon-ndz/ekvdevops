@@ -1,0 +1,3 @@
+{
+  "drivingSchoolEmail": "tdscool.${randomString:8}@mailinnator.com"
+}
