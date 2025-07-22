@@ -25,9 +25,12 @@
       "name": "new_driving_school_flow: Onboard a Driving School",
       "method": "POST",
       "path": "driving-school/self-service/create",
+      "requires": [
+        "drivingSchoolEmail"
+      ],
       "body": {
         "name": "Test Driving School ${randomString:8}",
-        "email": "tdscool.1050@mailinnator.com",
+        "email": "${drivingSchoolEmail}",
         "logo": "${randomString:10}",
         "phone": "${phoneNumber:090,11}",
         "stateId": 25,
@@ -58,7 +61,7 @@
       "path": "payments/initiate",
       "body": {
         "type": "pre_registration_payment",
-        "email": "tdscool.1050@mailinnator.com",
+        "email": "${drivingSchoolEmail}",
         "description": "Payment licence pre registration",
         "successRedirectUrl": "https://localhost:3000/payment/gateway/success",
         "failureRedirectUrl": "https://localhost:3000/payment/gateway/failure"
