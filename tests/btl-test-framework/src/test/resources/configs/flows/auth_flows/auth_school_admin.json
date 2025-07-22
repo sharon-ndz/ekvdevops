@@ -17,8 +17,8 @@
       "method": "POST",
       "path": "auth/login",
       "body": {
-        "email": "josiah.adgbola@mailinator.com",
-        "password": "password"
+        "email": "agyakoji+419@gmail.com",
+        "password": "Password@123456"
       },
       "extract": {
         "school_admin_token": "accessToken"

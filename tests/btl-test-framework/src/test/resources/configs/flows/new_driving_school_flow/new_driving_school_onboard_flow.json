@@ -1,0 +1,252 @@
+{
+  "metadata": {
+    "epic": "Driving School Onboarding/Accreditation",
+    "feature": "Onboarding/Accreditation",
+    "severity": "critical",
+    "tags": [
+      "driving_school",
+      "onboarding",
+      "self_service"
+    ],
+    "expectedResults": [
+      "Driving school onboarding should succeed with status 201.",
+      "Driving school application payment should succeed with status 201.",
+      "Payment verification by system should succeed with status 201.",
+      "Payment status validation by system should succeed with status 201.",
+      "Payment status update by system should succeed with status 201.",
+      "Driving school completing application for school onboarding should succeed with status 201.",
+      "Inspection Request from driving school should succeed with status 201.",
+      "Inspection Request acknowledgement via Lasdri admin should succeed with status 201."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Driving school onboards",
+      "name": "new_driving_school_flow: Onboard a Driving School",
+      "method": "POST",
+      "path": "driving-school/self-service/create",
+      "body": {
+        "name": "Test Driving School ${randomString:8}",
+        "email": "tdscool.1050@mailinnator.com",
+        "logo": "${randomString:10}",
+        "phone": "${phoneNumber:090,11}",
+        "stateId": 25,
+        "lgaId": 518,
+        "address": "46 Agbado Ijaye, Ikeja, Lagos",
+        "rcNumber": "RC-849485",
+        "password": "1passwor#D"
+      },
+      "extract": {
+        "drivingSchoolId": "data.id",
+        "name": "data.name"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "message": "School Application Submitted Successfully",
+          "data.id": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "School makes application payment",
+      "name": "new_driving_school_flow: School makes application payment",
+      "method": "POST",
+      "path": "payments/initiate",
+      "body": {
+        "type": "pre_registration_payment",
+        "email": "tdscool.1050@mailinnator.com",
+        "description": "Payment licence pre registration",
+        "successRedirectUrl": "https://localhost:3000/payment/gateway/success",
+        "failureRedirectUrl": "https://localhost:3000/payment/gateway/failure"
+      },
+      "extract": {
+        "paymentReference": "reference"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "reference": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "System verifies payment",
+      "name": "new_driving_school_flow: System verifies payment",
+      "method": "POST",
+      "path": "payments/verify",
+      "requires": [
+        "paymentReference"
+      ],
+      "body": {
+        "type": "pre_registration_payment",
+        "reference": "${paymentReference}"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "message": "Payment verification successful",
+          "paymentData.reference": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "System validates transaction",
+      "name": "new_driving_school_flow: System validates transaction",
+      "method": "POST",
+      "path": "payments/validate-transaction",
+      "requires": [
+        "paymentReference"
+      ],
+      "body": {
+        "type": "pre_registration_payment",
+        "reference": "${paymentReference}"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "status": "failed",
+          "reference": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "System updates payments",
+      "name": "new_driving_school_flow: system updates payment",
+      "method": "POST",
+      "path": "payments/update",
+      "requires": [
+        "paymentReference"
+      ],
+      "body": {
+        "type": "pre_registration_payment",
+        "reference": "${paymentReference}",
+        "status": "completed",
+        "used": 0
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": false,
+          "message": "Record updated successfully",
+          "data.reference": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "School submits the application for school onboarding, awaiting inspection",
+      "name": "new_driving_school_flow: submits application for school onboarding",
+      "method": "POST",
+      "path": "driving-school/complete-application",
+      "requires": [
+        "school_admin_token",
+        "drivingSchoolId"
+      ],
+      "body": {
+        "drivingSchoolId": "${drivingSchoolId|number}",
+        "totalVehicles": 10,
+        "specialGadgets": "None",
+        "totalSimulators": 5,
+        "teachingAids": "Instructor guide",
+        "trainingRange": "50 kilometers",
+        "totalClassrooms": 10,
+        "classRoomCapacity": "10 Person",
+        "totalInstructors": 2,
+        "docType": "string",
+        "docFile": "string",
+        "vehicles": [
+          {
+            "vehicleType": "Sedan",
+            "registrationNumber": "ABJ-${randomString:8}-XYZ",
+            "vehicleMake": "Toyota",
+            "isFunctional": true,
+            "isBranded": false,
+            "specialGadgets": "Speed governor, dash-cam"
+          }
+        ],
+        "instructors": [
+          {
+            "instructorId": "IN-${randomString:6}",
+            "name": "John Doe",
+            "phone": "08012345678",
+            "email": "johndoe.${randomString:8}@example.com",
+            "dateOfBirth": "1990-01-01",
+            "genderId": 1,
+            "lgaId": 1,
+            "stateId": 1,
+            "address": "123 Main St, Anytown, USA",
+            "qualification": "Bachelor's Degree",
+            "isTrained": true,
+            "isActive": 1,
+            "certificateFile": "https://example.com/certificate.pdf",
+            "licenseClassId": 0
+          }
+        ],
+        "proprietorLicenseNo": "string"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "message": "Application completed successfully"
+        }
+      }
+    },
+    {
+      "story": "Inspection request gets to LASDRI admin after submission from the school",
+      "name": "new_driving_school_flow: Request inspection from lasdri admin",
+      "method": "POST",
+      "path": "driving-school/request-inspection",
+      "requires": [
+        "school_admin_token",
+        "drivingSchoolId"
+      ],
+      "body": {
+        "drivingSchoolId": "${drivingSchoolId|number}",
+        "year": 2025,
+        "month": 2,
+        "name": "FRSC Inspection for the month of Feb 2025",
+        "comment": "Up to standard",
+        "status": "cleared"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "message": "Inspection requested successfully"
+        }
+      }
+    },
+    {
+      "story": "Lasdri Admin acknowledges inspection",
+      "name": "new_driving_school_flow: Lasdri Admin acknowledges inspection",
+      "method": "POST",
+      "requires": [
+        "school_admin_token",
+        "lasdri_officer_id"
+      ],
+      "path": "inspections/acknowledge-inspection/${lasdri_officer_id}",
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "message": "Inspection acknowledged successfully"
+        }
+      }
+    }
+  ]
+}
