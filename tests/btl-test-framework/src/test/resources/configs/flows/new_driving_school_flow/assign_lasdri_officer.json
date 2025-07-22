@@ -1,0 +1,40 @@
+{
+  "metadata": {
+    "epic": "Driving School Onboarding/Accreditation",
+    "feature": "Onboarding/Accreditation",
+    "severity": "critical",
+    "tags": [
+      "driving_school",
+      "onboarding",
+      "self_service"
+    ],
+    "expectedResults": [
+      "Assigning Lasdri Officer to driving school should succeed with status 201."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Assign a LASDRI officer to the driving school",
+      "name": "new_driving_school_flow: Assign a LASDRI officer to the driving school",
+      "method": "POST",
+      "path": "driving-school/lasdri/assign-officer",
+      "requires": [
+        "lasdri_admin_token",
+        "drivingSchoolId",
+        "lasdri_officer_id"
+      ],
+      "body": {
+        "officerId": "${lasdri_officer_id|number}",
+        "inspectionDate": "2025-07-17T06:30:09.906Z",
+        "drivingSchoolId": "${drivingSchoolId|number}"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "message": "LASDRI officer successfully assigned"
+        }
+      }
+    }
+  ]
+}

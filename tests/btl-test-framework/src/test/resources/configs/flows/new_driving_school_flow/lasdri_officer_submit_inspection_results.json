@@ -1,0 +1,104 @@
+{
+  "metadata": {
+    "epic": "Driving School Onboarding/Accreditation",
+    "feature": "Onboarding/Accreditation",
+    "severity": "critical",
+    "tags": [
+      "driving_school",
+      "onboarding",
+      "self_service"
+    ],
+    "expectedResults": [
+      "Lasdri officer viewing assigned inspection should succeed with status 200.",
+      "Lasdri officer viewing driving school application details should succeed with status 200.",
+      "Lasdri officer viewing inspection question should succeed with status 200.",
+      "Lasdri officer submitting inspection results should succeed with status 200."
+    ]
+  },
+  "steps": [
+    {
+      "story": "LASDRI Officer views assigned inspections",
+      "name": "new_driving_school_flow: LASDRI Officer views assigned inspections",
+      "method": "GET",
+      "path": "inspections/assigned",
+      "requires": [
+        "lasdri_officer_token"
+      ],
+      "assertions": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Record found successfully"
+        }
+      }
+    },
+    {
+      "story": "LASDRI officer gets the details of the selected driving school",
+      "name": "new_driving_school_flow: Displays the details of the selected driving school",
+      "method": "GET",
+      "path": "driving-school/applications/details/${drivingSchoolId}",
+      "requires": [
+        "lasdri_officer_token",
+        "drivingSchoolId"
+      ],
+      "assertions": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Record found successfully"
+        }
+      }
+    },
+    {
+      "story": "LASDRI officer gets the inspection questions",
+      "name": "new_driving_school_flow: Gets the inspection questions",
+      "method": "GET",
+      "path": "inspections/get-questions/25",
+      "requires": [
+        "lasdri_officer_token"
+      ],
+      "assertions": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Record found successfully"
+        }
+      }
+    },
+    {
+      "story": "LASDRI officer submits inspection result",
+      "name": "new_driving_school_flow: LASDRI officer submits inspection result",
+      "method": "POST",
+      "path": "inspections/submit-inspection",
+      "requires": [
+        "lasdri_officer_token",
+        "drivingSchoolId"
+      ],
+      "body": {
+        "drivingSchoolId": "${drivingSchoolId|number}",
+        "questionId": 0,
+        "inspectionResult": [
+          {
+            "questionId": 0,
+            "choice": "string",
+            "comment": "string"
+          }
+        ],
+        "name": "string",
+        "month": 0,
+        "year": 0,
+        "comment": "string",
+        "vehicles": [
+          "string"
+        ]
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "message": "Record added successfully"
+        }
+      }
+    }
+  ]
+}

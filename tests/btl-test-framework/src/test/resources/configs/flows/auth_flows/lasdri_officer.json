@@ -18,11 +18,12 @@
       "method": "POST",
       "path": "auth/login",
       "body": {
-        "email": "lasdri.officer@mailinator.com",
-        "password": "password"
+        "email": "agyakoji+1@gmail.com",
+        "password": "kaa5adr2"
       },
       "extract": {
-        "lasdri_officer_token": "accessToken"
+        "lasdri_officer_token": "accessToken",
+        "lasdri_officer_id": "user.id"
       },
       "assertions": {
         "status": 201,
