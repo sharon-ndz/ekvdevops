@@ -1,0 +1,170 @@
+import java.text.SimpleDateFormat
+
+
+plugins {
+    id 'java'
+    id 'io.qameta.allure' version '2.11.2' // Allure plugin
+}
+
+group 'com.btl.test'
+version '1.0-SNAPSHOT'
+sourceSets {
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+// Ensure all tasks use Java 21
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += '--enable-preview'
+    options.release = 21
+}
+
+// Configure JavaExec tasks (including your generateDocs task) to use Java 21
+tasks.withType(JavaExec).configureEach {
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // REST Assured
+    testImplementation 'io.rest-assured:rest-assured:5.4.0'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+
+    // Jackson for JSON parsing
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
+
+    // JUnit 5
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+
+    //  Allure
+    testImplementation 'io.qameta.allure:allure-junit5:2.29.1'
+    testImplementation 'io.qameta.allure:allure-model:2.29.1'
+}
+
+
+test {
+    useJUnitPlatform()
+    doFirst {
+        delete 'build/allure-results'
+    }
+
+    // Prefer project property if provided
+    if (project.hasProperty('enablePayloadLogging')) {
+        systemProperty 'enablePayloadLogging', project.getProperty('enablePayloadLogging')
+    }
+
+    // Fallback to environment variable (useful for CI environments)
+    def envLogging = System.getenv("ENABLE_PAYLOAD_LOGGING")
+    if (envLogging != null) {
+        systemProperty 'enablePayloadLogging', envLogging
+    }
+
+
+
+    // Get project property or fallback
+    def envProp = project.hasProperty('env') ? project.getProperty('env') : 'dev'
+    systemProperty 'env', envProp
+
+    // Generate a timestamp string
+    def timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())
+
+    // Enable and configure reports the RIGHT way
+    reports {
+        html.required.set(true)
+        junitXml.required.set(true)
+
+        html.outputLocation.set(file("$buildDir/reports/tests/test_$timestamp"))
+        junitXml.outputLocation.set(file("$buildDir/test-results/test_$timestamp"))
+    }
+
+    //include '**/ApiSuiteTest.*'
+
+    testLogging {
+        events "started", "passed", "failed", "skipped"  // include "started" to see when each test begins
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+
+    // Print clickable link after tests
+    doLast {
+        println "\n📄 Test HTML report generated at:"
+        println "file://$buildDir/reports/tests/test_$timestamp/index.html\n"
+    }
+
+    forkEvery = 0
+}
+
+tasks.javadoc {
+    source = sourceSets.test.allJava
+    classpath += configurations.testRuntimeClasspath
+    destinationDir = file("$buildDir/docs/javadoc")
+    failOnError = false
+    options.memberLevel = JavadocMemberLevel.PROTECTED
+}
+
+allure {
+    version = '2.29.0' // Matches allure-junit5 version line
+    autoconfigure = true
+    aspectjweaver = false
+}
+
+tasks.register('json2md', JavaExec) {
+    group = 'documentation'
+    description = 'Converts JSON test cases to Markdown documentation'
+
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.btl.test.documentation.Main'
+
+    args 'json2md'
+
+    // Handle input and output directories
+    if (project.hasProperty('input')) {
+        args project.property('input')
+    } else {
+        args 'src/test/resources/testcases/json'  // default input directory
+    }
+
+    if (project.hasProperty('output')) {
+        args project.property('output')
+    } else {
+        args 'src/test/resources/testcases/markdown'  // default output directory
+    }
+}
+
+tasks.register('md2json', JavaExec) {
+    group = 'documentation'
+    description = 'Converts Markdown documentation to JSON test cases'
+
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.btl.test.documentation.Main'
+
+    args 'md2json'
+
+    // Handle input and output directories
+    if (project.hasProperty('input')) {
+        args project.property('input')
+    } else {
+        args 'src/test/resources/flows/markdown'  // default input directory
+    }
+
+    if (project.hasProperty('output')) {
+        args project.property('output')
+    } else {
+        args 'src/test/resources/flows/json'  // default output directory
+    }
+}
+

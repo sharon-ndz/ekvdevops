@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "epic": "Mobile LSDRI",
+    "feature": "Mobile LSDRI",
+    "severity": "critical",
+    "tags": ["device_management", "lsdri", "mobile", "biometrics"],
+    "expectedResults": [
+      "Check device activation status returns status 200.",
+      "Pre-activation device enrollment returns status 201.",
+      "Biometric update returns status 201."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Check Device Activation Status",
+      "name": "Mobile LSDRI: Check Device Activation Status",
+      "method": "GET",
+      "path": "device/check-activation-status",
+      "query": {
+        "deviceId": "${deviceId}"
+      },
+      "requires": ["school_admin_token","deviceImei"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Pre-activate Device Enrollment",
+      "name": "Mobile LSDRI: Post",
+      "method": "POST",
+      "path": "device/pre-activation",
+      "body": {
+        "deviceImei": "${deviceImei}",
+        "license": "LICENSE038383777262664",
+        "deviceId": "${deviceId}",
+        "type": "android",
+        "organizationCode": "MVAA",
+        "requesterEmail": "mvaaagent@mailinator.com",
+        "requesterFirstName": "MVAA",
+        "requesterLastName": "Agent",
+        "requesterPhone": "08170000044"
+      },
+      "requires": ["school_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Update Biometrics",
+      "name": "Mobile LSDRI: Update Biometrics",
+      "method": "POST",
+      "path": "users/update-biometrics",
+      "body": {
+        "email": "garrett@mailinator.com",
+        "files": [
+          {
+            "documentType": "finger",
+            "fingerType": "right_thumb",
+            "fileId": 1
+          }
+        ]
+      },
+      "requires": ["school_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "epic": "Mobile MVAA",
+    "feature": "Device Onboarding",
+    "severity": "normal",
+    "tags": ["device", "registration", "mvaa"],
+    "expectedResults": [
+      "Device is created successfully with status 201",
+      "Device information is stored in the system"
+    ]
+  },
+  "steps": [
+    {
+      "story": "Create a new device",
+      "name": "create_device: Create a device",
+      "method": "POST",
+      "path": "device",
+      "body": {
+        "deviceImei": "${numericString:15}",
+        "license": "LICENSE9585989438363846384364",
+        "type": "android",
+        "organizationCode": "MVAA"
+      },
+      "requires": ["super_admin_token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "Device entry is created and returned in the response"
+      ],
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]
+}

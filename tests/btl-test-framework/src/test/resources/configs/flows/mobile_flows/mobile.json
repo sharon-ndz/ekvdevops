@@ -1,0 +1,177 @@
+{
+  "metadata": {
+    "epic": "Mobile",
+    "severity": "critical",
+    "feature": "Mobile",
+    "expectedResults": [
+      "Provide what is the overall goal of this flow"
+    ],
+    "tags": ["regression"]
+  },
+  "steps": [
+    {
+      "story": "Get Test History",
+      "name": "Get Test History requires  token",
+      "method": "GET",
+      "path": "driving-test/test-history",
+      "query": {
+        "page": 1,
+        "resultsPerPage": "10"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Get CBT Enrolls",
+      "name": "Get CBT Enrolls requires token",
+      "method": "GET",
+      "path": "cbt/enrolls",
+      "query": {
+        "page": "1",
+        "resultsPerPage": "10"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Submit Driving Test",
+      "name": "Submit Driving Test requires token",
+      "method": "POST",
+      "path": "driving-test/submit-driving-test",
+      "body": {
+        "applicationNo": "DRLP/2025/189704",
+        "score": 91,
+        "answers": [
+          {
+            "category": "Vision",
+            "question": "Do you have any eyes Issues",
+            "result": "No"
+          },
+          {
+            "category": "Vision",
+            "question": "Vision Assessment",
+            "result": "Passed"
+          }
+        ],
+        "licenseClassId": 1,
+        "vehicleType": "Toyota Camry 2021",
+        "location": "Ahmadu Bello Expres Way",
+        "files": [
+          {
+            "fileId": 3,
+            "documentType": "testFile"
+          }
+        ]
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Submit Driving Test with Payment",
+      "name": "Submit Driving Test with Payment requires token",
+      "method": "POST",
+      "path": "driving-test/submit-driving-test",
+      "body": {
+        "applicationNo": "DRLP/2025/189704",
+        "score": 91,
+        "answers": [
+          {
+            "category": "Vision",
+            "question": "Do you have any eyes Issues",
+            "result": "No"
+          },
+          {
+            "category": "Vision",
+            "question": "Vision Assessment",
+            "result": "Passed"
+          }
+        ],
+        "licenseClassId": 1,
+        "vehicleType": "Toyota Camry 2021",
+        "location": "Ahmadu Bello Expres Way",
+        "files": [
+          {
+            "fileId": 3,
+            "documentType": "testFile"
+          }
+        ],
+        "reference": "NL4ZUSRDHVNL1747327821784"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Submit Renewal request",
+      "name": "Submit Renewal reques requires token",
+      "method": "POST",
+      "path": "license/mobile/submit-renewal-request",
+      "body": {
+        "oldLicenseNo": "49815726",
+        "applicationNo": "DRLP/2025/387412",
+        "weight": 65,
+        "height": 6.5,
+        "eyes": "BROWN",
+        "licenseClassId": 4,
+        "years": 3,
+        "email": "kesty.developer@gmail.com",
+        "nationalityId": 1,
+        "stateId": 25,
+        "lgaId": 518,
+        "source": "assisted_mobile",
+        "isExternal": false,
+        "files": [
+          {
+            "fileId": 1,
+            "documentType": "finger"
+          }
+        ],
+        "reference": "LR3Z11QUO3LR1739957392526"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Submit Replacement Request",
+      "name": "Submit Replacement Request requires token",
+      "method": "POST",
+      "path": "license/mobile/submit-replacement-request",
+      "body": {
+        "oldLicenseNo": "20569384",
+        "applicationNo": "A-0569384",
+        "replacementReason": "damaged",
+        "weight": 65,
+        "height": 6.5,
+        "eyes": "BROWN",
+        "licenseClassId": 4,
+        "years": 3,
+        "email": "kesty.developer@gmail.com",
+        "nationalityId": 1,
+        "stateId": 25,
+        "lgaId": 518,
+        "source": "assisted_mobile",
+        "isExternal": false,
+        "files": [
+          {
+            "fileId": 1,
+            "documentType": "face"
+          }
+        ],
+        "reference": "LRILRVLVO1ALRI1739958309029"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]
+}

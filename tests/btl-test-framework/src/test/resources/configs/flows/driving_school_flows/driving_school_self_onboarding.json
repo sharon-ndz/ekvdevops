@@ -1,0 +1,126 @@
+{
+  "metadata": {
+    "epic": "Driving School",
+    "feature": "Self Onboarding Super Admin",
+    "severity": "critical",
+    "tags": ["driving_school", "self_onboarding", "inspection"],
+    "expectedResults": [
+      "Driving school creation returns status 201 with identifier.",
+      "Application completion returns status 201 and success.",
+      "Officer assignment returns status 200 and success.",
+      "Inspection submission returns status 200 and success."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Create a driving school via self-service onboarding",
+      "name": "driving_school_self_onboarding: create a driving school",
+      "method": "POST",
+      "path": "driving-school/self-service/create",
+      "body": {
+        "name": "Self Test Driving School ${randomString:5}",
+        "email": "fcsd.${randomString:6}@mailinnator.com",
+        "logo": "${randomString:12}",
+        "phone": "${phoneNumber:090,11}",
+        "stateId": 25,
+        "lgaId": 518,
+        "address": "Mkanjuola, Eve, Ikeja, Lagos",
+        "rcNumber": "RC-997978",
+        "password": "1passwor#D"
+      },
+      "extract": {
+        "identifier": "data.identifier",
+        "drivingSchoolId": "data.id"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": {
+            "exists": true
+          },
+          "data.identifier": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "Complete the application for the created driving school",
+      "name": "driving_school_self_onboarding: complete application",
+      "method": "POST",
+      "path": "driving-school/complete-application",
+      "requires": ["school_admin_token","drivingSchoolId"],
+      "body": {
+        "drivingSchoolId": "${drivingSchoolId|number}",
+        "vehicleTypes": ["Mini Pick-ups", "Motorcycle", "SUVs"],
+        "rcNumber": "8373884",
+        "totalVehicles": 10,
+        "totalSimulators": 4,
+        "totalClassrooms": 5,
+        "classRoomCapacity": "300",
+        "totalInstructors": 7,
+        "trainingRange": "50 km",
+        "docType": "",
+        "docFile": ""
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "Assign an LASDRI officer to the driving school",
+      "name": "driving_school_self_onboarding: assign officer",
+      "method": "POST",
+      "path": "driving-school/lasdri/assign-officer",
+      "requires": ["lasdri_admin_token","drivingSchoolId"],
+      "body": {
+        "drivingSchoolId": "${drivingSchoolId|number}",
+        "officerId": 2,
+        "inspectionDate": "2025-5-30"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "Submit LASDRI inspection for the driving school",
+      "name": "driving_school_self_onboarding: submit inspection",
+      "method": "POST",
+      "path": "inspections/submit-inspection",
+      "token": ["lasdri_admin_token","drivingSchoolId"],
+      "body": {
+        "drivingSchoolId": "${drivingSchoolId|number}",
+        "questionId": 0,
+        "inspectionResult": [
+          {
+            "questionId": 0,
+            "choice": "string",
+            "comment": "string"
+          }
+        ],
+        "name": "string",
+        "month": 0,
+        "year": 0,
+        "comment": "string"
+      },
+      "assertions": {
+        "status": 200,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    }
+  ]
+}

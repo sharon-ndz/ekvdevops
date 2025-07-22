@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "epic": "Driving School",
+    "feature": "Permit Management",
+    "severity": "normal",
+    "tags": ["permit", "api"],
+    "expectedResults": [
+      "Retrieve permit stats successfully.",
+      "Retrieve permit list successfully.",
+      "Retrieve permit details successfully.",
+      "Issue a new permit successfully."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Get Permit Stats",
+      "name": "Permit: Get Permit stats",
+      "method": "GET",
+      "path": "permit/stats",
+      "requires": ["school_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Get Permit List",
+      "name": "Permit: Get Permit List",
+      "method": "GET",
+      "path": "permit/list",
+      "query": {
+        "page": "1",
+        "resultsPerPage": "10"
+      },
+      "requires": ["school_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Get Permit Details",
+      "name": "Permit: Get Permit Details",
+      "method": "GET",
+      "path": "permit/details/PM203181989165146712",
+      "requires": ["school_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Issue Permit",
+      "name": "Permit: Issue Permit",
+      "method": "POST",
+      "path": "permit/new-issuance",
+      "body": {
+        "permitClassId": 1,
+        "years": 5,
+        "studentNo": "DR03NLEU58DR-135269",
+        "reference": "PIME6LUIR2PI1738109830031"
+      },
+      "requires": ["school_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]
+}

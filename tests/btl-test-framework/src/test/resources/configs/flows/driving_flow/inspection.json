@@ -1,0 +1,49 @@
+{
+  "metadata": {
+    "epic": "Driving School",
+    "feature": "Inspection",
+    "severity": "normal",
+    "tags": ["inspection", "driving_school", "api"],
+    "expectedResults": [
+      "Retrieve inspection list successfully.",
+      "Create new inspection log successfully."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Get Inspection List",
+      "name": "Inspection: Get Inspection List",
+      "method": "GET",
+      "path": "inspections",
+      "query": {
+        "page": "1",
+        "resultsPerPage": "10",
+        "drivingSchoolId": 1
+      },
+      "requires": ["lasdri_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Create Inspection Log",
+      "name": "Inspection: Create Inspection Log",
+      "method": "POST",
+      "path": "inspections",
+      "body": {
+        "drivingSchoolId": 1,
+        "questionId": 0,
+        "totalScrore": 8,
+        "year": 2025,
+        "month": 2,
+        "name": "FRSC Inspection for the month of Feb 2025",
+        "comment": "Up to standard",
+        "status": "cleared"
+      },
+      "requires": ["lasdri_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]
+}

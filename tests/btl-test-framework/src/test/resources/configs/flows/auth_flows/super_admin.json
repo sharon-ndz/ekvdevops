@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "epic": "Authentication",
+    "feature": "Super Admin",
+    "severity": "critical",
+    "tags": ["authentication", "super_admin", "login"],
+    "expectedResults": [
+      "Super admin login returns status 201 with a valid access token."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Authenticate as super admin",
+      "name": "super_admin: Authenticate as super admin",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "super.admin@mailinator.com",
+        "password": "password"
+      },
+      "extract": {
+        "super_admin_token": "accessToken"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "accessToken": {
+            "exists": true
+          },
+          "success": true
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "epic": "Driving School Flows",
+    "feature": "CMS LASDRI Admin",
+    "severity": "critical",
+    "tags": ["driving-school", "lasdri-admin", "cms"],
+    "expectedResults": [
+      "Driving school status toggle should succeed with status 200."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Admin toggles driving school status",
+      "name": "driving_school_cms_toggle: Driving School Toggle Status",
+      "method": "PATCH",
+      "path": "driving-school/toggle-status/${drivingSchoolId}",
+      "requires": ["lasdri_admin_token", "drivingSchoolId"],
+      "body": {
+        "status": "0"
+      },
+      "assertions": {
+        "status": 200,
+        "body": {
+          "success": {
+            "exists": true
+          },
+          "message": {
+            "equals": "Record updated successfully"
+          }
+        }
+      }
+    }
+  ]
+}

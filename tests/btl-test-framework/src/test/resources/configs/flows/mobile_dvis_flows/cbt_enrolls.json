@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "epic": "Mobile DVIS",
+    "feature": "CBT Enrollment",
+    "severity": "critical",
+    "tags": [
+      "cbt",
+      "enrollments",
+      "api"
+    ],
+    "expectedResults": [
+      "CBT enrolls retrieval returns status 200 with paginated results."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Retrieve paginated CBT enrolls",
+      "name": "cbt_enrolls: Get CBT Enrolls",
+      "method": "GET",
+      "path": "cbt/enrolls",
+      "query": {
+        "page": "1",
+        "resultsPerPage": "10"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    }
+  ]
+}

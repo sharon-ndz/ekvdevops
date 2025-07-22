@@ -1,0 +1,5 @@
+[
+  "../auth_flows/super_admin.json",
+  "device_onboarding.json",
+  "biometric_capture.json"
+]

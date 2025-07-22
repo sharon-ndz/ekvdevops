@@ -1,0 +1,78 @@
+{
+  "metadata": {
+    "epic": "Mobile DVIS",
+    "feature": "Device Authentication",
+    "severity": "critical",
+    "tags": [
+      "device",
+      "authentication",
+      "biometrics",
+      "api"
+    ],
+    "expectedResults": [
+      "Check activation status returns status 200.",
+      "Device enrollment returns status 201.",
+      "Update biometrics returns status 201."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Check device activation status",
+      "name": "device_authentication: Check Activation Status",
+      "method": "GET",
+      "path": "device/check-activation-status",
+      "query": {
+        "deviceId": "a8bb60d6e58b0af9"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Enroll device for pre-activation",
+      "name": "device_authentication: Enroll Device",
+      "method": "POST",
+      "path": "device/pre-activation",
+      "requires": ["super_admin_token"],
+      "body": {
+        "deviceImei": "9848748474874847484",
+        "license": "LICENSE038383777262664",
+        "deviceId": "a8bb60d6e58b0af9",
+        "requesterEmail": "mvaaagent@mailinator.com",
+        "requesterFirstName": "MVAA",
+        "requesterLastName": "Agent",
+        "requesterPhone": "08170000044",
+        "organizationCode": "MVAA"
+      },
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Update user biometrics",
+      "name": "device_authentication: Update Biometrics",
+      "method": "POST",
+      "path": "users/update-biometrics",
+      "requires": ["super_admin_token"],
+      "body": {
+        "email": "garrett@mailinator.com",
+        "files": [
+          {
+            "documenType": "finger",
+            "fingerType": "right_thumb",
+            "fileId": 1
+          },
+          {
+            "documenType": "finger",
+            "fingerType": "left_index",
+            "fileId": 2
+          }
+        ]
+      },
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]
+}

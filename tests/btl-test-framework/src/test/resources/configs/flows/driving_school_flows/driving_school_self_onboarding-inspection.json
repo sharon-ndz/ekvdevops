@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "epic": "Driving School",
+    "feature": "Self Onboarding Inspection",
+    "severity": "critical",
+    "tags": ["driving_school", "self_onboarding", "inspection"],
+    "expectedResults": [
+      "Driving school creation returns status 201 with identifier.",
+      "Application completion returns status 201 and success.",
+      "Officer assignment returns status 200 and success.",
+      "Inspection submission returns status 200 and success."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Submit LASDRI inspection for the driving school",
+      "name": "driving_school_self_onboarding: submit inspection",
+      "method": "POST",
+      "path": "inspections/submit-inspection",
+      "token": ["lasdri_admin_token","drivingSchoolId"],
+      "body": {
+        "drivingSchoolId": "${drivingSchoolId|number}",
+        "questionId": 0,
+        "inspectionResult": [
+          {
+            "questionId": 0,
+            "choice": "string",
+            "comment": "string"
+          }
+        ],
+        "name": "string",
+        "month": 0,
+        "year": 0,
+        "comment": "string"
+      },
+      "assertions": {
+        "status": 200,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    }
+  ]
+}

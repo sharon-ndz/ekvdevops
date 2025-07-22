@@ -1,0 +1,122 @@
+{
+  "metadata": {
+    "epic": "Mobile DVIS",
+    "feature": "CBT Registration and Scheduling",
+    "severity": "critical",
+    "tags": [
+      "cbt",
+      "registration",
+      "scheduling",
+      "auth"
+    ],
+    "expectedResults": [
+      "OTP send request returns status 201.",
+      "OTP validation returns status 201.",
+      "License pre-registration returns status 201.",
+      "CBT slots retrieval returns status 201.",
+      "CBT slot booking returns status 201.",
+      "Failed attempts retrieval returns status 200.",
+      "CBT rescheduling returns status 201."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Send OTP request",
+      "name": "cbt_registration_scheduling: Send Otp Request",
+      "method": "POST",
+      "path": "auth/send-otp",
+      "body": {
+        "email": "vickkycodegenius@gmail.com"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Validate OTP request",
+      "name": "cbt_registration_scheduling: Validate Otp Request",
+      "method": "POST",
+      "path": "auth/validate-otp",
+      "body": {
+        "email": "vickkycodegenius@gmail.com",
+        "otp": "377101"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "License pre-registration",
+      "name": "cbt_registration_scheduling: License Pre-registration",
+      "method": "POST",
+      "path": "license/single/pre-registration",
+      "body": {
+        "applicationNo": "DRLP/2025/849367"
+      },
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Get CBT slots",
+      "name": "cbt_registration_scheduling: Get CBT SLots",
+      "method": "POST",
+      "path": "cbt/slots",
+      "body": {
+        "cbtCenterId": 7
+      },
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Book CBT slot",
+      "name": "cbt_registration_scheduling: Book CBT Slot",
+      "method": "POST",
+      "path": "cbt/book-slot",
+      "body": {
+        "cbtCenterId": 1,
+        "studentId": 2,
+        "lgaId": 518,
+        "stateId": 25,
+        "date": "2025-06-07",
+        "time": "08:00:00"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Get failed attempts",
+      "name": "cbt_registration_scheduling: Get Failed attempts",
+      "method": "GET",
+      "path": "cbt/failed-attempts/5",
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Reschedule CBT",
+      "name": "cbt_registration_scheduling: Reschedule CBT",
+      "method": "POST",
+      "path": "cbt/reschedule",
+      "body": {
+        "reference": "PRADZA2FRHPR1747142881076",
+        "cbtCenterId": 1,
+        "studentId": 5,
+        "lgaId": 518,
+        "stateId": 25,
+        "date": "2025-04-07",
+        "time": "09:00:00"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]
+}

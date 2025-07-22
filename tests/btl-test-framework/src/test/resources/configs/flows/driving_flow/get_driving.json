@@ -1,0 +1,50 @@
+{
+  "metadata": {
+    "epic": "Driving School",
+    "feature": "Data Retrieval",
+    "severity": "normal",
+    "tags": ["driving_school", "cbt", "get"],
+    "expectedResults": [
+      "Successfully retrieve single driving school details.",
+      "Retrieve training durations for a given driving school.",
+      "Retrieve list of CBT centers with pagination.",
+      "All API calls should return status 200."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Get single driving school details",
+      "name": "get_driving: Get Single Driving School",
+      "method": "GET",
+      "path": "driving-school/single/1",
+      "requires": ["school_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Get training durations for driving school",
+      "name": "get_driving: Get Training Durations",
+      "method": "GET",
+      "path": "driving-school/training-durations/1",
+      "requires": ["school_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Get CBT centers with pagination",
+      "name": "get_driving: Get CBT Centers",
+      "method": "GET",
+      "path": "cbt/centers",
+      "query": {
+        "page": "",
+        "resultsPerPage": ""
+      },
+      "requires": ["school_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    }
+  ]
+}

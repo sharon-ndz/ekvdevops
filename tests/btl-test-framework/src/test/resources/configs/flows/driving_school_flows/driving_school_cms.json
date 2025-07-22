@@ -1,0 +1,88 @@
+{
+  "metadata": {
+    "epic": "Driving School Flows",
+    "feature": "CMS Super Admin",
+    "severity": "critical",
+    "tags": ["driving-school", "super-admin", "cms"],
+    "expectedResults": [
+      "Driving school creation should succeed with status 201.",
+      "Driving school update should succeed with status 200.",
+      "Driving school status toggle should succeed with status 403."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Create a driving school",
+      "name": "driving_school_cms: Create a driving School",
+      "method": "POST",
+      "path": "driving-school",
+      "requires": ["super_admin_token"],
+      "body": {
+        "name": "Test Driving School ${randomString:8}",
+        "email": "tdscool.${randomString:8}@mailinnator.com",
+        "logo": "${randomString:10}",
+        "phone": "${phoneNumber:090,11}",
+        "stateId": 25,
+        "lgaId": 518,
+        "address": "46 Agbado Ijaye, Ikeja, Lagos",
+        "isActive": 0,
+        "trainingDurations": [3, 6, 9]
+      },
+      "extract": {
+        "drivingSchoolId": "data.id",
+        "name": "data.name",
+        "email": "data.email",
+        "phone": "data.phone"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "message": "Record added successfully",
+          "data.id": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "Admin updates a driving school",
+      "name": "driving_school_cms: Update a driving School",
+      "method": "PATCH",
+      "path": "driving-school",
+      "requires": ["super_admin_token", "drivingSchoolId", "name", "email", "phone"],
+      "body": {
+        "id": "${drivingSchoolId|number}",
+        "name": "${name}",
+        "email": "${email}",
+        "phone": "${phone}",
+        "stateId": 25,
+        "lgaId": 518,
+        "address": "Swift Ave, Lekki Phase 1, Leki, Lagos",
+        "rcNumber": "8373884",
+        "totalVehicles": 10,
+        "totalSimulators": 4,
+        "totalClassrooms": 5,
+        "classRoomCapacity": "300",
+        "totalInstructors": 7,
+        "status": 1
+      },
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Admin toggles driving school status",
+      "name": "driving_school_cms: Driving School Toggle Status",
+      "method": "PATCH",
+      "path": "driving-school/toggle-status/${drivingSchoolId}",
+      "requires": ["super_admin_token", "drivingSchoolId"],
+      "body": {
+        "status": "0"
+      },
+      "assertions": {
+        "status": 403
+      }
+    }
+  ]
+}

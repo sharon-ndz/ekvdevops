@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "epic": "Authentication",
+    "feature": "LASDRI Officer Login",
+    "severity": "critical",
+    "tags": ["auth", "login", "lasdri"],
+    "expectedResults": [
+      "Authenticate successfully as a LASDRI officer using valid credentials.",
+      "Return 200 status code.",
+      "Response should contain a valid accessToken.",
+      "Response should indicate success."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Authenticate LASDRI officer",
+      "name": "lasdri_officer: Authenticate as lasdri officer",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "lasdri.officer@mailinator.com",
+        "password": "password"
+      },
+      "extract": {
+        "lasdri_officer_token": "accessToken"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "accessToken": {
+            "exists": true
+          },
+          "success": true
+        }
+      }
+    }
+  ]
+}

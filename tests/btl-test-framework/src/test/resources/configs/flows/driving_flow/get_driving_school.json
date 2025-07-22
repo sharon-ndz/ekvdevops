@@ -1,0 +1,78 @@
+{
+  "metadata": {
+    "epic": "Driving School",
+    "feature": "CBT APIs",
+    "severity": "normal",
+    "tags": ["driving_school", "cbt", "api"],
+    "expectedResults": [
+      "Retrieve driving school pages successfully.",
+      "Fetch details for single driving school.",
+      "Get training durations for a school.",
+      "List CBT centers with pagination.",
+      "Successfully book a CBT slot."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Get Driving School (Page 1)",
+      "name": "get_driving_school: Get Driving School (Page1)",
+      "method": "GET",
+      "path": "driving-school",
+      "query": {
+        "page": "",
+        "resultsPerPage": ""
+      },
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Get single driving school details",
+      "name": "get_driving_school: Get single driving school",
+      "method": "GET",
+      "path": "driving-school/single/1",
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Get training durations for driving school",
+      "name": "get_driving_school: Get training durations",
+      "method": "GET",
+      "path": "driving-school/training-durations/1",
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Get CBT centers list",
+      "name": "get_driving_school: Get CBT centers",
+      "method": "GET",
+      "path": "cbt/centers",
+      "query": {
+        "page": "",
+        "resultsPerPage": ""
+      },
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Book CBT slot",
+      "name": "get_driving_school: Book slot",
+      "method": "POST",
+      "path": "cbt/book-slot",
+      "body": {
+        "cbtCenterId": 1,
+        "studentId": 1,
+        "lgaId": 518,
+        "stateId": 25,
+        "date": "2025-01-02",
+        "time": "09:30:00"
+      },
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "metadata": {
+    "epic": "Authentication",
+    "feature": "School Admin ALl",
+    "severity": "critical",
+    "tags": ["auth", "login", "positive", "negative"],
+    "expectedResults": [
+      "Login should succeed with valid credentials and return a 201 status and accessToken.",
+      "Login should fail with wrong password and return 400 with 'Invalid credentials' message.",
+      "Login should fail with invalid email format and return 400 with a validation message."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Login with valid credentials",
+      "name": "Login Success",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "josiah.adgbola@mailinator.com",
+        "password": "password"
+      },
+      "extract": {
+        "school_admin_token": "accessToken"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "accessToken": {
+            "exists": true
+          },
+          "success": true
+        }
+      }
+    },
+    {
+      "story": "Login with incorrect password",
+      "name": "Login Failure - Wrong Password",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "josiah.adgbola@mailinator.com",
+        "password": "password123"
+      },
+      "assertions": {
+        "status": 400,
+        "body": {
+          "message": {
+            "equals": "Invalid credentials"
+          }
+        }
+      }
+    },
+    {
+      "story": "Login with malformed email address",
+      "name": "Login Failure - Wrong e-mail format",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "josiah.adgbola",
+        "password": "password123"
+      },
+      "assertions": {
+        "status": 400,
+        "body": {
+          "message": {
+            "contains": "email must be an email"
+          }
+        }
+      }
+    }
+  ]
+}

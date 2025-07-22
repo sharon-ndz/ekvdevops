@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "epic": "Mobile DVIS",
+    "feature": "Driving Test",
+    "severity": "critical",
+    "tags": [
+      "driving_test",
+      "otp",
+      "license",
+      "submission"
+    ],
+    "expectedResults": [
+      "Send OTP returns status 201.",
+      "Validate OTP returns status 201.",
+      "License pre-registration returns status 201.",
+      "Driving test submission returns status 201."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Send OTP for driving test flow",
+      "name": "driving_test_flow: Send OTP",
+      "method": "POST",
+      "path": "auth/send-otp",
+      "body": {
+        "email": "vickkycodegenius@gmail.com"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Validate OTP for driving test flow",
+      "name": "driving_test_flow: Validate OTP",
+      "method": "POST",
+      "path": "auth/validate-otp",
+      "body": {
+        "email": "vickkycodegenius@gmail.com",
+        "otp": "377101"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "License Pre-Registration",
+      "name": "driving_test_flow: License Pre-Registration",
+      "method": "POST",
+      "path": "license/single/pre-registration",
+      "body": {
+        "applicationNo": "DRLP/2025/849367"
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Submit Driving Test",
+      "name": "driving_test_flow: Submit Driving Test",
+      "method": "POST",
+      "path": "driving-test/submit-driving-test",
+      "body": {
+        "applicationNo": "DRLP/2025/849367",
+        "score": 91,
+        "answers": [
+          {
+            "category": "Vision",
+            "question": "Do you have any eyes Issues",
+            "result": "No"
+          },
+          {
+            "category": "Vision",
+            "question": "Vision Assessment",
+            "result": "Passed"
+          }
+        ],
+        "licenseClassId": 1,
+        "vehicleType": "Toyota Camry 2021",
+        "location": "Ahmadu Bello Expres Way",
+        "files": [
+          {
+            "fileId": 3,
+            "documentType": "testFile"
+          }
+        ]
+      },
+      "requires": ["super_admin_token"],
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]
+}

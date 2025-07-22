@@ -1,6 +1,6 @@
 resource "aws_security_group" "open_ssh_and_app" {
   name        = "allow_ssh_and_app_new"
-  description = "Allow SSH and App ports"
+  description = "Allow SSH (22) and App (4000) access from anywhere"
   vpc_id      = module.vpc.vpc_id
 
 

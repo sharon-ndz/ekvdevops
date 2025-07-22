@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "epic": "Authentication API",
+    "feature": "Driving School Application Flow",
+    "severity": "critical",
+    "tags": ["auth", "driving-school", "application"],
+    "expectedResults": [
+      "Successfully retrieve a list of driving school applications.",
+      "Retrieve specific application details using ID.",
+      "Fetch application statistics with a valid token.",
+      "Update the application status and verify successful response."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Get Driving School Application List",
+      "name": "Auth_API: Get Driving School Application List",
+      "method": "GET",
+      "path": "driving-school/applications/list",
+      "query": {
+        "page": "1",
+        "resultPerPage": "10"
+      },
+      "requires": ["school_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Get Driving School Application Detail",
+      "name": "Auth_API: Get Driving School Application Detail",
+      "method": "GET",
+      "path": "driving-school/applications/details/3",
+      "requires": ["school_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Get Driving School Application Stats",
+      "name": "Auth_API: Get Driving School Application Stats",
+      "method": "GET",
+      "path": "driving-school/applications/stats",
+      "requires": ["school_admin_token"],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Change Application Status",
+      "name": "Auth_API: Change Application Status",
+      "method": "POST",
+      "path": "driving-school/change-application-status",
+      "requires": ["school_admin_token"],
+      "body": {
+        "applicationId": "DRLF/2025/823970",
+        "status": 1
+      },
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]
+}

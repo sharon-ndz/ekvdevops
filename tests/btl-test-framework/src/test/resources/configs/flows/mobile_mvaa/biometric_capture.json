@@ -1,0 +1,150 @@
+{
+  "metadata": {
+    "epic": "Mobile MVAA",
+    "feature": "Biometric Capture",
+    "severity": "normal",
+    "tags": ["regression", "mobile", "mvaa"],
+    "expectedResults": [
+      "User can complete full mobile licensing process",
+      "All endpoints respond with expected status codes",
+      "Correct data is returned for each step"
+    ]
+  },
+  "steps": [
+    {
+      "story": "Send OTP",
+      "name": "mobile_mvaa: Send OTP",
+      "method": "POST",
+      "path": "auth/send-otp",
+      "body": {
+        "email": "vickkycodegenius@gmail.com"
+      },
+      "requires": ["super_admin_token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "OTP sent to the user's email"
+      ],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Validate OTP",
+      "name": "mobile_mvaa: Validate OTP",
+      "method": "POST",
+      "path": "auth/validate-otp",
+      "body": {
+        "email": "vickkycodegenius@gmail.com",
+        "otp": "377101"
+      },
+      "requires": ["super_admin_token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "OTP validation is successful"
+      ],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Pre-Register License",
+      "name": "mobile_mvaa: License Pre-Registration",
+      "method": "POST",
+      "path": "license/single/pre-registration",
+      "body": {
+        "applicationNo": "DRLP/2025/849367"
+      },
+      "requires": ["super_admin_token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "License pre-registration should be created"
+      ],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Upload Pre-Registration Files",
+      "name": "mobile_mvaa: Submit Pre-registration files",
+      "method": "POST",
+      "path": "license/submit-pre-registration-files",
+      "body": {
+        "reference": "BIOARQTXT12BIO1741767893420",
+        "applicationNo": "DRLP/2025/760385",
+        "files": [
+          {
+            "fileId": 1,
+            "documentType": "finger",
+            "fingerType": "index_1"
+          }
+        ]
+      },
+      "requires": ["super_admin_token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "Biometric file submitted successfully"
+      ],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Submit New License Request",
+      "name": "mobile_mvaa: License submit new request",
+      "method": "POST",
+      "path": "license/submit-new-request",
+      "body": {
+        "height": 179,
+        "weight": 70,
+        "facialMarks": "Yes",
+        "glasses": "Yes",
+        "disability": "Yes",
+        "eyeColor": "BLUE",
+        "licenseClassId": 2,
+        "years": 0,
+        "applicationNo": "${numericString:10}",
+        "email": "john.doe@mailinator.com",
+        "phone": "${phoneNumber:090,11}"
+      },
+      "requires": ["super_admin_token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "New license request is submitted successfully"
+      ],
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Generate License Card",
+      "name": "mobile_mvaa: Generate License Card",
+      "method": "GET",
+      "path": "license/generate-license/86427159",
+      "requires": ["super_admin_token"],
+      "expectedResults": [
+        "Status code should be 200",
+        "License card is generated and returned"
+      ],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "View License Details",
+      "name": "mvaa_mobile: License Details",
+      "method": "POST",
+      "path": "license/details",
+      "body": {
+        "applicationNo": "DRLP/2025/087956"
+      },
+      "requires": ["super_admin_token"],
+      "expectedResults": [
+        "Status code should be 201",
+        "License details returned successfully"
+      ],
+      "assertions": {
+        "status": 201
+      }
+    }
+  ]
+}
