@@ -208,7 +208,7 @@ resource "aws_lambda_function" "this" {
   }
 
   environment {
-  variables = jsondecode(data.aws_ssm_parameter.lambda_env.value)
+  variables = try(jsondecode(data.aws_ssm_parameter.lambda_env.value), {})
 }
 
 
