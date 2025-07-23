@@ -18,8 +18,8 @@ output "nlb_arn_suffix" {
   value = module.group_1_nlb.lb_arn_suffix
 }
 
-output "nlb_listener_arn" {
-  value = module.group_1_nlb.lb_listener_arn
+output "nlb_listener_arns" {
+  value = module.group_1_nlb.lb_listener_arns
 }
 
 output "nlb_private_subnets_with_az" {
