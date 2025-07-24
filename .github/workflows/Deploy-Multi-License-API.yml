@@ -1,4 +1,4 @@
-name: Deploy-Multi-License-API
+name: Deploy Multi License API
 
 on:
   workflow_dispatch:
@@ -19,33 +19,18 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.ENV }}
+    environment: ${{ github.event.inputs.ENV || 'dev' }}
     permissions:
       id-token: write
       contents: read
 
     steps:
-      - name: Checkout `feature/btl-48` codebase
+      - name: Checkout feature/btl-48 codebase
         uses: actions/checkout@v4
         with:
           ref: feature/btl-48
-          fetch-depth: 2
-
-      - name: Detect Infra or Pipeline Changes
-        id: changes
-        run: |
-          git fetch origin ${{ github.event.before }} --depth=1 || true
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          echo "$CHANGED_FILES"
-
-          if echo "$CHANGED_FILES" | grep -E '^infra/|^.github/workflows/'; then
-            echo "FORCE_FULL_RUN=true" >> $GITHUB_ENV
-          else
-            echo "FORCE_FULL_RUN=false" >> $GITHUB_ENV
-          fi
 
       - name: Set up Terraform
-        if: env.FORCE_FULL_RUN == 'true'
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.0
@@ -57,36 +42,37 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # Run Terraform section only if infra files changed
       - name: Terraform Apply VPC
-        if: env.FORCE_FULL_RUN == 'true'
+        if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/vpc
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/vpc/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply NLB
-        if: env.FORCE_FULL_RUN == 'true'
+        if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/nlb
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/nlb/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply API Gateway
-        if: env.FORCE_FULL_RUN == 'true'
+        if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/rest-api
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply CloudWatch
-        if: env.FORCE_FULL_RUN == 'true'
+        if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/cloudwatch
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply ECR
-        if: env.FORCE_FULL_RUN == 'true'
+        if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         id: ecr
         run: |
           cd infra/ecr
@@ -96,7 +82,6 @@ jobs:
           echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
 
       - name: Terraform Apply SSM
-        if: env.FORCE_FULL_RUN == 'true'
         id: ssm
         run: |
           cd infra/ssm
@@ -113,8 +98,6 @@ jobs:
 
       - name: Print ECR URL
         run: echo "Using ECR:$ECR_REPO_URL"
-        env:
-          ECR_REPO_URL: ${{ env.ECR_REPO_URL }}
 
       - name: Log in to Amazon ECR
         id: login-ecr
@@ -129,13 +112,13 @@ jobs:
           BUILD_TAG="${DATE_TAG}.${BUILD_NUM}"
           IMAGE_URI="${ECR_REPO_URL}:${BUILD_TAG}"
           LATEST_URI="${ECR_REPO_URL}:latest"
+
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
           echo "LATEST_URI=$LATEST_URI" >> $GITHUB_ENV
           echo "BUILD_TAG=$BUILD_TAG" >> $GITHUB_ENV
 
       - name: Build and tag Docker image
-        run: |
-          docker build -t $IMAGE_URI -t $LATEST_URI -f docker/Dockerfile src
+        run: docker build -t $IMAGE_URI -t $LATEST_URI -f docker/Dockerfile src
 
       - name: Push Docker images to ECR
         run: |
@@ -170,7 +153,9 @@ jobs:
           echo "Deploying to instance: $INSTANCE_ID"
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
-          # Create .env and prepare deployment
+          echo "Creating single shared .env file with dynamic values..."
+
+          # Fetch .env from SSM and append BUILD_TAG & IMAGE_REPO
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
@@ -185,9 +170,10 @@ jobs:
             --timeout-seconds 300 \
             --region "$AWS_REGION"
 
-          # Upload and deploy docker-compose
+          # Upload docker-compose.yml to S3
           aws s3 cp docker/docker-compose.yml s3://${BACKUP_BUCKET}/${ENV}/docker-compose.yml
 
+          # Download it on EC2
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --instance-ids "$INSTANCE_ID" \
@@ -195,6 +181,7 @@ jobs:
             --parameters 'commands=["aws s3 cp s3://'"$BACKUP_BUCKET"'/'"${ENV}"'/docker-compose.yml /home/ubuntu/docker-compose.yml"]' \
             --region "$AWS_REGION"
 
+          # Ensure Docker + Docker Compose are installed and deploy
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --instance-ids "$INSTANCE_ID" \
