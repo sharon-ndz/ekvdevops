@@ -1,0 +1,213 @@
+name: Deploy Multi License API
+
+on:
+  workflow_dispatch:
+    inputs:
+      ENV:
+        description: 'Environment to deploy (dev/staging/prod)'
+        required: true
+        default: "dev"
+      ROLLBACK_TAG:
+        description: 'Optional: Previous build tag (e.g., 2025.06.30.02). If left blank, deploys latest.'
+        required: false
+
+env:
+  AWS_REGION: us-east-1
+  TF_BUCKET: my-terraform-state-bckt43
+  BACKUP_BUCKET: idlms-website-built-artifact
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.ENV }}
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout `feature/btl-48` codebase
+        uses: actions/checkout@v4
+        with:
+          ref: feature/btl-48
+          fetch-depth: 2
+
+      - name: Detect Infra or Pipeline Changes
+        id: changes
+        run: |
+          git fetch origin ${{ github.event.before }} --depth=1 || true
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          echo "$CHANGED_FILES"
+
+          if echo "$CHANGED_FILES" | grep -E '^infra/|^.github/workflows/'; then
+            echo "FORCE_FULL_RUN=true" >> $GITHUB_ENV
+          else
+            echo "FORCE_FULL_RUN=false" >> $GITHUB_ENV
+          fi
+
+      - name: Set up Terraform
+        if: env.FORCE_FULL_RUN == 'true'
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Apply VPC
+        if: env.FORCE_FULL_RUN == 'true'
+        run: |
+          cd infra/vpc
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/vpc/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+
+      - name: Terraform Apply NLB
+        if: env.FORCE_FULL_RUN == 'true'
+        run: |
+          cd infra/nlb
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/nlb/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+
+      - name: Terraform Apply API Gateway
+        if: env.FORCE_FULL_RUN == 'true'
+        run: |
+          cd infra/rest-api
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+
+      - name: Terraform Apply CloudWatch
+        if: env.FORCE_FULL_RUN == 'true'
+        run: |
+          cd infra/cloudwatch
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+
+      - name: Terraform Apply ECR
+        if: env.FORCE_FULL_RUN == 'true'
+        id: ecr
+        run: |
+          cd infra/ecr
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+          ECR_REPO_URL=$(terraform output -raw ecr_repository_url)
+          echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
+
+      - name: Terraform Apply SSM
+        if: env.FORCE_FULL_RUN == 'true'
+        id: ssm
+        run: |
+          cd infra/ssm
+          ENV_CONTENT=$(aws ssm get-parameter \
+            --name "/idlms/shared/${{ github.event.inputs.ENV }}/.env" \
+            --with-decryption \
+            --query "Parameter.Value" \
+            --output text)
+          BASE64_ENV=$(echo "$ENV_CONTENT" | base64 -w 0)
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars" -var="app_env_content=${BASE64_ENV}"
+          SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm:\/\///')
+          echo "SSM_ENV_PARAM=$SSM_ENV_PARAM" >> $GITHUB_ENV
+
+      - name: Print ECR URL
+        run: echo "Using ECR:$ECR_REPO_URL"
+        env:
+          ECR_REPO_URL: ${{ env.ECR_REPO_URL }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Generate build tags
+        id: tags
+        run: |
+          ECR_REPO_URL="${{ env.ECR_REPO_URL }}"
+          DATE_TAG=$(date +'%Y.%m.%d')
+          BUILD_NUM=$(printf "%03d" $GITHUB_RUN_NUMBER)
+          BUILD_TAG="${DATE_TAG}.${BUILD_NUM}"
+          IMAGE_URI="${ECR_REPO_URL}:${BUILD_TAG}"
+          LATEST_URI="${ECR_REPO_URL}:latest"
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          echo "LATEST_URI=$LATEST_URI" >> $GITHUB_ENV
+          echo "BUILD_TAG=$BUILD_TAG" >> $GITHUB_ENV
+
+      - name: Build and tag Docker image
+        run: |
+          docker build -t $IMAGE_URI -t $LATEST_URI -f docker/Dockerfile src
+
+      - name: Push Docker images to ECR
+        run: |
+          docker push $IMAGE_URI
+          docker push $LATEST_URI
+
+      - name: Update last successful build in SSM
+        run: |
+          aws ssm put-parameter \
+            --name "/idlms/license-api/last-successful-build" \
+            --value "$BUILD_TAG" \
+            --type String \
+            --overwrite
+
+      - name: Deploy to EC2 via SSM
+        run: |
+          ENV="${{ github.event.inputs.ENV }}"
+          BUILD_TAG="${{ env.BUILD_TAG }}"
+          ECR_REPO_URL="${{ env.ECR_REPO_URL }}"
+
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=Backend API IDLMS-${ENV}" "Name=instance-state-name,Values=running" \
+            --query "Reservations[].Instances[].InstanceId" \
+            --region "$AWS_REGION" \
+            --output text)
+
+          if [ -z "$INSTANCE_ID" ]; then
+            echo "ERROR: No running EC2 instance found for tag Backend API IDLMS-${ENV}"
+            exit 1
+          fi
+
+          echo "Deploying to instance: $INSTANCE_ID"
+          echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
+
+          # Create .env and prepare deployment
+          aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Prepare .env for docker-compose" \
+            --parameters "commands=[
+              \"set -e\",
+              \"ENV_CONTENT=\$(aws ssm get-parameter --name '/idlms/shared/${ENV}/.env' --with-decryption --query 'Parameter.Value' --output text)\",
+              \"echo \\\"\$ENV_CONTENT\\\" > /home/ubuntu/.env\",
+              \"echo 'BUILD_TAG=${BUILD_TAG}' >> /home/ubuntu/.env\",
+              \"echo 'IMAGE_REPO=${ECR_REPO_URL}' >> /home/ubuntu/.env\"
+            ]" \
+            --timeout-seconds 300 \
+            --region "$AWS_REGION"
+
+          # Upload and deploy docker-compose
+          aws s3 cp docker/docker-compose.yml s3://${BACKUP_BUCKET}/${ENV}/docker-compose.yml
+
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --instance-ids "$INSTANCE_ID" \
+            --comment "Download docker-compose.yml from S3" \
+            --parameters 'commands=["aws s3 cp s3://'"$BACKUP_BUCKET"'/'"${ENV}"'/docker-compose.yml /home/ubuntu/docker-compose.yml"]' \
+            --region "$AWS_REGION"
+
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --instance-ids "$INSTANCE_ID" \
+            --comment "Pull and start containers using docker-compose" \
+            --parameters 'commands=[
+              "set -e",
+              "if ! command -v docker &> /dev/null; then sudo apt-get update -y && sudo apt-get install -y docker.io; fi",
+              "if ! command -v docker-compose &> /dev/null; then curl -L \"https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose || true; fi",
+              "aws ecr get-login-password --region '${AWS_REGION}' | docker login --username AWS --password-stdin '${ECR_REPO_URL%/*}'",
+              "cd /home/ubuntu",
+              "docker-compose --env-file .env down || true",
+              "docker-compose --env-file .env pull",
+              "docker-compose --env-file .env up -d"
+            ]' \
+            --timeout-seconds 900 \
+            --region "$AWS_REGION"
