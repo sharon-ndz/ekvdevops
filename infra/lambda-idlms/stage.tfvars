@@ -3,7 +3,7 @@ runtime         = "nodejs18.x"
 handler         = "dist/lambda.handler"
 memory_size     = 512
 timeout         = 10
-lambda_package  = "builds/lambda.zip"
+lambda_package  = "infra/lambda-idlms/backend-api.zip"
 
 tags = {
   Owner   = "DevOps"
