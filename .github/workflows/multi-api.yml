@@ -12,7 +12,7 @@ on:
         required: false
 
 env:
-  AWS_REGION: ${{ env.AWS_REGION }}
+  AWS_REGION: $AWS_REGION
   TF_BUCKET: my-terraform-state-bckt43
   BACKUP_BUCKET: idlms-website-built-artifact
 
