@@ -13,6 +13,36 @@ resource "aws_iam_role" "lambda_exec_role" {
   tags = var.tags
 }
 
+resource "aws_iam_role_policy" "lambda_vpc_access" {
+  name = "LambdaVPCAccessPolicy"
+  role = aws_iam_role.lambda_exec_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ec2:CreateNetworkInterface",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DeleteNetworkInterface"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+
 resource "aws_security_group" "lambda_sg" {
   name        = var.lambda_sg_name
   description = "Lambda SG"
