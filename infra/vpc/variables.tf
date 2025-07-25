@@ -1,26 +1,32 @@
-variable "vpc_name" {}
-variable "cidr_block" {}
+variable "cidr_block" {
+  description = "CIDR block for the VPC"
+  type        = string
+}
 
 variable "public_subnets" {
+  description = "List of public subnet objects with az and cidr_block"
   type = list(object({
-    cidr_block = string
-    az         = string
+    az          = string
+    cidr_block  = string
   }))
 }
 
 variable "private_subnets" {
+  description = "List of private subnet objects with az and cidr_block"
   type = list(object({
-    cidr_block = string
-    az         = string
+    az          = string
+    cidr_block  = string
   }))
 }
 
-variable "enable_nat_gateway" {
-  type    = bool
-  default = true
+variable "vpc_name" {
+  description = "Project or VPC name"
+  type        = string
 }
 
 variable "tags" {
-  type = map(string)
+  description = "Tags to apply to resources"
+  type        = map(string)
+  default     = {}
 }
 

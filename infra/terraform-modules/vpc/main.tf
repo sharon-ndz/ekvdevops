@@ -48,8 +48,14 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
+resource "aws_eip" "nat" {
+  domain = "vpc"
+  tags   = var.tags
+}
+
 resource "aws_nat_gateway" "this" {
-  allocation_id = var.eip_allocation_id
+  allocation_id = aws_eip.nat.id
   subnet_id     = aws_subnet.public[0].id
   tags          = var.tags
 }
+
