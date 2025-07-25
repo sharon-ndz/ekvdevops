@@ -54,8 +54,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Terraform VPC Init & Apply
+        working-directory: ./infra/vpc
+        run: |
+          terraform init
+          terraform apply -auto-approve -var-file=${{ env.ENV }}.tfvars
+
+      - name: Terraform SSM Init & Apply
+        working-directory: ./infra/ssm
+        run: |
+          terraform init
+          terraform apply -auto-approve -var-file=${{ env.ENV }}.tfvars
+
       - name: Terraform Lambda Init & Apply
-        working-directory: ./infra/lambda
+        working-directory: ./infra/lambda-idlms
         run: |
           terraform init
           terraform apply -auto-approve -var-file=${{ env.ENV }}.tfvars
