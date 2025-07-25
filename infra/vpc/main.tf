@@ -1,5 +1,5 @@
 module "vpc" {
-  source = "../../terraform-modules/vpc"
+  source = "../terraform-modules/vpc"
 
   vpc_cidr_block         = var.vpc_cidr_block
   availability_zones     = var.availability_zones
