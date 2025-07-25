@@ -10,5 +10,6 @@ resource "aws_ecr_repository" "this" {
     encryption_type = var.encryption_type
   }
 
+force_delete = true
   tags = var.tags
 }
