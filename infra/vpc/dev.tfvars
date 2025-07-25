@@ -23,7 +23,6 @@ private_subnets = [
   }
 ]
 
-enable_nat_gateway = true
 
 tags = {
   Project = "dev-idlms"
