@@ -1,6 +1,4 @@
 idlms-secrets.json
-main.tf
-lambda/
 .terraform/
 # Terraform
 .terraform/
@@ -11,6 +9,4 @@ crash.log
 *.tar.gz
 *.bin
 *.backup
-!/infra/lambda/
-!/infra
 .terraform.lock.hcl
