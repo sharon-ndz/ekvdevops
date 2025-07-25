@@ -103,8 +103,8 @@ jobs:
              --output text)
             BASE64_ENV=$(echo "$ENV_CONTENT" | base64 -w 0)
            else
-             echo "Parameter $PARAM_NAME not found. Initializing with empty content."
-            BASE64_ENV=""
+             echo "Parameter $PARAM_NAME not found. Initializing with placeholder content."
+            BASE64_ENV=$(echo "# placeholder env" | base64 -w 0)
            fi
 
            terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
