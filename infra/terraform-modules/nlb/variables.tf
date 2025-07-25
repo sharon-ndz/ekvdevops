@@ -96,16 +96,6 @@ variable "egress_roles" {
   }))
 }
 
-#variable "access_logs_bucket" {
-  #description = "S3 bucket name for storing NLB access logs"
- # type        = string
-#}
-
-#variable "access_logs_prefix" {
-  #description = "Prefix inside S3 bucket for NLB access logs"
-  #type        = string
- # default     = "Prefix within the S3 bucket for NLB access logs"
-#}
 
 variable "environment" {
   description = "Environment name (e.g. dev, stage, prod)"

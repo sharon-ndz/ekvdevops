@@ -58,14 +58,6 @@ variable "nat_gateway_name" {
   type        = string
 }
 
-#variable "private_lb_subnets" {
-#  type = object({
-#    routes                   = list(any)
-#    cidrs_blocks             = list(string)
-#    subnets_name_prefix      = string
-#    route_table_name         = string
-#  })
-#}
 
 ###Private App Subnets###
 variable "private_subnets" {
@@ -77,26 +69,6 @@ variable "private_subnets" {
   })
 }
 
-##Private Data Subnets
-#variable "private_data_subnets" {
-#  type = object({
-#    routes                   = list(any)
-#    cidrs_blocks             = list(string)
-#    subnets_name_prefix      = string
-#    route_table_name         = string
-#    is_public                = bool
-#  })
-#}
-
-##Private Services Subnets
-#variable "private_services_subnets" {
-#  type = object({
-#    routes                   = list(any)
-#    cidrs_blocks             = list(string)
-#    subnets_name_prefix      = string
-#    route_table_name         = string
-#  })
-#}
 
 ###Public Subnets###
 variable "public_subnets" {

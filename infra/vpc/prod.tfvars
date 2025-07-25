@@ -1,74 +1,75 @@
-environment = "stage"
+environment = "prod"
 region      = "us-east-1"
-ec2_ssm_profile_name = "stage-ec2_ssm_profile"
-ec2_ssm_role_name    = "ec2_ssm_role-stage"
+ec2_ssm_profile_name = "prod-ec2_ssm_profile"
+ec2_ssm_role_name    = "ec2_ssm_role-prod"
 tf_state_bucket      = "my-terraform-state-bckt43"
-ami_id               = "ami-*************"
+ami_id               = "ami-020cba7c55df1f615"
+app_ports = [4000, 4001, 4002]
 docker_artifact_bucket = "idlms-website-built-artifact"
 
 enable_dns_support   = true
 enable_dns_hostnames = true
-vpc_name             = "stage-idlms-vpc"
-vpc_cidr             = "10.122.0.0/16"
+vpc_name             = "prod-idlms-vpc"
+vpc_cidr             = "10.123.0.0/16"
 
 common_tags = {
   "Owner"      = "IDLMS"
   "Project"    = "Terraform VPC"
-  "Environment"= "stage"
+  "Environment"= "prod"
 }
 
-internet_gateway_name = "stage-idlms-igw"
+internet_gateway_name = "prod-idlms-igw"
 total_nat_gateway_required = 3
-eip_for_nat_gateway_name   = "stage-idlms-eip"
-nat_gateway_name           = "stage-idlms-ngw"
+eip_for_nat_gateway_name   = "prod-idlms-eip"
+nat_gateway_name           = "prod-idlms-ngw"
 
 public_subnets = {
-  cidrs_blocks         = ["10.122.1.0/24", "10.122.2.0/24"]
+  cidrs_blocks         = ["10.123.1.0/24", "10.123.2.0/24"]
   availability_zones   = ["us-east-1a", "us-east-1b"]
-  subnets_name_prefix  = "stage-public"
-  route_table_name     = "stage-public"
+  subnets_name_prefix  = "prod-public"
+  route_table_name     = "prod-public"
   map_public_ip_on_launch = true
   routes               = []
 }
 
 private_subnets = {
-  cidrs_blocks         = ["10.122.10.0/24", "10.122.20.0/24"]
+  cidrs_blocks         = ["10.123.10.0/24", "10.123.20.0/24"]
   availability_zones   = ["us-east-1a", "us-east-1b"]
-  subnets_name_prefix  = "stage-private"
-  route_table_name     = "stage-private"
+  subnets_name_prefix  = "prod-private"
+  route_table_name     = "prod-private"
   routes               = []
 }
 
 private_lb_subnets = {
-  cidrs_blocks         = ["10.121.15.0/26", "10.121.15.64/26", "10.121.15.128/26"]
+  cidrs_blocks         = ["10.123.15.0/26", "10.123.15.64/26", "10.123.15.128/26"]
   availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  subnets_name_prefix  = "stage-lb"
-  route_table_name     = "stage-lb"
+  subnets_name_prefix  = "prod-lb"
+  route_table_name     = "prod-lb"
   routes               = []
 }
 
 private_app_subnets = {
-  cidrs_blocks         = ["10.121.16.0/22", "10.121.20.0/22", "10.121.24.0/22"]
+  cidrs_blocks         = ["10.123.16.0/22", "10.123.20.0/22", "10.123.24.0/22"]
   availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  subnets_name_prefix  = "stage-app"
-  route_table_name     = "stage-app"
+  subnets_name_prefix  = "prod-app"
+  route_table_name     = "prod-app"
   routes               = []
 }
 
 private_data_subnets = {
-  cidrs_blocks         = ["10.121.40.0/24", "10.121.41.0/24", "10.121.42.0/24"]
+  cidrs_blocks         = ["10.123.40.0/24", "10.123.41.0/24", "10.123.42.0/24"]
   availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  subnets_name_prefix  = "stage-data"
-  route_table_name     = "stage-data"
+  subnets_name_prefix  = "prod-data"
+  route_table_name     = "prod-data"
   routes               = []
   is_public            = true
 }
 
 private_services_subnets = {
-  cidrs_blocks         = ["10.121.254.0/26", "10.121.254.64/26", "10.121.254.128/26"]
+  cidrs_blocks         = ["10.123.254.0/26", "10.123.254.64/26", "10.123.254.128/26"]
   availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  subnets_name_prefix  = "stage-service"
-  route_table_name     = "stage-service"
+  subnets_name_prefix  = "prod-service"
+  route_table_name     = "prod-service"
   routes               = []
 }
 

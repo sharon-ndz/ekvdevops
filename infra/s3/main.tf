@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "docker_backup" {
-  bucket = "idlms-website-built-artifact"
+  bucket = var.s3_bucket_name
 
   tags = {
     Name        = "IDLMS Docker Backup"
@@ -11,6 +11,6 @@ resource "aws_s3_bucket_versioning" "docker_backup_versioning" {
   bucket = aws_s3_bucket.docker_backup.id
 
   versioning_configuration {
-    status = "Enabled"
+    status = var.enable_versioning ? "Enabled" : "Suspended"
   }
 }

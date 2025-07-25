@@ -1,23 +1,3 @@
-#module "cloudwatch" {
- # source                = "git::https://github.com/sharon-ndz/terraform-modules.git//cloudwatch"
-  #environment           = var.environment
- # region                = var.region
-
-  # Required additional variables
-  #tf_state_bucket       = var.tf_state_bucket
-  #ssm_param_name        = var.ssm_param_name
-  #ssm_tag_name          = var.ssm_tag_name
-  #docker_log_group_name = var.docker_log_group_name
-  #log_group_tag_name    = var.log_group_tag_name
-  #access_logs_bucket    = var.access_logs_bucket
-  #access_logs_prefix    = var.access_logs_prefix
-#}
-
-provider "aws" {
-  region = var.region
-}
-
-
 
 module "group_1_nlb" {
   source               = "../terraform-modules/nlb"
@@ -40,9 +20,4 @@ module "group_1_nlb" {
   tags          = var.common_tags
 }
 
-
-
-  # ✅ Use S3 bucket created by local cloudwatch module
-#  access_logs_bucket = var.access_logs_bucket
-#  access_logs_prefix = var.access_logs_prefix 
 

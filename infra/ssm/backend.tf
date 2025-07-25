@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
-    bucket         = "my-terraform-state-bckt43"             # your state bucket
-    key            = "dev/ssm/terraform.tfstate"           # change to dev/prod as needed
+    bucket         = "my-terraform-state-bckt43"      
+    key            = "dev/ssm/terraform.tfstate"          
     region         = "us-east-1"
     encrypt        = true
   }

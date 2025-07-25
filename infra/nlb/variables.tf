@@ -55,10 +55,6 @@ variable "region" {
   default     = "us-east-1"
 }
 
-#variable "access_logs_prefix" {
-#  type        = string
-#  description = "Prefix within the S3 bucket for NLB access logs"
-#}
 
 variable "stack_name" {
   type        = string
@@ -78,11 +74,6 @@ variable "lb_ingress_cidr_blocks" {
   description = "CIDR blocks allowed to access the load balancer"
 }
 
-# ✅ CloudWatch module variables
-#variable "access_logs_bucket" {
- # type        = string
-#  description = "S3 bucket to store NLB logs"
-#}
 
 variable "ssm_param_name" {
   type        = string
@@ -94,15 +85,6 @@ variable "ssm_tag_name" {
   description = "Tag value assigned to the SSM parameter"
 }
 
-#variable "docker_log_group_name" {
-#  type        = string
-#  description = "CloudWatch log group name for Docker logs"
-#}
-
-#variable "log_group_tag_name" {
-#  type        = string
-#  description = "Tag for the Docker CloudWatch log group"
-#}
 
 variable "subnet_with_az" {
   description = "List of objects with AZ and subnet_id used for subnet mapping"

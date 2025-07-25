@@ -42,3 +42,37 @@ variable "nlb_dns_name" {
   description = "DNS name of the NLB used in the integration URI"
   type        = string
 }
+
+variable "throttling_rate_limit" {
+  description = "Rate limit (requests per second) for API Gateway"
+  type        = number
+}
+
+variable "throttling_burst_limit" {
+  description = "Burst limit (maximum concurrent requests) for API Gateway"
+  type        = number
+}
+
+variable "metrics_enabled" {
+  description = "Enable CloudWatch metrics for API Gateway stage"
+  type        = bool
+
+}
+
+variable "logging_level" {
+  description = "Logging level for API Gateway stage"
+  type        = string
+  
+}
+
+variable "data_trace_enabled" {
+  description = "Enable full data trace logging for API Gateway stage"
+  type        = bool
+ 
+}
+
+variable "api_port" {
+  description = "Port number used to connect to the backend service via NLB"
+  type        = number
+ 
+}
