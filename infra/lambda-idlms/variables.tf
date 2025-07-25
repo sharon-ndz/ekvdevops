@@ -30,3 +30,12 @@ variable "lambda_env_param_name" {
   type = string
 }
 
+variable "lambda_exec_role_name" {
+  type        = string
+  description = "IAM role name for Lambda execution"
+}
+
+variable "lambda_sg_name" {
+  type        = string
+  description = "Security group name for Lambda"
+}

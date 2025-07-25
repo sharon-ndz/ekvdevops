@@ -12,3 +12,6 @@ tags = {
 
 # The parameter name to fetch from SSM
 lambda_env_param_name = "/idlms/lambda/stage/env-vars"
+
+lambda_exec_role_name = "stage-idlms-lambda-exec-role"
+lambda_sg_name        = "stage-idlms-lambda-sg"
