@@ -76,8 +76,15 @@ jobs:
           cd infra/ecr
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
-          ECR_REPO_URL=$(terraform output -raw ecr_repository_url | xargs)
+          RAW_OUTPUT=$(terraform output -raw ecr_repository_url 2>&1)
+          ECR_REPO_URL=$(${TERRAFORM_CLI_PATH}/terraform-bin output -raw ecr_repository_url)
+          echo "Raw Terraform Output: [$RAW_OUTPUT]"
+
+          #ECR_REPO_URL=$(terraform output -raw ecr_repository_url | xargs)
+          #ECR_REPO_URL1=$(terraform output -raw ecr_repository_url | xargs)
           echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
+          echo $ECR_REPO_URL
+          echo $GITHUB_ENV
 
       - name: Terraform Apply SSM
         id: ssm
@@ -94,6 +101,12 @@ jobs:
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars" -var="app_env_content=${BASE64_ENV}"
 
+          SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm:\/\///')
+          echo "SSM_ENV_PARAM=$SSM_ENV_PARAM" >> $GITHUB_ENV
+
+      - name: Print ECR URL
+        run: echo "Using ECR:$ECR_REPO_URL"
+        
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -101,11 +114,13 @@ jobs:
       - name: Generate build tags
         id: tags
         run: |
+          ECR_REPO_URL="${{ env.ECR_REPO_URL }}"
           DATE_TAG=$(date +'%Y.%m.%d')
           BUILD_NUM=$(printf "%03d" $GITHUB_RUN_NUMBER)
           BUILD_TAG="${DATE_TAG}.${BUILD_NUM}"
           IMAGE_URI="${ECR_REPO_URL}:${BUILD_TAG}"
           LATEST_URI="${ECR_REPO_URL}:latest"
+
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
           echo "LATEST_URI=$LATEST_URI" >> $GITHUB_ENV
           echo "BUILD_TAG=$BUILD_TAG" >> $GITHUB_ENV
