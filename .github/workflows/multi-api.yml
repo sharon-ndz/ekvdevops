@@ -170,7 +170,7 @@ jobs:
             --parameters 'commands=[
               "set -e",
               "cd /home/ubuntu",
-              "ENV_CONTENT=$(aws ssm get-parameter --name \"/idlms/shared/'"$ENV"'/.env\" --with-decryption --query 'Parameter.Value' --output text)",
+              "ENV_CONTENT=$(aws ssm get-parameter --name \"/idlms/shared/'"$ENV"'/.env\" --with-decryption --query \"Parameter.Value\" --output text)",
               "echo \"$ENV_CONTENT\" > .env",
               "echo \"BUILD_TAG='"$TAG_TO_DEPLOY"'\" >> .env",
               "echo \"IMAGE_REPO='"$ECR_REPO_URL"'\" >> .env",
@@ -181,21 +181,21 @@ jobs:
               "docker-compose --env-file .env down || true",
               "docker-compose --env-file .env pull",
               "docker-compose --env-file .env up -d",
-              "sleep 10",
-              "RUNNING_CONTAINERS=$(docker ps --format '{{.Names}}' | grep -E 'api1|api2|api3' | wc -l)",
-              "if [ \"$RUNNING_CONTAINERS\" -ne 3 ]; then
-                echo \"Deployment failed. Rolling back...\"
-                PREV_TAG=$(aws ssm get-parameter --name \"/idlms/license-api/last-successful-build\" --query 'Parameter.Value' --output text)
-                echo \"Rolling back to tag: $PREV_TAG\"
-                sed -i \"/BUILD_TAG=/d\" .env
-                echo \"BUILD_TAG=$PREV_TAG\" >> .env
-                docker-compose --env-file .env down || true
-                docker-compose --env-file .env pull
-                docker-compose --env-file .env up -d
-              else
-                echo \"All containers are up. Saving $TAG_TO_DEPLOY as last-successful-build...\"
-                aws ssm put-parameter --name \"/idlms/license-api/last-successful-build\" --value \"$TAG_TO_DEPLOY\" --type String --overwrite
-              fi"
-            ]' \
-            --timeout-seconds 900 \
-            --region "$AWS_REGION"
+              "sleep 60",
+              "RUNNING_CONTAINERS=$(docker ps --format '{{.Names}}' | grep -E 'api1|api2|api3' | wc -l) && \
+              if [ \"$RUNNING_CONTAINERS\" -ne 3 ]; then \
+               echo \"Deployment failed. Rolling back...\"; \
+               PREV_TAG=$(aws ssm get-parameter --name \"/idlms/license-api/last-successful-build\" --query \"Parameter.Value\" --output text); \
+               echo \"Rolling back to tag: $PREV_TAG\"; \
+               sed -i \"/BUILD_TAG=/d\" .env; \
+               echo \"BUILD_TAG=$PREV_TAG\" >> .env; \
+               docker-compose --env-file .env down || true; \
+               docker-compose --env-file .env pull; \
+               docker-compose --env-file .env up -d; \
+             else \
+               echo \"All containers are up. Saving $TAG_TO_DEPLOY as last-successful-build...\"; \
+               aws ssm put-parameter --name \"/idlms/license-api/last-successful-build\" --value \"$TAG_TO_DEPLOY\" --type String --overwrite; \
+             fi"
+           ]' \
+           --timeout-seconds 900 \
+           --region "$AWS_REGION"
