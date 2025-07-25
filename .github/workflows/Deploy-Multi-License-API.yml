@@ -87,21 +87,35 @@ jobs:
           echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
           echo $ECR_REPO_URL
           echo $GITHUB_ENV
-
+          
       - name: Terraform Apply SSM
         id: ssm
         run: |
           cd infra/ssm
-          ENV_CONTENT=$(aws ssm get-parameter \
-            --name "/idlms/shared/${{ github.event.inputs.ENV }}/.env" \
-            --with-decryption \
-            --query "Parameter.Value" \
-            --output text)
-          BASE64_ENV=$(echo "$ENV_CONTENT" | base64 -w 0)
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
-          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars" -var="app_env_content=${BASE64_ENV}"
+
+          PARAM_NAME="/idlms/shared/${{ github.event.inputs.ENV }}/.env"
+
+          if aws ssm get-parameter --name "$PARAM_NAME" --with-decryption > /dev/null 2>&1; then
+            ENV_CONTENT=$(aws ssm get-parameter \
+             --name "$PARAM_NAME" \
+             --with-decryption \
+             --query "Parameter.Value" \
+             --output text)
+            BASE64_ENV=$(echo "$ENV_CONTENT" | base64 -w 0)
+           else
+             echo "Parameter $PARAM_NAME not found. Initializing with empty content."
+            BASE64_ENV=""
+           fi
+
+           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
+
+           terraform apply -auto-approve \
+             -var-file="${{ github.event.inputs.ENV }}.tfvars" \
+             -var="app_env_content=${BASE64_ENV}"
+
           SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm:\/\///')
           echo "SSM_ENV_PARAM=$SSM_ENV_PARAM" >> $GITHUB_ENV
+
 
       - name: Print ECR URL
         run: echo "Using ECR:$ECR_REPO_URL"
