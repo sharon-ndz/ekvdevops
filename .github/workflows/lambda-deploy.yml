@@ -19,7 +19,7 @@ jobs:
     env:
       AWS_REGION: us-east-1
       ENV: ${{ github.event.inputs.ENV }}
-      FUNCTION_NAME: "idlms-license-api-${{ github.event.inputs.ENV }}" # Replace with your actual function name
+      FUNCTION_NAME: "${{ github.event.inputs.ENV }-idlms-lambda" 
 
     steps:
       - name: Checkout `feature/btl-52` codebase
