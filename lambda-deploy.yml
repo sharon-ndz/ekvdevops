@@ -1,4 +1,4 @@
-name: Deploy  Lambda
+name: Deploy Lambda
 
 on:
   workflow_dispatch:
@@ -22,6 +22,23 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: feature/btl-52
+
+      - name: Detect if only `src/` was modified
+        id: changes
+        run: |
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          echo "Changed files: $CHANGED_FILES"
+
+          ONLY_SRC_MODIFIED=true
+          for file in $CHANGED_FILES; do
+            if [[ "$file" != src/* ]]; then
+              ONLY_SRC_MODIFIED=false
+              break
+            fi
+          done
+
+          echo "ONLY_SRC_MODIFIED=$ONLY_SRC_MODIFIED" >> $GITHUB_ENV
+          echo "only-src-modified=$ONLY_SRC_MODIFIED" >> $GITHUB_OUTPUT
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -55,6 +72,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Terraform VPC Init & Apply
+        if: env.ONLY_SRC_MODIFIED != 'true'
         working-directory: ./infra/vpc
         run: |
           terraform init
@@ -73,6 +91,7 @@ jobs:
           terraform apply -auto-approve -var-file=${{ env.ENV }}.tfvars
 
       - name: Terraform REST API Init & Apply
+        if: env.ONLY_SRC_MODIFIED != 'true'
         working-directory: ./infra/api
         run: |
           terraform init
