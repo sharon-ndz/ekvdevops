@@ -7,6 +7,9 @@ on:
         description: 'Environment to deploy (dev/staging/prod)'
         required: true
         default: 'dev'
+      ROLLBACK_VERSION:
+        description: 'Lambda version to roll back to (optional)'
+        required: false
 
 jobs:
   deploy-license-api:
@@ -16,6 +19,7 @@ jobs:
     env:
       AWS_REGION: us-east-1
       ENV: ${{ github.event.inputs.ENV }}
+      FUNCTION_NAME: "idlms-license-api-${{ github.event.inputs.ENV }}" # Replace with your actual function name
 
     steps:
       - name: Checkout `feature/btl-52` codebase
@@ -97,3 +101,26 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve -var-file=${{ env.ENV }}.tfvars
+
+      - name: Capture deployed Lambda version
+        id: lambda-version
+        run: |
+          VERSION=$(terraform -chdir=./infra/lambda-idlms output -raw function_version)
+          echo "DEPLOYED_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "deployed-version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Save deployed version in SSM
+        run: |
+          aws ssm put-parameter \
+            --name "/idlms/lambda/${{ env.ENV }}/last-successful-version" \
+            --value "${{ steps.lambda-version.outputs.deployed-version }}" \
+            --type String \
+            --overwrite
+
+      - name: Roll back Lambda alias if version provided
+        if: ${{ github.event.inputs.ROLLBACK_VERSION != '' }}
+        run: |
+          aws lambda update-alias \
+            --function-name ${{ env.FUNCTION_NAME }} \
+            --name live \
+            --function-version ${{ github.event.inputs.ROLLBACK_VERSION }}
