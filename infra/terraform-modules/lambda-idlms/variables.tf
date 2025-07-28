@@ -13,3 +13,7 @@ variable "lambda_package" {
   description = "Path to the Lambda ZIP file"
   type        = string
 }
+variable "publish" {
+  description = "Whether to publish a new version of the Lambda function"
+  type        = bool
+}

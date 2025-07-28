@@ -12,5 +12,6 @@ module "lambda" {
   lambda_env_param_name    = var.lambda_env_param_name
   lambda_exec_role_name    = var.lambda_exec_role_name
   lambda_sg_name           = var.lambda_sg_name
+  publish                  = var.publish
   tags                     = var.tags
 }

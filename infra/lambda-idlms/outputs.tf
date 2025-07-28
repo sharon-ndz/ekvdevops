@@ -5,3 +5,11 @@ output "function_name" {
 output "function_invoke_arn" {
   value = module.lambda.function_invoke_arn
 }
+
+output "function_version" {
+  value = module.lambda.function_version
+}
+
+output "lambda_alias_arn" {
+  value = module.lambda.lambda_alias_arn
+}

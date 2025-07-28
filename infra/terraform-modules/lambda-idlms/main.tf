@@ -70,7 +70,8 @@ resource "aws_lambda_function" "this" {
   runtime       = var.runtime
   memory_size   = var.memory_size
   timeout       = var.timeout
-
+  publish = var.publish
+ 
   filename         = var.lambda_package
   source_code_hash = filebase64sha256(var.lambda_package)
 
@@ -84,4 +85,11 @@ resource "aws_lambda_function" "this" {
   }
 
   tags = var.tags
+}
+
+resource "aws_lambda_alias" "live" {
+  name             = "live"
+  function_name    = aws_lambda_function.this.function_name
+  function_version = aws_lambda_function.this.version
+  description      = "Live alias pointing to latest stable version"
 }

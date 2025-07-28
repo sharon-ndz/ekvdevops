@@ -39,3 +39,8 @@ variable "lambda_sg_name" {
   type        = string
   description = "Security group name for Lambda"
 }
+
+variable "publish" {
+  description = "Whether to publish a new version of the Lambda function"
+  type        = bool
+}
