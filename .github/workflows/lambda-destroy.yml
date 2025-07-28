@@ -42,13 +42,25 @@ jobs:
           terraform destroy -auto-approve -var-file=${{ env.ENV }}.tfvars
 
       - name: Create dummy backend-api.zip for Lambda
-        working-directory: ./infra/lambda
+        working-directory: ./infra/lambda-idlms
         run: |
           echo "dummy" > dummy.txt
           zip backend-api.zip dummy.txt
 
       - name: Destroy Lambda Infra
-        working-directory: ./infra/lambda
+        working-directory: ./infra/lambda-idlms
+        run: |
+          terraform init
+          terraform destroy -auto-approve -var-file=${{ env.ENV }}.tfvars
+          
+      - name: Destroy SSM 
+        working-directory: ./infra/ssm
+        run: |
+          terraform init
+          terraform destroy -auto-approve -var-file=${{ env.ENV }}.tfvars
+
+      - name: Destroy VPC 
+        working-directory: ./infra/vpc
         run: |
           terraform init
           terraform destroy -auto-approve -var-file=${{ env.ENV }}.tfvars
