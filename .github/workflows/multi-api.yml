@@ -138,7 +138,7 @@ jobs:
         run: |
           TAG="${{ github.event.inputs.ROLLBACK_TAG }}"
           if [ -z "$TAG" ]; then
-            TAG=$(aws ssm get-parameter --name "/idlms/license-api/last-successful-build" --query "Parameter.Value" --output text)
+            TAG="${{ env.BUILD_TAG }}"
           fi
           echo "TAG_TO_DEPLOY=$TAG" >> $GITHUB_ENV
 
