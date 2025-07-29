@@ -70,3 +70,9 @@ jobs:
           cd infra/ssm
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
           terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+
+      - name: Destroy S3
+        run: |
+          cd infra/s3
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
+          terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
