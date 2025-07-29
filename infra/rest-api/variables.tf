@@ -64,3 +64,13 @@ variable "api_port" {
   description = "Port number used for API Gateway integration"
   type        = number
 }
+
+variable "tf_state_bucket" {
+  description = "Name of the S3 bucket storing Terraform remote state"
+  type        = string
+}
+
+variable "tf_state_region" {
+  description = "Region of the Terraform backend bucket"
+  type        = string
+}

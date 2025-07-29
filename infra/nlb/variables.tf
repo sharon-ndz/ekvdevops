@@ -99,3 +99,13 @@ variable "additional_ports" {
   description = "List of ports the NLB should listen on and forward to"
   type        = list(number)
 }
+
+variable "tf_state_bucket" {
+  description = "Name of the S3 bucket storing Terraform remote state"
+  type        = string
+}
+
+variable "tf_state_region" {
+  description = "Region of the Terraform backend bucket"
+  type        = string
+}

@@ -5,4 +5,4 @@ log_group_tag_name    = "dev-DockerAPI"
 ssm_param_name              = "/cloudwatch/docker-config"
 docker_log_group_name       = "/dev/docker/api"
 ssm_tag_name                = "docker-cloudwatch-config"
-
+tf_state_region  = "us-east-1"

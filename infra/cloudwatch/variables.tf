@@ -75,3 +75,8 @@ variable "nlb_logs_bucket_tag_name" {
   type        = string
   default     = "NLB Access Logs"
 }
+
+variable "tf_state_region" {
+  description = "Region of the Terraform backend bucket"
+  type        = string
+}

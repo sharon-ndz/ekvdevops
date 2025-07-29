@@ -6,3 +6,4 @@ ssm_param_name              = "/stage-cloudwatch/docker-config"
 docker_log_group_name       = "/stage/docker/api"
 ssm_tag_name                = "stage-docker-cloudwatch-config"
 
+tf_state_region  = "us-east-1"
