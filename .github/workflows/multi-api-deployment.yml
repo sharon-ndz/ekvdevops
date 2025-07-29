@@ -110,9 +110,11 @@ jobs:
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
           RAW_OUTPUT=$(terraform output docker_backup_bucket_name)
-          echo "::debug::Raw output: $RAW_OUTPUT"
+          echo "Raw output: $RAW_OUTPUT"
+          BUCKET_NAME=$(echo "$RAW_OUTPUT" | tr -d '"' | tr -d '\n' | tr -d '\r')
+          echo "Cleaned bucket name: '$BUCKET_NAME'"
           echo "BACKUP_BUCKET=$BUCKET_NAME" >> "$GITHUB_ENV"
-          echo "BACKUP_BUCKET resolved to: $BUCKET_NAME"
+          echo " BACKUP_BUCKET resolved to: $BUCKET_NAME"
           
       - name: Upload docker-compose.yml to S3
         run: |
