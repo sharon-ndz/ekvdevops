@@ -104,7 +104,7 @@ jobs:
           echo "SSM_ENV_PARAM=$SSM_ENV_PARAM" >> $GITHUB_ENV
 
       - name: Terraform Apply S3
-        id: s3
+        id: s3_apply
         run: |
           cd infra/s3
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
@@ -112,12 +112,12 @@ jobs:
           RAW_OUTPUT=$(terraform output docker_backup_bucket_name)
           echo "Raw output: $RAW_OUTPUT"
       
-      - name: Set BACKUP_BUCKET from Terraform Output
-        run: |
-          cd infra/s3
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
-          BUCKET_NAME=$(terraform output -raw docker_backup_bucket_name | head -n 1)
-          echo "BACKUP_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
+      - name: Get bucket name
+        id: s3_output
+        run: echo "bucket=$(terraform output -raw docker_backup_bucket_name)" >> $GITHUB_OUTPUT
+
+      - name: Set env from output
+        run: echo "BACKUP_BUCKET=${{ steps.s3.outputs.bucket }}" >> $GITHUB_ENV
           
       - name: Upload docker-compose.yml to S3
         run: |
