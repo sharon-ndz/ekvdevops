@@ -116,7 +116,7 @@ jobs:
         run: |
           set -e
           cd infra/s3
-          BUCKET_NAME=$(terraform output -raw docker_backup_bucket_name | tr -d '\r')  # Remove carriage returns (in case)
+          BUCKET_NAME=$(./terraform-bin output -raw docker_backup_bucket_name 2>/dev/null | tr -d '\r')
           echo "BACKUP_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
 
       - name: Upload docker-compose.yml to S3
