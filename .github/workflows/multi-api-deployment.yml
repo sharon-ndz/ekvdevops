@@ -114,22 +114,15 @@ jobs:
       
       - name: Set BACKUP_BUCKET from Terraform Output
         run: |
-          set -e
           cd infra/s3
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
-
           BUCKET_NAME=$(terraform output -raw docker_backup_bucket_name | tr -d '\r')
-          
-          if [ -z "$BUCKET_NAME" ]; then
-            echo "ERROR: BUCKET_NAME is empty. Cannot proceed."
-            exit 1
-          fi
-
           echo "Resolved bucket: $BUCKET_NAME"
           echo "BACKUP_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
           
       - name: Upload docker-compose.yml to S3
         run: |
+          echo "Uploading to bucket: $BACKUP_BUCKET"
           aws s3 cp docker/docker-compose.yml s3://$BACKUP_BUCKET/${{ github.event.inputs.ENV }}/docker-compose.yml   
       
           
