@@ -109,15 +109,16 @@ jobs:
           cd infra/s3
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
-          BUCKET_NAME=$(terraform output docker_backup_bucket_name | sed -E 's/^"?(.*)"?$/\1/')
-          echo "BUCKET_NAME resolved to: $BUCKET_NAME"
+          RAW_OUTPUT=$(terraform output docker_backup_bucket_name)
+          echo "::debug::Raw output: $RAW_OUTPUT"
           echo "BACKUP_BUCKET=$BUCKET_NAME" >> "$GITHUB_ENV"
+          echo "BACKUP_BUCKET resolved to: $BUCKET_NAME"
           
       - name: Upload docker-compose.yml to S3
         run: |
           echo "Uploading to s3://$BACKUP_BUCKET/${{ github.event.inputs.ENV }}/docker-compose.yml"
           aws s3 cp docker/docker-compose.yml s3://$BACKUP_BUCKET/${{ github.event.inputs.ENV }}/docker-compose.yml   
-
+      
           
       - name: Print ECR URL
         run: echo "Using ECR:$ECR_REPO_URL"
