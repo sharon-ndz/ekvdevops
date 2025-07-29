@@ -112,15 +112,18 @@ jobs:
           RAW_OUTPUT=$(terraform output docker_backup_bucket_name)
           echo "Raw output: $RAW_OUTPUT"
       
-      - name: Get bucket name
-        id: s3_output
+      - name: Get terraform outputs
+        id: tf_outputs
         run: |
           cd infra/s3
-          BUCKET=$(terraform output -raw docker_backup_bucket_name | tr -d '\r')
-          echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
+          echo "bucket=$(terraform output -raw docker_backup_bucket_name | tr -d '\r')" >> $GITHUB_OUTPUT
+          echo "ssm_env=$(terraform output -raw ssm_env_param_name | tr -d '\r')" >> $GITHUB_OUTPUT
 
-      - name: Set env from output
-        run: echo "BACKUP_BUCKET=${{ steps.s3.outputs.bucket }}" >> $GITHUB_ENV
+      - name: Export outputs to env
+        run: |
+          echo "BACKUP_BUCKET=${{ steps.tf_outputs.outputs.bucket }}" >> $GITHUB_ENV
+          echo "SSM_ENV_PARAM=${{ steps.tf_outputs.outputs.ssm_env }}" >> $GITHUB_ENV
+
           
       - name: Upload docker-compose.yml to S3
         run: |
