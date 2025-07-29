@@ -113,6 +113,12 @@ jobs:
           BUCKET_NAME=$(terraform output -raw docker_backup_bucket_name | tr -d '\r\n')
           echo "BACKUP_BUCKET=$BUCKET_NAME" >> "$GITHUB_ENV"
 
+      - name: Get Backup Bucket Name
+        id: tf_outputs
+        run: |
+          echo "BACKUP_BUCKET=$(terraform output -raw docker_backup_bucket_name)" >> "$GITHUB_ENV"
+
+
       - name: Upload docker-compose.yml to S3
         run: |
           aws s3 cp docker/docker-compose.yml s3://$BACKUP_BUCKET/${{ github.event.inputs.ENV }}/docker-compose.yml   
