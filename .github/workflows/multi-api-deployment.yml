@@ -109,9 +109,9 @@ jobs:
           cd infra/s3
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
-          BUCKET_NAME=$(terraform output -raw docker_backup_bucket_name | tr -d '\r\n' | sed 's/[^a-zA-Z0-9._-]//g')
+          BUCKET_NAME=$(terraform output docker_backup_bucket_name | sed -E 's/^"?(.*)"?$/\1/')
           echo "BUCKET_NAME resolved to: $BUCKET_NAME"
-          printf "BACKUP_BUCKET=%s\n" "$BUCKET_NAME" >> "$GITHUB_ENV"
+          echo "BACKUP_BUCKET=$BUCKET_NAME" >> "$GITHUB_ENV"
           
       - name: Upload docker-compose.yml to S3
         run: |
