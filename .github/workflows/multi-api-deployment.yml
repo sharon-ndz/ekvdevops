@@ -111,13 +111,9 @@ jobs:
         id: tf_outputs
         run: |
           cd infra/s3
-          echo "bucket<<EOF" >> $GITHUB_OUTPUT
-          terraform output -raw docker_backup_bucket_name | tr -d '\r' >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "bucket=$(terraform output -raw docker_backup_bucket_name)" >> $GITHUB_OUTPUT
           cd ../ssm
-          echo "ssm_env<<EOF" >> $GITHUB_OUTPUT
-          terraform output -raw ssm_env_param_name | tr -d '\r' | sed 's/^ssm:\/\///' >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "ssm_env=$(terraform output -raw ssm_env_param_name | sed 's/^ssm:\/\///')" >> $GITHUB_OUTPUT
           
       - name: Export outputs to env
         run: |
