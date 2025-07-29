@@ -14,7 +14,6 @@ on:
 env:
   AWS_REGION: us-east-1
   TF_BUCKET: my-terraform-state-bckt43
-  BACKUP_BUCKET: idlms-website-built-artifact
 
 jobs:
   deploy:
@@ -103,6 +102,15 @@ jobs:
 
           SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm:\/\///')
           echo "SSM_ENV_PARAM=$SSM_ENV_PARAM" >> $GITHUB_ENV
+
+      - name: Terraform Apply S3
+        id: s3
+        run: |
+          cd infra/s3
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
+          terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+          BUCKET_NAME=$(terraform output -raw docker_backup_bucket_name)
+          echo "BACKUP_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
 
       - name: Print ECR URL
         run: echo "Using ECR:$ECR_REPO_URL"
