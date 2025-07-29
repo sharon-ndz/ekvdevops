@@ -117,7 +117,20 @@ jobs:
           set -e
           cd infra/s3
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
-          BUCKET_NAME=$(terraform output -raw docker_backup_bucket_name | head -n 1 | tr -d '\r')
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
+
+          if ! terraform output -raw docker_backup_bucket_name > /dev/null 2>&1; then
+            echo "ERROR: Failed to fetch docker_backup_bucket_name from Terraform output."
+            exit 1
+          fi
+
+          BUCKET_NAME=$(terraform output -raw docker_backup_bucket_name | tr -d '\r' | head -n 1)
+
+          if [ -z "$BUCKET_NAME" ]; then
+            echo "ERROR: BUCKET_NAME is empty. Cannot proceed."
+            exit 1
+          fi
+
           echo "Resolved bucket: $BUCKET_NAME"
           echo "BACKUP_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
           
