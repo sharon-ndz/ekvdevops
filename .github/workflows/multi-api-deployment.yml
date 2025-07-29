@@ -100,25 +100,21 @@ jobs:
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars" -var="app_env_content=${BASE64_ENV}"
 
-          SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm:\/\///')
-          echo "SSM_ENV_PARAM=$SSM_ENV_PARAM" >> $GITHUB_ENV
-
       - name: Terraform Apply S3
         id: s3_apply
         run: |
           cd infra/s3
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
-          RAW_OUTPUT=$(terraform output docker_backup_bucket_name)
-          echo "Raw output: $RAW_OUTPUT"
       
       - name: Get terraform outputs
         id: tf_outputs
         run: |
           cd infra/s3
           echo "bucket=$(terraform output -raw docker_backup_bucket_name | tr -d '\r')" >> $GITHUB_OUTPUT
-          echo "ssm_env=$(terraform output -raw ssm_env_param_name | tr -d '\r')" >> $GITHUB_OUTPUT
-
+          cd ../ssm
+          echo "ssm_env=$(terraform output -raw ssm_env_param_name | tr -d '\r' | sed 's/^ssm:\/\///')" >> $GITHUB_OUTPUT
+          
       - name: Export outputs to env
         run: |
           echo "BACKUP_BUCKET=${{ steps.tf_outputs.outputs.bucket }}" >> $GITHUB_ENV
