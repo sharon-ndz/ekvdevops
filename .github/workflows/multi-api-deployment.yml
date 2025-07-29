@@ -114,7 +114,10 @@ jobs:
       
       - name: Get bucket name
         id: s3_output
-        run: echo "bucket=$(terraform output -raw docker_backup_bucket_name)" >> $GITHUB_OUTPUT
+        run: |
+          cd infra/s3
+          BUCKET=$(terraform output -raw docker_backup_bucket_name | tr -d '\r')
+          echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
 
       - name: Set env from output
         run: echo "BACKUP_BUCKET=${{ steps.s3.outputs.bucket }}" >> $GITHUB_ENV
