@@ -14,6 +14,7 @@ on:
 env:
   AWS_REGION: us-east-1
   TF_BUCKET: my-terraform-state-bckt43
+  BACKUP_BUCKET: idlms-stage-built-artifact
 
 jobs:
   deploy:
@@ -112,19 +113,7 @@ jobs:
           RAW_OUTPUT=$(terraform output docker_backup_bucket_name)
           echo "Raw output: $RAW_OUTPUT"
       
-      - name: Get terraform outputs
-        id: tf_outputs
-        run: |
-          cd infra/s3
-          echo "bucket=$(terraform output -raw docker_backup_bucket_name | tr -d '\r')" >> $GITHUB_OUTPUT
-          echo "ssm_env=$(terraform output -raw ssm_env_param_name | tr -d '\r')" >> $GITHUB_OUTPUT
-
-      - name: Export outputs to env
-        run: |
-          echo "BACKUP_BUCKET=${{ steps.tf_outputs.outputs.bucket }}" >> $GITHUB_ENV
-          echo "SSM_ENV_PARAM=${{ steps.tf_outputs.outputs.ssm_env }}" >> $GITHUB_ENV
-
-          
+  
       - name: Upload docker-compose.yml to S3
         run: |
           echo "Uploading to bucket: $BACKUP_BUCKET"
