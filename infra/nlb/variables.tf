@@ -37,22 +37,16 @@ variable "lb_egress_roles" {
   description = "Egress rules for the LB security group"
 }
 
-variable "tf_state_bucket" {
-  type        = string
-  description = "S3 bucket name for Terraform remote state"
-  default     = "my-terraform-state-bckt43"
-}
 
 variable "environment" {
   type        = string
   description = "Environment name (e.g., dev, stage, prod)"
-  default     = "stage"
+ 
 }
 
 variable "region" {
   type        = string
   description = "The AWS region"
-  default     = "us-east-1"
 }
 
 
