@@ -111,10 +111,14 @@ jobs:
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
           RAW_OUTPUT=$(terraform output docker_backup_bucket_name)
           echo "Raw output: $RAW_OUTPUT"
-          terraform output -raw docker_backup_bucket_name > bucket.txt
-          echo "BACKUP_BUCKET=$(cat bucket.txt)" >> $GITHUB_ENV
-          echo "Bucket is: $BACKUP_BUCKET"
-          
+      
+      - name: Set BACKUP_BUCKET from Terraform Output
+        run: |
+          set -e
+          cd infra/s3
+          BUCKET_NAME=$(terraform output -raw docker_backup_bucket_name | tr -d '\r')  # Remove carriage returns (in case)
+          echo "BACKUP_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
+
       - name: Upload docker-compose.yml to S3
         run: |
           aws s3 cp docker/docker-compose.yml s3://$BACKUP_BUCKET/${{ github.event.inputs.ENV }}/docker-compose.yml   
