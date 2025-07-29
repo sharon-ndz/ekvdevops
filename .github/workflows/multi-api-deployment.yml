@@ -111,6 +111,8 @@ jobs:
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
           BUCKET_NAME=$(terraform output -raw docker_backup_bucket_name | tr -d '\r\n')
           echo "BACKUP_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
+          cd ../..
+          aws s3 cp docker/docker-compose.yml s3://$BUCKET_NAME/${{ github.event.inputs.ENV }}/docker-compose.yml
 
       - name: Print ECR URL
         run: echo "Using ECR:$ECR_REPO_URL"
