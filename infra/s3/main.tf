@@ -6,9 +6,7 @@ resource "aws_s3_bucket" "docker_backup" {
     Environment = var.environment
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
+
 }
 
 
