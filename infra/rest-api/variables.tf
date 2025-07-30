@@ -32,3 +32,45 @@ variable "common_tags" {
   description = "Common tags applied to all resources"
   type        = map(string)
 }
+
+variable "throttling_rate_limit" {
+  description = "Rate limit for the API Gateway stage"
+  type        = number
+}
+
+variable "throttling_burst_limit" {
+  description = "Burst limit for the API Gateway stage"
+  type        = number
+}
+
+variable "metrics_enabled" {
+  description = "Enable CloudWatch metrics for API Gateway stage"
+  type        = bool
+
+}
+
+variable "logging_level" {
+  description = "Logging level for API Gateway stage"
+  type        = string
+}
+
+variable "data_trace_enabled" {
+  description = "Enable full data trace logging for API Gateway stage"
+  type        = bool
+
+}
+
+variable "api_port" {
+  description = "Port number used for API Gateway integration"
+  type        = number
+}
+
+variable "tf_state_bucket" {
+  description = "Name of the S3 bucket storing Terraform remote state"
+  type        = string
+}
+
+variable "tf_state_region" {
+  description = "Region of the Terraform backend bucket"
+  type        = string
+}

@@ -63,7 +63,7 @@ resource "aws_api_gateway_integration" "root" {
   http_method             = aws_api_gateway_method.root.http_method
   integration_http_method = "ANY"
   type                    = "HTTP_PROXY"
-  uri                     = "http://${var.nlb_dns_name}:4000/"
+  uri                     = "http://${var.nlb_dns_name}:${var.api_port}/"
   connection_type         = "VPC_LINK"
   connection_id           = aws_api_gateway_vpc_link.this.id
 }
@@ -93,7 +93,7 @@ resource "aws_api_gateway_integration" "proxy" {
   http_method             = aws_api_gateway_method.proxy.http_method
   integration_http_method = "ANY"
   type                    = "HTTP_PROXY"
-  uri                     = "http://${var.nlb_dns_name}:4000/{proxy}"
+  uri                     = "http://${var.nlb_dns_name}:${var.api_port}/{proxy}"
   connection_type         = "VPC_LINK"
   connection_id           = aws_api_gateway_vpc_link.this.id
   passthrough_behavior    = "WHEN_NO_MATCH"
@@ -160,11 +160,12 @@ resource "aws_api_gateway_method_settings" "this" {
   method_path = "*/*"
 
   settings {
-    metrics_enabled         = true
-    logging_level           = "INFO"
-    data_trace_enabled      = false
-    throttling_burst_limit  = 1000
-    throttling_rate_limit   = 500
+     metrics_enabled         = var.metrics_enabled
+    logging_level           = var.logging_level
+    data_trace_enabled      = var.data_trace_enabled
+    throttling_burst_limit  = var.throttling_burst_limit
+    throttling_rate_limit   = var.throttling_rate_limit
+
   }
 
   depends_on = [

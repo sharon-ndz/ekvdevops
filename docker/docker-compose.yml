@@ -2,35 +2,38 @@ version: "3.8"
 
 services:
   api1:
-    image: 084828592148.dkr.ecr.us-east-1.amazonaws.com/license-api-dev:${BUILD_TAG}
+    image: ${IMAGE_REPO}:${BUILD_TAG}
     container_name: api1
     restart: always
     env_file:
-      - .env.api1
+      - .env
     ports:
-      - "4000:4000"
-    working_dir: /app
+      - "${PORT}:${PORT}"
+    environment:
+      - PORT=${PORT}
     command: node dist/main.js
 
   api2:
-    image: 084828592148.dkr.ecr.us-east-1.amazonaws.com/license-api-dev:${BUILD_TAG}
+    image: ${IMAGE_REPO}:${BUILD_TAG}
     container_name: api2
     restart: always
     env_file:
-      - .env.api2
+      - .env
     ports:
-      - "4001:4001"
-    working_dir: /app
+      - "${PORT1}:${PORT1}"
+    environment:
+      - PORT=${PORT1}
     command: node dist/main.js
 
   api3:
-    image: 084828592148.dkr.ecr.us-east-1.amazonaws.com/license-api-dev:${BUILD_TAG}
+    image: ${IMAGE_REPO}:${BUILD_TAG}
     container_name: api3
     restart: always
     env_file:
-      - .env.api3
+      - .env
     ports:
-      - "4002:4002"
-    working_dir: /app
+      - "${PORT2}:${PORT2}"
+    environment:
+      - PORT=${PORT2}
     command: node dist/main.js
 

@@ -1,13 +1,12 @@
 tf_state_bucket = "my-terraform-state-bckt43"
 environment     = "stage"
 region          = "us-east-1"
-
-#access_logs_bucket = "nlb-access-logs-stage-nyo9xe"
+tf_state_region  = "us-east-1"
 load_balancer_type = "network"
 internal           = true
 target_port        = 4000
 lb_create_sg       = true
-#access_logs_prefix = "stage/nlb"
+additional_ports = [4000, 4001, 4002]
 
 lb_egress_roles = [
   {
@@ -26,7 +25,6 @@ common_tags = {
   Environment = "stage"
   Project     = "IDMS"
 }
-ssm_param_name         = "/cloudwatch/docker-config"
-ssm_tag_name           = "docker-cloudwatch-config"
-docker_log_group_name  = "/docker/api"
-log_group_tag_name     = "DockerAPI"
+ssm_param_name         = "/stage-cloudwatch/docker-config"
+ssm_tag_name           = "stage-docker-cloudwatch-config"
+

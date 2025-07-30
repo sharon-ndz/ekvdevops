@@ -8,11 +8,6 @@ variable "region" {
   description = "AWS Region"
 }
 
-#variable "access_logs_prefix" {
-#  description = "Prefix for NLB access logs in the S3 bucket"
-#  type        = string
-#}
-
 variable "tf_state_bucket" {
   description = "Terraform remote state S3 bucket name"
   type        = string
@@ -74,13 +69,14 @@ variable "ssm_tag_name" {
   type        = string
 }
 
-#variable "access_logs_bucket" {
-#  description = "Name of the S3 bucket for NLB access logs"
-#  type        = string
-#}
 
 variable "nlb_logs_bucket_tag_name" {
   description = "Name tag for the S3 bucket storing NLB logs"
   type        = string
   default     = "NLB Access Logs"
+}
+
+variable "tf_state_region" {
+  description = "Region of the Terraform backend bucket"
+  type        = string
 }

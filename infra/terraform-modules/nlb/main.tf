@@ -17,11 +17,6 @@ resource "aws_lb" "this" {
     }
   }
 
- # access_logs {
-   # enabled = true
-  #  bucket  = var.access_logs_bucket
- #   prefix  = "${var.environment}/nlb"
-#  }
 
 
   tags = merge(

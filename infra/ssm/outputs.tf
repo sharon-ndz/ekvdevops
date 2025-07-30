@@ -1,7 +1,8 @@
 output "ssm_env_param_name" {
-  value = aws_ssm_parameter.app_env.name
+  value = module.app_env.ssm_parameter_name
 }
 
 output "ssm_parameter_version" {
-  value = aws_ssm_parameter.app_env.version
+  value = module.app_env.ssm_parameter_version
 }
+

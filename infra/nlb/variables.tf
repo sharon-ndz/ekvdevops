@@ -37,28 +37,18 @@ variable "lb_egress_roles" {
   description = "Egress rules for the LB security group"
 }
 
-variable "tf_state_bucket" {
-  type        = string
-  description = "S3 bucket name for Terraform remote state"
-  default     = "my-terraform-state-bckt43"
-}
 
 variable "environment" {
   type        = string
   description = "Environment name (e.g., dev, stage, prod)"
-  default     = "stage"
+ 
 }
 
 variable "region" {
   type        = string
   description = "The AWS region"
-  default     = "us-east-1"
 }
 
-#variable "access_logs_prefix" {
-#  type        = string
-#  description = "Prefix within the S3 bucket for NLB access logs"
-#}
 
 variable "stack_name" {
   type        = string
@@ -78,11 +68,6 @@ variable "lb_ingress_cidr_blocks" {
   description = "CIDR blocks allowed to access the load balancer"
 }
 
-# ✅ CloudWatch module variables
-#variable "access_logs_bucket" {
- # type        = string
-#  description = "S3 bucket to store NLB logs"
-#}
 
 variable "ssm_param_name" {
   type        = string
@@ -94,15 +79,6 @@ variable "ssm_tag_name" {
   description = "Tag value assigned to the SSM parameter"
 }
 
-#variable "docker_log_group_name" {
-#  type        = string
-#  description = "CloudWatch log group name for Docker logs"
-#}
-
-#variable "log_group_tag_name" {
-#  type        = string
-#  description = "Tag for the Docker CloudWatch log group"
-#}
 
 variable "subnet_with_az" {
   description = "List of objects with AZ and subnet_id used for subnet mapping"
@@ -116,4 +92,14 @@ variable "subnet_with_az" {
 variable "additional_ports" {
   description = "List of ports the NLB should listen on and forward to"
   type        = list(number)
+}
+
+variable "tf_state_bucket" {
+  description = "Name of the S3 bucket storing Terraform remote state"
+  type        = string
+}
+
+variable "tf_state_region" {
+  description = "Region of the Terraform backend bucket"
+  type        = string
 }

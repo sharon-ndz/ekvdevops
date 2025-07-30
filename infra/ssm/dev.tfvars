@@ -1,2 +1,6 @@
 environment = "dev"
 region = "us-east-1"
+ssm_param_name         = "/idlms/shared/dev/.env"
+ssm_param_description  = "Shared environment variables for IDLMS in dev"
+ssm_param_app_tag      = "idlms"
+app_env_content         = ""
