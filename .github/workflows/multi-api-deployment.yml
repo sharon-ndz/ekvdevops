@@ -13,9 +13,10 @@ on:
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
-  TF_BUCKET: ${var.environment}-btl-idlms-backend-api-tfstate
-  BACKUP_BUCKET: ${var.environment}-btl-idlms-backend-api-tfstate-backup
+  TF_BUCKET: ${{ github.event.inputs.ENV }}-btl-idlms-backend-api-tfstate
+  BACKUP_BUCKET: ${{ github.event.inputs.ENV }}-btl-idlms-backend-api-tfstate-backup
   TF_REGION: ${{ vars.AWS_REGION }}
+ 
 
 jobs:
   deploy:
