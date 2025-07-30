@@ -25,10 +25,10 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout ekvtest codebase
+      - name: Checkout feature/btl-48 codebase
         uses: actions/checkout@v4
         with:
-          ref: ekvtest
+          ref: feature/btl-48
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
