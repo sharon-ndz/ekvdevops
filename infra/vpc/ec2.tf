@@ -4,7 +4,6 @@ resource "aws_instance" "web" {
   subnet_id              = module.vpc.private_subnets_ids[0]
   vpc_security_group_ids = [aws_security_group.open_ssh_and_app.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2_ssm_profile.name
-  key_name               = var.ec2_key_name
   associate_public_ip_address = false
   user_data = <<-EOF
               #!/bin/bash
