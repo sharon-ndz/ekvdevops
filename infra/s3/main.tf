@@ -11,10 +11,6 @@ resource "aws_s3_bucket" "docker_backup" {
   }
 }
 
-resource "aws_s3_bucket_acl" "docker_backup_acl" {
-  bucket = aws_s3_bucket.docker_backup.id
-  acl    = "private"
-}
 
 
 resource "aws_s3_bucket_public_access_block" "docker_backup_block" {
