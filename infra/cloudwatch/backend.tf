@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
-    bucket = "my-terraform-state-bckt43"
+    bucket = "my-terraform-state-bckt4321"
     key    = "dev/cloudwatch/terraform.tfstate"
-    region = "us-east-1"
+    region = "eu-west-1"
   }
 }
