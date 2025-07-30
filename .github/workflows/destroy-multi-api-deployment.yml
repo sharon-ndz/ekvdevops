@@ -9,8 +9,8 @@ on:
         default: 'dev'
 
 env:
-  AWS_REGION: eu-west1
-  TF_BUCKET: my-terraform-state-bckt4321
+  AWS_REGION: eu-west-1
+  TF_BUCKET: my-terraform-state-bckt43
 
 jobs:
   destroy:
@@ -33,7 +33,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west1
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Destroy CloudWatch
         run: |
