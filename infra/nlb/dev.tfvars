@@ -1,6 +1,6 @@
-tf_state_bucket = "my-terraform-state-bckt43"
-tf_state_region  = "us-east-1"
-region          = "us-east-1"
+tf_state_bucket = "my-terraform-state-bckt432"
+tf_state_region  = "eu-north-1a"
+region          = "eu-north-1a"
 environment     = "dev"
 load_balancer_type = "network"
 internal           = true
