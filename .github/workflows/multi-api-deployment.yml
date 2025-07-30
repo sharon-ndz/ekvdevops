@@ -1,5 +1,6 @@
 name: Deploy Multi License API with Rollback Options
-
+env:
+  TF_REGION: ${{ vars.AWS_REGION }}
 on:
   workflow_dispatch:
     inputs:
@@ -46,35 +47,35 @@ jobs:
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/vpc
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/vpc/terraform.tfstate"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/vpc/terraform.tfstate" -backend-config="region=${TF_REGION}"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply NLB
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/nlb
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/nlb/terraform.tfstate"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/nlb/terraform.tfstate" -backend-config="region=${TF_REGION}"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply API Gateway
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/rest-api
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate" -backend-config="region=${TF_REGION}"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply CloudWatch
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/cloudwatch
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate" -backend-config="region=${TF_REGION}"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply ECR
         id: ecr
         run: |
           cd infra/ecr
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate" -backend-config="region=${TF_REGION}"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
           RAW_OUTPUT=$(terraform output -raw ecr_repository_url 2>&1)
           ECR_REPO_URL=$(${TERRAFORM_CLI_PATH}/terraform-bin output -raw ecr_repository_url)
@@ -98,7 +99,7 @@ jobs:
             BASE64_ENV=$(echo "# placeholder env" | base64 -w 0)
           fi
 
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate" -backend-config="region=${TF_REGION}"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars" -var="app_env_content=${BASE64_ENV}"
 
           SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm:\/\///')
@@ -108,7 +109,7 @@ jobs:
         id: s3_apply
         run: |
           cd infra/s3
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate" -backend-config="region=${TF_REGION}"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
           RAW_OUTPUT=$(terraform output docker_backup_bucket_name)
           echo "Raw output: $RAW_OUTPUT"
