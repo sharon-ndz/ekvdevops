@@ -7,7 +7,7 @@ tf_state_bucket      = "my-terraform-state-bckt4321"
 ami_id               = "ami-01f23391a59163da9"
 app_ports = [4000, 4001, 4002]
 
-docker_artifact_bucket = "idlms-website-built-artifact"
+docker_artifact_bucket = "idlms-stage-built-artifact1"
 enable_dns_support   = true
 enable_dns_hostnames = true
 vpc_name             = "dev-idlms-vpc"
