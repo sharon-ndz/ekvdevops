@@ -1,7 +1,7 @@
-tf_state_bucket = "my-terraform-state-bckt432"
+tf_state_bucket = "my-terraform-state-bckt4321"
 environment     = "stage"
-region          = "eu-north-1"
-tf_state_region  = "eu-north-1"
+region          = "eu-west-1"
+tf_state_region  = "eu-west-1"
 load_balancer_type = "network"
 internal           = true
 target_port        = 4000
