@@ -9,8 +9,8 @@ on:
         default: 'dev'
 
 env:
-  AWS_REGION: us-east-1
-  TF_BUCKET: my-terraform-state-bckt43
+  AWS_REGION: eu-west1
+  TF_BUCKET: my-terraform-state-bckt4321
 
 jobs:
   destroy:
