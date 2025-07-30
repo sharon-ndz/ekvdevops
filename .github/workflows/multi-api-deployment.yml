@@ -1,6 +1,5 @@
 name: Deploy Multi License API with Rollback Options
-env:
-  TF_REGION: ${{ vars.AWS_REGION }}
+
 on:
   workflow_dispatch:
     inputs:
@@ -16,6 +15,7 @@ env:
   AWS_REGION: eu-west-1
   TF_BUCKET: my-terraform-state-bckt4321
   BACKUP_BUCKET: idlms-stage-built-artifact1
+  TF_REGION: ${{ vars.AWS_REGION }}
 
 jobs:
   deploy:
