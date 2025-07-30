@@ -3,22 +3,22 @@ vpc_name           = "prod-idlms-lambda-vpc"                               cidr_
 public_subnets = [
   {
     cidr_block = "10.0.1.0/24"
-    az         = "us-east-1a"
+    az         = "eu-west-1a"
   },
   {
     cidr_block = "10.0.2.0/24"
-    az         = "us-east-1b"
+    az         = "eu-west-1b"
   }
 ]
 
 private_subnets = [
   {
     cidr_block = "10.0.3.0/24"
-    az         = "us-east-1a"
+    az         = "eu-west-1a"
   },
   {
     cidr_block = "10.0.4.0/24"
-    az         = "us-east-1b"
+    az         = "eu-west-1b"
   }
 ]
 
