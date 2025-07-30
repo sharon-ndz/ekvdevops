@@ -1,8 +1,8 @@
 data "terraform_remote_state" "lambda-idlms" {
   backend = "s3"
   config = {
-    bucket = "my-terraform-state-bckt43"
+    bucket = "my-terraform-state-bckt4321"
     key    = "dev/lambda/terraform.tfstate"
-    region = "us-east-1"
+    region = "eu-west-1"
   }
 }
