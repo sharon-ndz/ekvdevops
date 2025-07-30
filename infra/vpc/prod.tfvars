@@ -1,5 +1,5 @@
 environment = "prod"
-region      = "us-east-1"
+region      = "eu-north-1"
 ec2_ssm_profile_name = "prod-ec2_ssm_profile"
 ec2_ssm_role_name    = "ec2_ssm_role-prod"
 tf_state_bucket      = "my-terraform-state-bckt43"
