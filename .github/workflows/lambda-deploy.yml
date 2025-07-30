@@ -17,7 +17,7 @@ jobs:
     environment: ${{ github.event.inputs.ENV }}
 
     env:
-      AWS_REGION: us-east-1
+      AWS_REGION: eu-west-1
       ENV: ${{ github.event.inputs.ENV }}
       FUNCTION_NAME: ${{ github.event.inputs.ENV }}-idlms-lambda
 
