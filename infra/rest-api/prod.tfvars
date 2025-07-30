@@ -1,4 +1,4 @@
-region               = "us-east-1"
+region               = "eu-west-1"
 environment          = "prod"
 stage_name           = "prod-idlms"
 log_retention_days   = 7
@@ -17,5 +17,5 @@ logging_level        = "INFO"
 data_trace_enabled   = false
 
 api_port = 4000
-tf_state_bucket  = "my-terraform-state-bckt43"
-tf_state_region  = "us-east-1"
+tf_state_bucket  = "my-terraform-state-bckt4321"
+tf_state_region  = "eu-west-1"
