@@ -13,7 +13,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  TF_BUCKET: my-terraform-state-bckt43
+  TF_BUCKET: my-terraform-state-bckt432
   BACKUP_BUCKET: idlms-stage-built-artifact
 
 jobs:
