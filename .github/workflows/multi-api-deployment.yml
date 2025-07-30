@@ -12,9 +12,9 @@ on:
         required: false
 
 env:
-  AWS_REGION: eu-west-1
-  TF_BUCKET: my-terraform-state-bckt4321
-  BACKUP_BUCKET: idlms-stage-built-artifact1
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  TF_BUCKET: ${var.environment}-btl-idlms-backend-api-tfstate
+  BACKUP_BUCKET: ${var.environment}-btl-idlms-backend-api-tfstate-backup
   TF_REGION: ${{ vars.AWS_REGION }}
 
 jobs:
