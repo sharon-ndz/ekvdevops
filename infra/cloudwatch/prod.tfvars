@@ -1,6 +1,6 @@
 environment = "prod"
-region      = "us-east-1"
-tf_state_bucket = "my-terraform-state-bckt43"
+region      = "eu-west-1"
+tf_state_bucket = "my-terraform-state-bckt4321"
 log_group_tag_name    = "prod-DockerAPI"
 ssm_param_name              = "/prod-cloudwatch/docker-config"
 docker_log_group_name       = "/prod/docker/api"
