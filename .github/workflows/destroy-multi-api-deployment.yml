@@ -11,7 +11,7 @@ on:
 env:
   AWS_REGION: eu-west-1
   AWS_DEFAULT_REGION: eu-west-1
-  TF_BUCKET: my-terraform-state-bckt43
+  TF_BUCKET: my-terraform-state-bckt4321
 
 jobs:
   destroy:
