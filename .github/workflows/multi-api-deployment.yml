@@ -6,7 +6,7 @@ on:
       ENV:
         description: 'Environment to deploy (dev/staging/prod)'
         required: true
-        default: "dev"
+        default: "stage"
       ROLLBACK_TAG:
         description: 'Optional: Previous build tag (e.g., 2025.06.30.02). If left blank, deploys latest.'
         required: false
@@ -21,7 +21,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.ENV || 'dev' }}
+    environment: ${{ github.event.inputs.ENV || 'stage' }}
     permissions:
       id-token: write
       contents: read
