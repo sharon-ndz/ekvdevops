@@ -1,3 +1,3 @@
 environment = "stage"
-s3_bucket_name    = "idlms-stage-built-artifact1"
+s3_bucket_name    = "stage-idlms-website-built-artifact"
 enable_versioning = true
