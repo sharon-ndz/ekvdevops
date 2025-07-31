@@ -89,7 +89,7 @@ jobs:
 
       - name: Terraform Destroy Plan
         working-directory: infra/s3
-        run: terraform plan -destroy -var-file="${{ github.event.inputs.environment }}.tfvars"
+        run: terraform plan -destroy -var-file="${{ github.event.inputs.ENV }}.tfvars"
     
 
       - name: Destroy S3
