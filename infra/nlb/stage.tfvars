@@ -1,4 +1,4 @@
-tf_state_bucket = "my-terraform-state-bckt4321"
+tf_state_bucket = "stage-btl-idlms-backend-api-tfstate"
 environment     = "stage"
 region          = "eu-west-1"
 tf_state_region  = "eu-west-1"
