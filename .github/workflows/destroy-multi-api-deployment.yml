@@ -9,7 +9,7 @@ on:
         default: 'dev'
 
 env:
-  AWS_REGION: ${{ var.AWS_REGION}}
+  AWS_REGION: ${{ vars.AWS_REGION}}
   TF_BUCKET: ${{ github.event.inputs.ENV }}-btl-idlms-backend-api-tfstate
 
 jobs:
