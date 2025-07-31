@@ -79,13 +79,13 @@ jobs:
           cd infra/ssm
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
           terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
-      - name: Initialize Terraform
-        working-directory: infra/s3 # Or root if your destroy works from there
+          
+      - name: Initialize Terraform # (for S3 module in this example)
+        working-directory: infra/s3
         run: |
           terraform init \
             -backend-config="bucket=${TF_BUCKET}" \
-            -backend-config="key=${{ github.event.inputs.environment }}/s3/terraform.tfstate"
-
+            -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate" # <-- CHANGED 'environment' to 'ENV'
 
       - name: Terraform Destroy Plan
         working-directory: infra/s3
