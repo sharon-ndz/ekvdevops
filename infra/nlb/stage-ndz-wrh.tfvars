@@ -1,5 +1,5 @@
-tf_state_bucket = "{{env}}-btl-idlms-backend-api-tfstate"
-environment     = "{{env}}"
+tf_state_bucket = "stage-ndz-wrh-btl-idlms-backend-api-tfstate"
+environment     = "stage-ndz-wrh"
 region          = "eu-west-1"
 tf_state_region  = "eu-west-1"
 load_balancer_type = "network"
@@ -22,9 +22,9 @@ lb_egress_roles = [
 ]
 
 common_tags = {
-  Environment = "{{env}}"
+  Environment = "stage-ndz-wrh"
   Project     = "IDMS"
 }
-ssm_param_name         = "/{{env}}-cloudwatch/docker-config"
-ssm_tag_name           = "{{env}}-docker-cloudwatch-config"
+ssm_param_name         = "/stage-ndz-wrh-cloudwatch/docker-config"
+ssm_tag_name           = "stage-ndz-wrh-docker-cloudwatch-config"
 

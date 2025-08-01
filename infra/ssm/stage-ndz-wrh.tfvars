@@ -1,0 +1,6 @@
+environment = "stage-ndz-wrh"
+region = "eu-west-1"
+ssm_param_name         = "/idlms/shared/stage-ndz-wrh/.env"
+ssm_param_description  = "Shared environment variables for IDLMS in stage-ndz-wrh"
+ssm_param_app_tag      = "idlms"
+app_env_content         = ""
