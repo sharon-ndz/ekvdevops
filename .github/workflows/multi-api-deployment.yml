@@ -14,7 +14,6 @@ on:
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
   TF_BUCKET: ${{ github.event.inputs.ENV }}-btl-idlms-backend-api-tfstate
-  BACKUP_BUCKET: ${{ github.event.inputs.ENV }}-btl-idlms-backend-api-tfstate-backup
   TF_REGION: ${{ vars.AWS_REGION }}
  
 
@@ -43,6 +42,15 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get AWS Account ID
+        id: aws-account
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          echo "account_id=$ACCOUNT_ID" >> "$GITHUB_OUTPUT" 
+
+      - name: Set dynamic backup bucket name
+        run: echo "BACKUP_BUCKET=idlms-${{ github.event.inputs.ENV }}-built-artifact-${{ steps.aws-account.outputs.account_id }}" >> $GITHUB_ENV              
 
       - name: Terraform Apply VPC
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
@@ -113,8 +121,6 @@ jobs:
           cd infra/s3
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate" -backend-config="region=${TF_REGION}"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
-          RAW_OUTPUT=$(terraform output docker_backup_bucket_name)
-          echo "Raw output: $RAW_OUTPUT"
       
   
       - name: Upload docker-compose.yml to S3
