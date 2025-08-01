@@ -1,9 +1,23 @@
 data "aws_caller_identity" "current" {}
 
+resource "null_resource" "ensure_log_group_deleted" {
+  provisioner "local-exec" {
+    command = <<EOT
+      aws logs delete-log-group --log-group-name "${var.docker_log_group_name}" || true
+    EOT
+  }
+
+  triggers = {
+    always_run = timestamp()
+  }
+}
+
+
 resource "aws_cloudwatch_log_group" "docker_api" {
+  depends_on         = [null_resource.ensure_log_group_deleted]
   name              = var.docker_log_group_name
   retention_in_days = var.retention_in_days
-  skip_destroy      = true
+
 
   tags = {
     Name = var.log_group_tag_name

@@ -18,10 +18,10 @@ jobs:
     environment: ${{ github.event.inputs.ENV }}
 
     steps:
-      - name: Checkout feature/btl-48 codebase
+      - name: Checkout feature/btl-77 codebase
         uses: actions/checkout@v4
         with:
-          ref: feature/btl-48
+          ref: feature/btl-77
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -38,41 +38,42 @@ jobs:
       - name: Destroy CloudWatch
         run: |
           cd infra/cloudwatch
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate" -backend-config="region=${{ env.AWS_REGION }}
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
           terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Destroy API Gateway
         run: |
           cd infra/rest-api
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate" -backend-config="region=${{ env.AWS_REGION }}
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate"
           terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Destroy NLB
         run: |
           cd infra/nlb
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/nlb/terraform.tfstate" -backend-config="region=${{ env.AWS_REGION }}
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/nlb/terraform.tfstate"
           terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Destroy VPC
         run: |
           cd infra/vpc
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/vpc/terraform.tfstate" -backend-config="region=${{ env.AWS_REGION }}
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/vpc/terraform.tfstate"
           terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Destroy ECR
         run: |
           cd infra/ecr
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate" -backend-config="region=${{ env.AWS_REGION }}
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
           terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Destroy SSM
         run: |
           cd infra/ssm
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate" -backend-config="region=${{ env.AWS_REGION }}
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
           terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+
 
       - name: Destroy S3
         run: |
           cd infra/s3
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate" -backend-config="region=${{ env.AWS_REGION }}
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
           terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
