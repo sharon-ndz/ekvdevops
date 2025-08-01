@@ -1,94 +1,79 @@
-# --- Basic Setup ---
-environment =            # "dev", "stage", or "prod"
-region =                 # AWS region (e.g., "eu-west-1")
-instance_type =          # EC2 type (e.g., "t2.micro")
-ami_id =                 # AMI ID for EC2
+environment = "{{env}}"
+region      = "eu-west-1"
+ec2_ssm_profile_name = "{{env}}-ec2_ssm_profile"
+ec2_ssm_role_name    = "ec2_ssm_role-{{env}}"
+tf_state_bucket      = "{{env}}-btl-idlms-backend-api-tfstate"
+ami_id               = "ami-01f23391a59163da9"
+docker_artifact_bucket = "{{env}}-idlms-website-built-artifact"
+app_ports = [4000, 4001, 4002]
+enable_dns_support   = true
+enable_dns_hostnames = true
+vpc_name             = "{{env}}-idlms-vpc"
+vpc_cidr             = "10.122.0.0/16"
 
-# --- IAM / EC2 Role ---
-ec2_ssm_profile_name =   # Name of EC2 instance profile (for SSM access)
-ec2_ssm_role_name =      # Name of IAM role used in instance profile
-
-# --- VPC & Networking ---
-vpc_name =               # Name of your VPC
-vpc_cidr =               # VPC CIDR block (e.g., "10.0.0.0/16")
-enable_dns_support =     # true or false
-enable_dns_hostnames =   # true or false
-
-internet_gateway_name =          # Name for internet gateway
-total_nat_gateway_required =     # Number of NAT gateways (e.g., 1 or 3)
-eip_for_nat_gateway_name =       # Name prefix for Elastic IPs
-nat_gateway_name =               # Name prefix for NAT gateways
-
-# --- Public Subnets ---
-public_subnets = {
-  cidrs_blocks = []              # List of public subnet CIDRs
-  availability_zones = []       # List of AZs (e.g., ["eu-west-1a"])
-  subnets_name_prefix =         # Name prefix for subnets
-  route_table_name =            # Name of route table
-  map_public_ip_on_launch =     # true or false
-  routes = []                   # Optional routes
-}
-
-# --- Private Subnets ---
-private_subnets = {
-  cidrs_blocks = []             
-  availability_zones = []       
-  subnets_name_prefix =         
-  route_table_name =            
-  routes = []                   
-}
-
-# --- Load Balancer Subnets ---
-private_lb_subnets = {
-  cidrs_blocks = []             
-  availability_zones = []       
-  subnets_name_prefix =         
-  route_table_name =            
-  routes = []                   
-}
-
-# --- App Subnets ---
-private_app_subnets = {
-  cidrs_blocks = []             
-  availability_zones = []       
-  subnets_name_prefix =         
-  route_table_name =            
-  routes = []                   
-}
-
-# --- Data Subnets ---
-private_data_subnets = {
-  cidrs_blocks = []             
-  availability_zones = []       
-  subnets_name_prefix =         
-  route_table_name =            
-  routes = []                   
-  is_public =                   # true if this subnet needs public access
-}
-
-# --- Services Subnets ---
-private_services_subnets = {
-  cidrs_blocks = []             
-  availability_zones = []       
-  subnets_name_prefix =         
-  route_table_name =            
-  routes = []                   
-}
-
-# --- Application Config ---
-
-app_ports = []                  # List of app ports (e.g., [4000, 4001,4002])
-
-# --- Tags ---
 common_tags = {
-  Owner =                       # Who owns the resources (e.g., "DevOps Team")
-  Project =                     # Project name
-  Environment =                 # Environment again (e.g., "stage")
+  "Owner"      = "IDLMS"
+  "Project"    = "Terraform VPC"
+  "Environment"= "{{env}}"
+}
+
+internet_gateway_name = "{{env}}-idlms-igw"
+total_nat_gateway_required = 3
+eip_for_nat_gateway_name   = "{{env}}-idlms-eip"
+nat_gateway_name           = "{{env}}-idlms-ngw"
+
+public_subnets = {
+  cidrs_blocks         = ["10.122.1.0/24", "10.122.2.0/24"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b"]
+  subnets_name_prefix  = "{{env}}-public"
+  route_table_name     = "{{env}}-public"
+  map_public_ip_on_launch = true
+  routes               = []
+}
+
+private_subnets = {
+  cidrs_blocks         = ["10.122.10.0/24", "10.122.20.0/24"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b"]
+  subnets_name_prefix  = "{{env}}-private"
+  route_table_name     = "{{env}}-private"
+  routes               = []
+}
+
+private_lb_subnets = {
+  cidrs_blocks         = ["10.121.15.0/26", "10.121.15.64/26", "10.121.15.128/26"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+  subnets_name_prefix  = "{{env}}-lb"
+  route_table_name     = "{{env}}-lb"
+  routes               = []
+}
+
+private_app_subnets = {
+  cidrs_blocks         = ["10.121.16.0/22", "10.121.20.0/22", "10.121.24.0/22"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+  subnets_name_prefix  = "{{env}}-app"
+  route_table_name     = "{{env}}-app"
+  routes               = []
+}
+
+private_data_subnets = {
+  cidrs_blocks         = ["10.121.40.0/24", "10.121.41.0/24", "10.121.42.0/24"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+  subnets_name_prefix  = "{{env}}-data"
+  route_table_name     = "{{env}}-data"
+  routes               = []
+  is_public            = true
+}
+
+private_services_subnets = {
+  cidrs_blocks         = ["10.121.254.0/26", "10.121.254.64/26", "10.121.254.128/26"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+  subnets_name_prefix  = "{{env}}-service"
+  route_table_name     = "{{env}}-service"
+  routes               = []
 }
 
 ec2_tags = {
-  Name =                        # EC2 instance name tag
+  Name = "Backend API IDLMS-{{env}}"
 }
 
-# --- Terraform State ---
-tf_state_bucket =               # Name of the S3 bucket for Terraform state
+instance_type = "t2.micro"
