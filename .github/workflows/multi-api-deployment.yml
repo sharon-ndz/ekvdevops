@@ -13,8 +13,6 @@ on:
 
 env:
   AWS_REGION: eu-west-1
-  TF_BUCKET: my-terraform-state-bckt4321
-  BACKUP_BUCKET: idlms-stage-built-artifact1
 
 jobs:
   deploy:
@@ -25,10 +23,10 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout feature/btl-48 codebase
+      - name: Checkout dev-ec2-final codebase
         uses: actions/checkout@v4
         with:
-          ref: feature/btl-48
+          ref: dev-ec2-final
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -42,49 +40,72 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Get AWS Account ID
+        id: aws-account
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          echo "account_id=$ACCOUNT_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy Terraform Backend CloudFormation Stack
+        id: deploy-cfn
+        run: |
+          STACK_NAME="terraform-backend-${{ github.event.inputs.ENV }}-${{ steps.aws-account.outputs.account_id }}"
+          BUCKET_NAME="idlms-terraformstate-${{ github.event.inputs.ENV }}-${{ steps.aws-account.outputs.account_id }}"
+          TABLE_NAME="idlms-terraformstate-lock-${{ github.event.inputs.ENV }}-${{ steps.aws-account.outputs.account_id }}"
+
+          echo "Using stack name: $STACK_NAME"
+          echo "Using S3 bucket name: $BUCKET_NAME"
+          echo "Using DynamoDB table name: $TABLE_NAME"
+
+          aws cloudformation deploy \
+            --stack-name $STACK_NAME \
+            --template-file backend/templates/tf_state.yml \
+            --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
+            --parameter-overrides BucketName=$BUCKET_NAME TableName=$TABLE_NAME \
+            --region $AWS_REGION
+
+          echo "TF_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
+          echo "TF_DYNAMODB_TABLE=$TABLE_NAME" >> $GITHUB_ENV
+
+      - name: Set dynamic backup bucket name
+        run: echo "BACKUP_BUCKET=idlms-${{ github.event.inputs.ENV }}-built-artifact-${{ steps.aws-account.outputs.account_id }}" >> $GITHUB_ENV    
+
       - name: Terraform Apply VPC
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/vpc
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/vpc/terraform.tfstate"
+          terraform init -backend-config="bucket=${{ env.TF_BUCKET }}" -backend-config="dynamodb_table=${{ env.TF_DYNAMODB_TABLE }}" -backend-config="key=${{ github.event.inputs.ENV }}/vpc/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply NLB
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/nlb
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/nlb/terraform.tfstate"
+          terraform init -backend-config="bucket=${{ env.TF_BUCKET }}" -backend-config="dynamodb_table=${{ env.TF_DYNAMODB_TABLE }}" -backend-config="key=${{ github.event.inputs.ENV }}/nlb/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply API Gateway
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/rest-api
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate"
+          terraform init -backend-config="bucket=${{ env.TF_BUCKET }}" -backend-config="dynamodb_table=${{ env.TF_DYNAMODB_TABLE }}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply CloudWatch
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/cloudwatch
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
+          terraform init -backend-config="bucket=${{ env.TF_BUCKET }}" -backend-config="dynamodb_table=${{ env.TF_DYNAMODB_TABLE }}" -backend-config="key=${{ github.event.inputs.ENV }}/cloudwatch/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply ECR
         id: ecr
         run: |
           cd infra/ecr
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
+          terraform init -backend-config="bucket=${{ env.TF_BUCKET }}" -backend-config="dynamodb_table=${{ env.TF_DYNAMODB_TABLE }}" -backend-config="key=${{ github.event.inputs.ENV }}/ecr/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
-          RAW_OUTPUT=$(terraform output -raw ecr_repository_url 2>&1)
-          ECR_REPO_URL=$(${TERRAFORM_CLI_PATH}/terraform-bin output -raw ecr_repository_url)
-          echo "Raw Terraform Output: [$RAW_OUTPUT]"
-
-          #ECR_REPO_URL=$(terraform output -raw ecr_repository_url | xargs)
-          #ECR_REPO_URL1=$(terraform output -raw ecr_repository_url | xargs)
+          ECR_REPO_URL=$(terraform output -raw ecr_repository_url)
           echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
-          echo $ECR_REPO_URL
-          echo $GITHUB_ENV
 
       - name: Terraform Apply SSM
         id: ssm
@@ -98,7 +119,7 @@ jobs:
             BASE64_ENV=$(echo "# placeholder env" | base64 -w 0)
           fi
 
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
+          terraform init -backend-config="bucket=${{ env.TF_BUCKET }}" -backend-config="dynamodb_table=${{ env.TF_DYNAMODB_TABLE }}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars" -var="app_env_content=${BASE64_ENV}"
 
           SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm:\/\///')
@@ -108,18 +129,14 @@ jobs:
         id: s3_apply
         run: |
           cd infra/s3
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
+          terraform init -backend-config="bucket=${{ env.TF_BUCKET }}" -backend-config="dynamodb_table=${{ env.TF_DYNAMODB_TABLE }}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
-          RAW_OUTPUT=$(terraform output docker_backup_bucket_name)
-          echo "Raw output: $RAW_OUTPUT"
       
-  
       - name: Upload docker-compose.yml to S3
         run: |
           echo "Uploading to bucket: $BACKUP_BUCKET"
           aws s3 cp docker/docker-compose.yml s3://$BACKUP_BUCKET/${{ github.event.inputs.ENV }}/docker-compose.yml   
-      
-          
+
       - name: Print ECR URL
         run: echo "Using ECR:$ECR_REPO_URL"
         
