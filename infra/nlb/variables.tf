@@ -104,6 +104,3 @@ variable "tf_state_region" {
   type        = string
 }
 
-variable "tf_state_key" {
-  type = string
-}
