@@ -18,3 +18,8 @@ variable "scan_on_push" {
 variable "encryption_type" {
   type        = string
 }
+
+variable "tf_state_bucket" {
+  description = "Terraform remote state S3 bucket name"
+  type        = string
+}
