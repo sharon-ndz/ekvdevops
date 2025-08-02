@@ -103,3 +103,7 @@ variable "tf_state_region" {
   description = "Region of the Terraform backend bucket"
   type        = string
 }
+
+variable "tf_state_key" {
+  type = string
+}
