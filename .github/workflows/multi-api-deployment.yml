@@ -176,12 +176,20 @@ jobs:
           SSM_ENV_PARAM=$(terraform output -raw ssm_env_param_name | tr -d '\r\n' | sed 's/^ssm:\/\///')
           echo "SSM_ENV_PARAM=$SSM_ENV_PARAM" >> $GITHUB_ENV
 
-      #- name: Terraform Apply S3
-       # id: s3_apply
-       # run: |
-         # cd infra/s3
-         # terraform init -backend-config="bucket=${{ env.TF_BUCKET }}" -backend-config="dynamodb_table=${{ env.TF_DYNAMODB_TABLE }}" -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
-         # terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
+      - name: Terraform Apply S3
+        id: s3_apply
+        run: |
+          cd infra/s3
+          terraform init \
+             -backend-config="bucket=$TF_STATE_BUCKET" \
+             -backend-config="dynamodb_table=$TF_DYNAMODB_TABLE" \
+             -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate" \
+             -backend-config="region=${{ env.AWS_REGION }}"
+
+          terraform apply -auto-approve \
+             -var-file="${{ github.event.inputs.ENV }}.tfvars" \
+             -var="tf_state_bucket=$TF_STATE_BUCKET" \
+             -var="environment=${{ github.event.inputs.ENV }}"
       
       - name: Upload docker-compose.yml to S3
         run: |
