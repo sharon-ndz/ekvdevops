@@ -4,7 +4,6 @@ ec2_ssm_profile_name = "stage-ec2_ssm_profile"
 ec2_ssm_role_name    = "ec2_ssm_role-stage"
 tf_state_bucket      = "my-terraform-state-bckt43"
 ami_id               = "ami-020cba7c55df1f615"
-docker_artifact_bucket = "idlms-website-built-artifact"
 app_ports = [4000, 4001, 4002]
 enable_dns_support   = true
 enable_dns_hostnames = true
