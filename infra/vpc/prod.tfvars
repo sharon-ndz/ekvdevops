@@ -2,7 +2,7 @@ environment = "prod"
 region      = "eu-west-1"
 ec2_ssm_profile_name = "prod-ec2_ssm_profile"
 ec2_ssm_role_name    = "ec2_ssm_role-prod"
-ami_id               = "ami-020cba7c55df1f615"
+ami_id               = "ami-01f23391a59163da9"
 app_ports = [4000, 4001, 4002]
 
 enable_dns_support   = true
