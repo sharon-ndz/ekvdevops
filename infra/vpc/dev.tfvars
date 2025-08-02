@@ -5,7 +5,6 @@ ec2_ssm_profile_name = "ec2_ssm_profile--dev"
 ec2_ssm_role_name    = "dev-ec2_ssm_role"
 ami_id               = "ami-01f23391a59163da9"
 app_ports = [4000, 4001, 4002]
-tf_state_bucket      = "my-terraform-state-bckt4321"
 enable_dns_support   = true
 enable_dns_hostnames = true
 vpc_name             = "dev-idlms-vpc"
