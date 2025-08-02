@@ -50,7 +50,8 @@ jobs:
         id: deploy-cfn
         run: |
           STACK_NAME="terraform-backend-${{ github.event.inputs.ENV }}-${{ steps.aws-account.outputs.account_id }}"
-          TF_STATE_BUCKET="idlms-terraformstate-${{ github.event.inputs.ENV }}-${{ steps.aws-account.outputs.account_id }}"
+          #TF_STATE_BUCKET="idlms-terraformstate-${{ github.event.inputs.ENV }}-${{ steps.aws-account.outputs.account_id }}"
+          TF_STATE_BUCKET="idlms-terraformstate-${{ steps.aws-account.outputs.account_id }}"
           TABLE_NAME="idlms-terraformstate-lock-${{ github.event.inputs.ENV }}-${{ steps.aws-account.outputs.account_id }}"
 
           echo "Using stack name: $STACK_NAME"
