@@ -44,7 +44,7 @@ jobs:
       - name: Destroy API Gateway
         run: |
           cd infra/rest-api
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/rest-api/terraform.tfstate"
           terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Destroy NLB

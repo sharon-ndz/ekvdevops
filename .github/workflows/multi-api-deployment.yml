@@ -70,7 +70,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/rest-api
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/http-api/terraform.tfstate" -backend-config="region=${TF_REGION}"
+          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/rest-api/terraform.tfstate" -backend-config="region=${TF_REGION}"
           terraform refresh -var-file="${{ github.event.inputs.ENV }}.tfvars"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
