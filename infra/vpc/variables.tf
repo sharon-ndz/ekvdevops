@@ -176,10 +176,6 @@ variable "cloudwatch_agent_policy_arn" {
   default     = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
-variable "docker_artifact_bucket" {
-  description = "S3 bucket name used to store Docker backup images"
-  type        = string
-}
 
 variable "app_ports" {
   description = "List of application ports to allow"
