@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    key    = "dev/vpc/terraform.tfstate"
+    key    = "vpc/terraform.tfstate"
     region = "eu-west-1"
     encrypt = true
   }
