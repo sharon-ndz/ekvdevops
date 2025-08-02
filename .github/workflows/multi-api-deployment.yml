@@ -61,7 +61,7 @@ jobs:
             --stack-name $STACK_NAME \
             --template-file infra/backend/templates/tf_state.yml \
             --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
-            --parameter-overrides BucketName=$BUCKET_NAME TableName=$TABLE_NAME \
+            --parameter-overrides BucketName=$TF_STATE_BUCKET TableName=$TABLE_NAME \
             --region $AWS_REGION
 
           echo "TF_STATE_BUCKET=$TF_STATE_BUCKET" >> $GITHUB_ENV
