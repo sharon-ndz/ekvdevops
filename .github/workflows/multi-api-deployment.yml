@@ -149,15 +149,21 @@ jobs:
            
    
           export TF_CLI_ARGS="-no-color"
-          ECR_REPO_URL=$(terraform output -raw ecr_repository_url 2>/dev/null | tr -d '\r')
 
-  
-          if [[ "$ECR_REPO_URL" == *"::"* ]]; then
-           echo "ECR_REPO_URL contains invalid '::'. Skipping export."
-           exit 1
+          echo "Fetching Terraform ECR output..."
+          ECR_REPO_URL=$(terraform output -raw ecr_repository_url 2>&1 || echo "")
+
+ 
+          ECR_REPO_URL=$(echo "$ECR_REPO_URL" | tr -d '\r')
+
+          echo "Terraform returned ECR_REPO_URL: $ECR_REPO_URL"
+
+          if [[ -z "$ECR_REPO_URL" || "$ECR_REPO_URL" == *"::"* ]]; then
+            echo "Invalid or empty ECR_REPO_URL. Aborting."
+            exit 1
           fi
 
-          echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
+           echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
 
       - name: Terraform Apply SSM
         id: ssm
