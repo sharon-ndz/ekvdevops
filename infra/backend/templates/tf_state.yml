@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Terraform State Resources
+
+###############################
+## CloudFormation Conditions ##
+## Conditions to create bucket and table if values exist 
+############################### 
+Conditions:
+  BucketNameOmitted: !Or
+    - !Equals [ !Ref 'BucketName', '' ]
+    - !Equals [ !Ref 'BucketName', undefined ]
+  TableNameOmitted: !Or
+    - !Equals [ !Ref 'TableName', '' ]
+    - !Equals [ !Ref 'TableName', undefined ]
+
+###############################
+## CloudFormation Parameters ##
+## S3 Bucket Name
+## DynamoDb TableName
+###############################    
+Parameters:
+  BucketName:
+    Default: ''
+    Description: (optional) Name for the S3 bucket
+    Type: String
+  TableName:
+    Default: ''
+    Description: (optional) Name for the DynamoDB table
+    Type: String
+
+###############################
+## CloudFormation Resources ##
+## S3 Bucket
+## DynamoDb Table
+###############################        
+Resources:
+  TerraformStateBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      AccessControl: Private
+      BucketName: !If
+        - BucketNameOmitted
+        - !Ref 'AWS::NoValue'
+        - !Ref 'BucketName'
+      BucketEncryption:  
+        ServerSideEncryptionConfiguration: 
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256     
+      LifecycleConfiguration:
+        Rules:
+          - NoncurrentVersionExpirationInDays: 90
+            Status: Enabled
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True  
+      Tags:
+        - Key: Environment
+          Value: !Ref 'AWS::StackName'
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  TerraformStateTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: LockID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: LockID
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      TableName: !If
+        - TableNameOmitted
+        - !Ref 'AWS::NoValue'
+        - !Ref 'TableName'
+      Tags:
+        - Key: Environment
+          Value: !Ref 'AWS::StackName'
+        - Key: ManagedBy
+          Value: CloudFormation
+
+###############################
+## CloudFormation Outputs ##
+## S3 Bucket ARN
+## S3 Bucket Name
+## Dynamo DB Table Name
+############################### 
+Outputs:
+  TerraformStateBucketArn:
+    Description: Arn of bucket storing Terraform state
+    Value: !GetAtt 'TerraformStateBucket.Arn'
+  TerraformStateBucketName:
+    Description: Name of bucket storing Terraform state
+    Value: !Ref 'TerraformStateBucket'
+  TerraformStateTableName:
+    Description: Name of DynamoDB table for Terraform state
+    Value: !Ref 'TerraformStateTable'
+

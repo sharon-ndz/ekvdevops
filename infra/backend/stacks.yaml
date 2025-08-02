@@ -1,0 +1,10 @@
+namespace: ${environment}-${aws_account_id}-terraformstate
+cfngin_bucket: ${environment}-${aws_account_id}-terraformstate
+
+stacks:
+  tf-state:
+    template_path: templates/tf_state.yml
+    variables:
+      BucketName: ek-${aws_account_id}-${environment}-tfstate
+      TableName: ek-${aws_account_id}-${environment}-lock
+
