@@ -26,3 +26,8 @@ variable "ssm_param_app_tag" {
   type        = string
   description = "App tag for the SSM parameter"
 }
+
+variable "tf_state_bucket" {
+  description = "Terraform remote state S3 bucket name"
+  type        = string
+}
