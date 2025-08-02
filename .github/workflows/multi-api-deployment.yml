@@ -59,12 +59,19 @@ jobs:
           echo "Using S3 bucket name: $TF_STATE_BUCKET"
           echo "Using DynamoDB table name: $TABLE_NAME"
 
+
           aws cloudformation deploy \
-            --stack-name $STACK_NAME \
-            --template-file infra/backend/templates/tf_state.yml \
-            --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
-            --parameter-overrides BucketName=$TF_STATE_BUCKET TableName=$TABLE_NAME \
-            --region $AWS_REGION
+           --stack-name $STACK_NAME \
+          --template-file infra/backend/templates/tf_state.yml \
+          --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
+          --parameter-overrides BucketName=$TF_STATE_BUCKET TableName=$TABLE_NAME \
+          --region $AWS_REGION \
+          --no-fail-on-empty-changeset
+
+  
+
+
+          
 
           echo "TF_STATE_BUCKET=$TF_STATE_BUCKET" >> $GITHUB_ENV
           echo "TF_DYNAMODB_TABLE=$TABLE_NAME" >> $GITHUB_ENV
