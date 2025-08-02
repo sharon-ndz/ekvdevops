@@ -1,9 +1,9 @@
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = var.tf_state_bucket
+    bucket = "idlms-terraformstate-dev-574643567490"
     key    = "dev/vpc/terraform.tfstate"
-    region = var.tf_state_region
+    region = eu-west-1
   }
 }
 
