@@ -70,7 +70,7 @@ jobs:
 
 
       - name: Set dynamic backup bucket name
-        run: echo "BACKUP_BUCKET=idlms-${{ github.event.inputs.ENV }}-built-artifact-${{ steps.aws-account.outputs.account_id }}" >> $GITHUB_ENV    
+        run: echo "BACKUP_BUCKET=idlms-built-artifact-${{ steps.aws-account.outputs.account_id }}" >> $GITHUB_ENV    
 
       - name: Terraform Apply VPC
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
