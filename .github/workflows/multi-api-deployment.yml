@@ -147,23 +147,16 @@ jobs:
            -var="tf_state_bucket=$TF_STATE_BUCKET" \
            -var="environment=${{ github.event.inputs.ENV }}"
            
+          RAW_OUTPUT=$(terraform output -raw ecr_repository_url 2>&1)
+          ECR_REPO_URL=$(${TERRAFORM_CLI_PATH}/terraform-bin output -raw ecr_repository_url)
+          echo "Raw Terraform Output: [$RAW_OUTPUT]"
+
+          #ECR_REPO_URL=$(terraform output -raw ecr_repository_url | xargs)
+          #ECR_REPO_URL1=$(terraform output -raw ecr_repository_url | xargs)
+          echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
+          echo $ECR_REPO_URL
+          echo $GITHUB_ENV      
    
-          export TF_CLI_ARGS="-no-color"
-
-          echo "Fetching Terraform ECR output..."
-          ECR_REPO_URL=$(terraform output -raw ecr_repository_url 2>&1 || echo "")
-
- 
-          ECR_REPO_URL=$(echo "$ECR_REPO_URL" | tr -d '\r')
-
-          echo "Terraform returned ECR_REPO_URL: $ECR_REPO_URL"
-
-          if [[ -z "$ECR_REPO_URL" || "$ECR_REPO_URL" == *"::"* ]]; then
-            echo "Invalid or empty ECR_REPO_URL. Aborting."
-            exit 1
-          fi
-
-           echo "ECR_REPO_URL=$ECR_REPO_URL" >> $GITHUB_ENV
 
       - name: Terraform Apply SSM
         id: ssm
