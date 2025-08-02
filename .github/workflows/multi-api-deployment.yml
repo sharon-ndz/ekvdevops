@@ -59,7 +59,7 @@ jobs:
 
           aws cloudformation deploy \
             --stack-name $STACK_NAME \
-            --template-file backend/templates/tf_state.yml \
+            --template-file infra/backend/templates/tf_state.yml \
             --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
             --parameter-overrides BucketName=$BUCKET_NAME TableName=$TABLE_NAME \
             --region $AWS_REGION
