@@ -198,6 +198,7 @@
 			"Sid": "EC2AndVPCManagement",
 			"Effect": "Allow",
 			"Action": [
+				"ec2:ModifyNetworkInterfaceAttribute",
 				"ec2:CreateVpc",
 				"ec2:DeleteVpc",
 				"ec2:DescribeVpcs",
