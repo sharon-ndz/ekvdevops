@@ -1,4 +1,4 @@
-tf_state_bucket = "stage-ndz-wrh-btl-idlms-backend-api-tfstate"
+tf_state_bucket = "stage-ndz-wrh-btl-idlms-sharon-backend-api-tfstate"
 environment     = "stage-ndz-wrh"
 region          = "eu-west-1"
 tf_state_region  = "eu-west-1"
