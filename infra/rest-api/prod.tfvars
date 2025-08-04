@@ -17,5 +17,5 @@ logging_level        = "INFO"
 data_trace_enabled   = false
 
 api_port = 4000
-tf_state_bucket  = "my-terraform-state-bckt4321"
+tf_state_bucket  = "stage-ndz-wrh-btl1-idlms-sharon-backend-api-tfstate"
 tf_state_region  = "eu-west-1"
