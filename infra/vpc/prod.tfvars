@@ -2,10 +2,10 @@ environment = "prod"
 region      = "eu-west-1"
 ec2_ssm_profile_name = "prod-ec2_ssm_profile"
 ec2_ssm_role_name    = "ec2_ssm_role-prod"
-tf_state_bucket      = "my-terraform-state-bckt4321"
-ami_id               = "ami-020cba7c55df1f615"
+tf_state_bucket      = "stage-ndz-wrh-btl1-idlms-sharon-backend-api-tfstate"
+ami_id               = "ami-01f23391a59163da9"
 app_ports = [4000, 4001, 4002]
-docker_artifact_bucket = "idlms-website-built-artifact"
+docker_artifact_bucket = "idlms-stage-ndz-wrh-built-artifact-592776312448"
 
 enable_dns_support   = true
 enable_dns_hostnames = true
