@@ -7,7 +7,7 @@ on:
         description: 'Environment to deploy (dev/staging/prod)'
         required: true
         default: "stage"
-      ROLLBACK_TAG: 2025.08.04.150
+      ROLLBACK_TAG: 
         description: 'Optional: Previous build tag (e.g., 2025.06.30.02). If left blank, deploys latest.'
         required: false
 
