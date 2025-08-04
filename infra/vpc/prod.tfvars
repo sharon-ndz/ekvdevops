@@ -74,7 +74,7 @@ private_services_subnets = {
 }
 
 ec2_tags = {
-  Name = "Backend API IDLMS-stage"
+  Name = "Backend API IDLMS-prod"
 }
 
 instance_type = "t3.micro"
