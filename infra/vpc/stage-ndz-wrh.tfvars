@@ -76,4 +76,4 @@ ec2_tags = {
   Name = "Backend API IDLMS-stage-ndz-wrh"
 }
 
-instance_type = "t2.medium"
+instance_type = "t3.micro"
