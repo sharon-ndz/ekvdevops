@@ -26,10 +26,10 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout feature/btl-77 codebase
+      - name: Checkout feature/btl-88 codebase
         uses: actions/checkout@v4
         with:
-          ref: feature/btl-77
+          ref: feature/btl-88
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
