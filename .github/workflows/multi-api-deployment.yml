@@ -13,7 +13,7 @@ on:
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
-  TF_BUCKET: ${{ github.event.inputs.ENV }}-btl-idlms-backend-api-tfstate
+  TF_BUCKET: ${{ github.event.inputs.ENV }}-btl-idlms-sharon-backend-api-tfstate
   TF_REGION: ${{ vars.AWS_REGION }}
  
 
