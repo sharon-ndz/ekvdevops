@@ -1,6 +1,6 @@
 environment = "prod"
 region      = "eu-west-1"
-tf_state_bucket = "stage-ndz-wrh-btl1-idlms-sharon-backend-api-tfstate"
+tf_state_bucket = "prod-btl1-idlms-sharon-backend-api-tfstate"
 log_group_tag_name    = "prod-DockerAPI"
 ssm_param_name              = "/prod-cloudwatch/docker-config"
 docker_log_group_name       = "/prod/docker/api"
