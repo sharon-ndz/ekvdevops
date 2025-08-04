@@ -25,7 +25,7 @@ nat_gateway_name           = "prod-idlms-ngw"
 
 public_subnets = {
   cidrs_blocks         = ["10.123.1.0/24", "10.123.2.0/24"]
-  availability_zones   = ["us-east-1a", "us-east-1b"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b"]
   subnets_name_prefix  = "prod-public"
   route_table_name     = "prod-public"
   map_public_ip_on_launch = true
@@ -34,7 +34,7 @@ public_subnets = {
 
 private_subnets = {
   cidrs_blocks         = ["10.123.10.0/24", "10.123.20.0/24"]
-  availability_zones   = ["us-east-1a", "us-east-1b"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b"]
   subnets_name_prefix  = "prod-private"
   route_table_name     = "prod-private"
   routes               = []
@@ -42,7 +42,7 @@ private_subnets = {
 
 private_lb_subnets = {
   cidrs_blocks         = ["10.123.15.0/26", "10.123.15.64/26", "10.123.15.128/26"]
-  availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   subnets_name_prefix  = "prod-lb"
   route_table_name     = "prod-lb"
   routes               = []
@@ -50,7 +50,7 @@ private_lb_subnets = {
 
 private_app_subnets = {
   cidrs_blocks         = ["10.123.16.0/22", "10.123.20.0/22", "10.123.24.0/22"]
-  availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   subnets_name_prefix  = "prod-app"
   route_table_name     = "prod-app"
   routes               = []
@@ -58,7 +58,7 @@ private_app_subnets = {
 
 private_data_subnets = {
   cidrs_blocks         = ["10.123.40.0/24", "10.123.41.0/24", "10.123.42.0/24"]
-  availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   subnets_name_prefix  = "prod-data"
   route_table_name     = "prod-data"
   routes               = []
@@ -67,7 +67,7 @@ private_data_subnets = {
 
 private_services_subnets = {
   cidrs_blocks         = ["10.123.254.0/26", "10.123.254.64/26", "10.123.254.128/26"]
-  availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   subnets_name_prefix  = "prod-service"
   route_table_name     = "prod-service"
   routes               = []
@@ -77,4 +77,4 @@ ec2_tags = {
   Name = "Backend API IDLMS-stage"
 }
 
-instance_type = "t2.micro"
+instance_type = "t3.micro"
