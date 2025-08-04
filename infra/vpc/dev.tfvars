@@ -79,4 +79,4 @@ ec2_tags = {
   Name = "Backend API IDLMS-dev"
 }
 
-instance_type = "t3.micro"
+instance_type = "t2.medium"
