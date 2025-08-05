@@ -19,9 +19,9 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.ENV || 'stage' }}
+    environment: ${{ github.event.inputs.ENV }}
     env:
-      TF_BUCKET: "${{ github.event.inputs.ENV }}-btl1-idlms-sharon-backend-api-tfstate"
+      TF_BUCKET: ${{ github.event.inputs.ENV }}-btl1-idlms-sharon-backend-api-tfstate
     permissions:
       id-token: write
       contents: read
