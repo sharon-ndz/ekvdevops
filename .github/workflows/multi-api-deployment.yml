@@ -13,7 +13,6 @@ on:
 
 env:
   AWS_REGION: eu-west-1
-  TF_BUCKET: ${{ github.event.inputs.ENV }}-btl1-idlms-sharon-backend-api-tfstate
   TF_REGION: eu-west-1
  
 
@@ -21,6 +20,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.ENV || 'stage' }}
+    env:
+      TF_BUCKET: "${{ github.event.inputs.ENV }}-btl1-idlms-sharon-backend-api-tfstate"
     permissions:
       id-token: write
       contents: read
